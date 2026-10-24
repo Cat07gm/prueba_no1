@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "## ",
+    "#x ",
+    " x "
+  ],
+  "key": {
+    "#": "prueba_no1:scarlet_ingot",
+    "x": "minecraft:cobbled_deepslate"
+  },
+  "result": {
+    "id": "prueba_no1:scarlet_axe",
+    "count": 1
+  }
+}

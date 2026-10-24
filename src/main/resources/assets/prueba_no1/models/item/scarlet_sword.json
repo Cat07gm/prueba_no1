@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "prueba_no1:item/scarlet_sword"
+  }
+}

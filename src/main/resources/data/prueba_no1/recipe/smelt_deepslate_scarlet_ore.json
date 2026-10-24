@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": "prueba_no1:deepslate_scarlet_ore",
+  "result": {
+    "id": "prueba_no1:scarlet_ingot"
+  },
+  "experience": 2.0,
+  "cookingtime": 200
+}

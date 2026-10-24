@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "prueba_no1:scarlet_block"
+  ],
+  "result": {
+    "id": "prueba_no1:scarlet_ingot",
+    "count": 9
+  }
+}

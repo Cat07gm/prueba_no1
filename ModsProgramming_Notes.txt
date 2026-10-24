@@ -1,0 +1,20 @@
+1. Entorno y Herramientas
+Compatibilidad de Versiones: Para modificar Minecraft 1.21 (y versiones como 1.21.4), es obligatorio utilizar Java 21.
+
+Gradle: Es el motor de construcción del proyecto. Se encarga de descargar el código fuente de Minecraft, configurar la API de Fabric y preparar el espacio de trabajo en IntelliJ. Tarda mucho en la primera carga, pero es normal.
+
+Plugin Recomendado: Minecraft Development. Es una extensión para IntelliJ que autocompleta código específico de Minecraft y detecta errores comunes.
+
+2. Estructura del Proyecto
+Identidad del Mod: El Mod ID (ej. prueba_no1) y el Package (ej. pruebano1.modid) son el ADN del proyecto. Siempre deben escribirse en minúsculas y sin espacios.
+
+Separación de Conceptos: En Minecraft, la lógica y el arte no se mezclan. El código Java (en la carpeta src/main/java) dicta qué hace un objeto; los archivos de recursos (en src/main/resources) dictan cómo se ve.
+
+Carpeta Resources: Es donde el juego busca estrictamente las imágenes (textures), las formas (models), los nombres traducidos (lang) y los sonidos.
+
+3. Programación en Java (Reglas 1.21.4)
+Organización del Código: Como buena práctica, nunca se debe amontonar todo en la clase principal. Se deben crear clases separadas (como ModItem.java) para agrupar los nuevos objetos.
+
+El Requisito del RegistryKey: A partir de Minecraft 1.21.4, los desarrolladores del juego exigen que todo ítem nuevo tenga su propia "Llave de Registro" (RegistryKey) inyectada en sus propiedades (.Settings()) antes de crearse. Si falta esto, el juego chocará (error Item id not set).
+
+El Proceso de Inicialización: Para que un ítem exista en el juego, primero se define, luego se registra en la base de datos interna (Registries.ITEM), y finalmente se debe "llamar" esa función desde el método onInitialize() de la clase principal para que se ejecute al arrancar.
