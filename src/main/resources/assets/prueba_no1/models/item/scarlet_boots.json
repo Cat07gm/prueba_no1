@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "prueba_no1:item/scarlet_boots"
+  }
+}

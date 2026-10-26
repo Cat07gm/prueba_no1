@@ -30,7 +30,7 @@ public class ModArmorMaterials {
             }), // Puntos de defensa exactos por pieza
             22, // Encantabilidad (Nivel Oro)
             SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND, // Sonido al equipar
-            2.0F, // Dureza (Toughness) - Nivel Diamante
+            2.5F, // Dureza (Toughness) - Nivel Diamante 2.0F
             0.0F, // Resistencia al empuje
             ModToolMaterials.SCARLET_REPAIR, // Reutilizamos la etiqueta de reparación
             SCARLET_ASSET_KEY // Inyectamos la conexión visual
