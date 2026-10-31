@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "# #"
+  ],
+  "key": {
+    "#": "prueba_no1:scarlet_ingot"
+  },
+  "result": {
+    "id": "prueba_no1:scarlet_helmet",
+    "count": 1
+  }
+}

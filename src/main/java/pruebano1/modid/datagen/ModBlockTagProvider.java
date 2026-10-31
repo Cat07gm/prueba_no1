@@ -1,0 +1,35 @@
+package pruebano1.modid.datagen;
+
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.tag.BlockTags;
+import pruebano1.modid.ModBlocks;
+
+import java.util.concurrent.CompletableFuture;
+
+/**
+ * Generador de Tags de Bloques (con qué herramienta se pica y qué nivel de pico requiere).
+ * Crea los archivos JSON en data/minecraft/tags/block/.
+ */
+public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
+
+    public ModBlockTagProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+        super(output, registriesFuture);
+    }
+
+    @Override
+    protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
+        // Bloques que se pican rápido con el pico
+        getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
+                .add(ModBlocks.SCARLET_ORE)
+                .add(ModBlocks.DEEPSLATE_SCARLET_ORE)
+                .add(ModBlocks.SCARLET_BLOCK);
+
+        // Bloques que requieren al menos pico de hierro (o puedes usar NEEDS_DIAMOND_TOOL)
+        getOrCreateTagBuilder(BlockTags.NEEDS_IRON_TOOL)
+                .add(ModBlocks.SCARLET_ORE)
+                .add(ModBlocks.DEEPSLATE_SCARLET_ORE)
+                .add(ModBlocks.SCARLET_BLOCK);
+    }
+}

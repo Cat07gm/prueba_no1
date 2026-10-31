@@ -30,6 +30,7 @@ dependencies {
 processResources {
 	def version = project.version
 	inputs.property "version", version
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
 	filesMatching("fabric.mod.json") {
 		expand "version": version

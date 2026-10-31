@@ -1,4 +1,5 @@
 {
+  "itemgroup.prueba_no1.scarlet_group": "Arsenal Scarlet",
   "item.prueba_no1.scarlet_ingot": "barra flipante de color rojo",
   "block.prueba_no1.scarlet_ore": "Mineral rojito de ostias",
   "item.prueba_no1.scarlet_ore": "Mineral rojito de Ostias",
@@ -10,5 +11,9 @@
   "item.prueba_no1.scarlet_pickaxe": "El flipante picador a todo gas",
   "item.prueba_no1.scarlet_axe": "El corta madera rojizo",
   "item.prueba_no1.scarlet_shovel": "Menuda pala te cargas, tío",
-  "item.prueba_no1.scarlet_hoe": "azador de cultivetes"
+  "item.prueba_no1.scarlet_hoe": "azador de cultivetes",
+  "item.prueba_no1.scarlet_helmet": "Casco rojizo de ostias",
+  "item.prueba_no1.scarlet_chestplate": "Pechera rojiza blindada",
+  "item.prueba_no1.scarlet_leggings": "Pantalones rojizos",
+  "item.prueba_no1.scarlet_boots": "Botas rojizas a todo gas"
 }
