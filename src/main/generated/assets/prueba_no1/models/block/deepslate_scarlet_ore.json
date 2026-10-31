@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "prueba_no1:block/deepslate_scarlet_ore"
+  }
+}

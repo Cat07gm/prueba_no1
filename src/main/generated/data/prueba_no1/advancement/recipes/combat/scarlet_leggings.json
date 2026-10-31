@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_scarlet_ingot": {
+      "conditions": {
+        "items": [
+          {
+            "items": "prueba_no1:scarlet_ingot"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "prueba_no1:scarlet_leggings"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_scarlet_ingot"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "prueba_no1:scarlet_leggings"
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+// 1.21.4	-999999999-01-01T00:00:00	prueba_no1/Block Loot Tables
+1793fa8b347cc4723d2b85639d7640f99072dbfd data/prueba_no1/loot_table/blocks/deepslate_scarlet_ore.json
+b9e820a4e7f0022b03f506bf6c50276b745d993a data/prueba_no1/loot_table/blocks/scarlet_block.json
+6ebb803f0baeae27083971da7f29780e76907418 data/prueba_no1/loot_table/blocks/scarlet_ore.json
