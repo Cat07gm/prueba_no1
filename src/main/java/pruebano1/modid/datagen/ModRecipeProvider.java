@@ -6,6 +6,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.data.recipe.RecipeExporter;
 import net.minecraft.data.recipe.RecipeGenerator;
 import net.minecraft.item.ItemConvertible;
+import net.minecraft.item.Items;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryWrapper;
 import pruebano1.modid.ModBlocks;
@@ -116,6 +117,17 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .pattern("# #")
                         .pattern("# #")
                         .input('#', ModItem.SCARLET_INGOT)
+                        .criterion(hasItem(ModItem.SCARLET_INGOT), conditionsFromItem(ModItem.SCARLET_INGOT))
+                        .offerTo(exporter);
+
+                // 5. Scarty (Elytra de Escarlata: Membrana de Phantom + Lingote de Escarlata + Diamante)
+                createShaped(RecipeCategory.COMBAT, ModItem.SCARTY)
+                        .pattern("M#M")
+                        .pattern("#D#")
+                        .pattern("M M")
+                        .input('M', Items.PHANTOM_MEMBRANE)
+                        .input('#', ModItem.SCARLET_INGOT)
+                        .input('D', Items.DIAMOND)
                         .criterion(hasItem(ModItem.SCARLET_INGOT), conditionsFromItem(ModItem.SCARLET_INGOT))
                         .offerTo(exporter);
             }

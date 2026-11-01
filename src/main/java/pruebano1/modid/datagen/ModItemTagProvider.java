@@ -34,8 +34,10 @@ public class ModItemTagProvider extends FabricTagProvider.ItemTagProvider {
 
         // Tags de armaduras (necesarios para encantamientos como Protección, Caída de Pluma, etc.)
         getOrCreateTagBuilder(ItemTags.HEAD_ARMOR).add(ModItem.SCARLET_HELMET);
-        getOrCreateTagBuilder(ItemTags.CHEST_ARMOR).add(ModItem.SCARLET_CHESTPLATE);
+        getOrCreateTagBuilder(ItemTags.CHEST_ARMOR).add(ModItem.SCARLET_CHESTPLATE).add(ModItem.SCARTY);
         getOrCreateTagBuilder(ItemTags.LEG_ARMOR).add(ModItem.SCARLET_LEGGINGS);
         getOrCreateTagBuilder(ItemTags.FOOT_ARMOR).add(ModItem.SCARLET_BOOTS);
+        getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE).add(ModItem.SCARTY);
+        getOrCreateTagBuilder(ItemTags.EQUIPPABLE_ENCHANTABLE).add(ModItem.SCARTY);
     }
 }

@@ -1,0 +1,10 @@
+{
+  "layers": {
+    "wings": [
+      {
+        "texture": "prueba_no1:scarty",
+        "use_player_texture": false
+      }
+    ]
+  }
+}

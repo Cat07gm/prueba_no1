@@ -1,6 +1,8 @@
 // 1.21.4	-999999999-01-01T00:00:00	prueba_no1/Tags for minecraft:item
 63f9f5799daf1140c39aef77d67eea8594d5c233 data/minecraft/tags/item/axes.json
-b3b034044cf93358e04860ad5059e88794db86eb data/minecraft/tags/item/chest_armor.json
+c5f4324af430ef1124b68e60a4ba52c9b9b1b09d data/minecraft/tags/item/chest_armor.json
+1f0f43a7f575f9aa10f957cd427e06f3440405d2 data/minecraft/tags/item/enchantable/durability.json
+1f0f43a7f575f9aa10f957cd427e06f3440405d2 data/minecraft/tags/item/enchantable/equippable.json
 51eba4e0b4c244b5b0aac9e5ffa321f79a1bc002 data/minecraft/tags/item/foot_armor.json
 0e974a395f856851c828eac7796f0599611c2be1 data/minecraft/tags/item/head_armor.json
 ca8de4dd4cd46c7d0b10f33279487822238e32c1 data/minecraft/tags/item/hoes.json

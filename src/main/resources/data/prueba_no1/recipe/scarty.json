@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "#D#",
+    "#E#",
+    "M M"
+  ],
+  "key": {
+    "M": "minecraft:phantom_membrane",
+    "#": "prueba_no1:scarlet_ingot",
+    "D": "minecraft:diamond",
+    "E": "minecraft:elytra"
+  },
+  "result": {
+    "id": "prueba_no1:scarty",
+    "count": 1
+  }
+}

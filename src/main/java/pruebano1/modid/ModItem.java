@@ -1,13 +1,23 @@
 package pruebano1.modid;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifierSlot;
+import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.component.type.EquippableComponent;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.*;
 import net.minecraft.item.equipment.EquipmentType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Rarity;
+import net.minecraft.util.Unit;
 
 public class ModItem {
 
@@ -57,6 +67,73 @@ public class ModItem {
             new Item.Settings().registryKey(SCARLET_BOOTS_KEY)
     );
 
+    // --- SCARTY (Scarlet + Elytra): Llave y Creación ---
+    public static final RegistryKey<Item> SCARTY_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "scarty"));
+
+    public static final Item SCARTY = new Item(
+            new Item.Settings()
+                    .registryKey(SCARTY_KEY)
+                    .maxDamage(532) // Mayor durabilidad que la Elytra normal (432)
+                    .rarity(Rarity.RARE)
+                    .repairable(ModToolMaterials.SCARLET_REPAIR) // Se repara con Lingote de Escarlata
+                    // 1. Permite planear exactamente como una Elytra convencional y usar cohetes
+                    .component(DataComponentTypes.GLIDER, Unit.INSTANCE)
+                    // 2. Se equipa en el pecho (CHEST) y muestra las alas 3D "scarty"
+                    .component(
+                            DataComponentTypes.EQUIPPABLE,
+                            EquippableComponent.builder(EquipmentSlot.CHEST)
+                                    .equipSound(SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA)
+                                    .model(ModArmorMaterials.SCARTY_ASSET_KEY)
+                                    .damageOnHurt(true)
+                                    .build()
+                    )
+                    // 3. Atributos especiales al llevarla equipada en el pecho
+                    .attributeModifiers(
+                            AttributeModifiersComponent.builder()
+                                    // Protección de una pechera de hierro (+6 de Armadura)
+                                    .add(
+                                            EntityAttributes.ARMOR,
+                                            new EntityAttributeModifier(
+                                                    Identifier.of(Prueba_no1.MOD_ID, "scarty_armor"),
+                                                    6.0,
+                                                    EntityAttributeModifier.Operation.ADD_VALUE
+                                            ),
+                                            AttributeModifierSlot.CHEST
+                                    )
+                                    // +10% más de daño a los ataques
+                                    .add(
+                                            EntityAttributes.ATTACK_DAMAGE,
+                                            new EntityAttributeModifier(
+                                                    Identifier.of(Prueba_no1.MOD_ID, "scarty_attack_bonus"),
+                                                    0.10,
+                                                    EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                                            ),
+                                            AttributeModifierSlot.CHEST
+                                    )
+                                    // Resistencia al daño por caída (-75% de daño recibido al caer)
+                                    .add(
+                                            EntityAttributes.FALL_DAMAGE_MULTIPLIER,
+                                            new EntityAttributeModifier(
+                                                    Identifier.of(Prueba_no1.MOD_ID, "scarty_fall_resistance"),
+                                                    -0.75,
+                                                    EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                                            ),
+                                            AttributeModifierSlot.CHEST
+                                    )
+                                    // +4 bloques extra de caída segura sin recibir nada de daño
+                                    .add(
+                                            EntityAttributes.SAFE_FALL_DISTANCE,
+                                            new EntityAttributeModifier(
+                                                    Identifier.of(Prueba_no1.MOD_ID, "scarty_safe_fall"),
+                                                    4.0,
+                                                    EntityAttributeModifier.Operation.ADD_VALUE
+                                            ),
+                                            AttributeModifierSlot.CHEST
+                                    )
+                                    .build()
+                    )
+    );
+
     // 4. Método ayudante de registro
     private static Item registerItem(RegistryKey<Item> key, Item item) {
         return Registry.register(Registries.ITEM, key, item);
@@ -79,18 +156,22 @@ public class ModItem {
         registerItem(SCARLET_LEGGINGS_KEY, SCARLET_LEGGINGS);
         registerItem(SCARLET_BOOTS_KEY, SCARLET_BOOTS);
 
+        // Registrar Scarty (Elytra Scarlet)
+        registerItem(SCARTY_KEY, SCARTY);
+
         // Pestaña Ingredientes
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> {
             entries.add(SCARLET_INGOT);
         });
 
-        // Pestaña Combate (Espada + Set completo de Armadura)
+        // Pestaña Combate (Espada + Set completo de Armadura + Scarty)
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> {
             entries.add(SCARLET_SWORD);
             entries.add(SCARLET_HELMET);
             entries.add(SCARLET_CHESTPLATE);
             entries.add(SCARLET_LEGGINGS);
             entries.add(SCARLET_BOOTS);
+            entries.add(SCARTY);
         });
 
         // Pestaña Herramientas
@@ -99,6 +180,7 @@ public class ModItem {
             entries.add(SCARLET_AXE);
             entries.add(SCARLET_SHOVEL);
             entries.add(SCARLET_HOE);
+            entries.add(SCARTY);
         });
     }
 }

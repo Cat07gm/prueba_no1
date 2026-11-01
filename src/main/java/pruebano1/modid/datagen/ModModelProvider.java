@@ -39,10 +39,11 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItem.SCARLET_SHOVEL, Models.HANDHELD);
         itemModelGenerator.register(ModItem.SCARLET_HOE, Models.HANDHELD);
 
-        // Piezas de armadura en el inventario
+        // Piezas de armadura y Scarty en el inventario
         itemModelGenerator.register(ModItem.SCARLET_HELMET, Models.GENERATED);
         itemModelGenerator.register(ModItem.SCARLET_CHESTPLATE, Models.GENERATED);
         itemModelGenerator.register(ModItem.SCARLET_LEGGINGS, Models.GENERATED);
         itemModelGenerator.register(ModItem.SCARLET_BOOTS, Models.GENERATED);
+        itemModelGenerator.register(ModItem.SCARTY, Models.GENERATED);
     }
 }

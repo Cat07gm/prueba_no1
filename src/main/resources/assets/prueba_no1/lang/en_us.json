@@ -5,8 +5,8 @@
   "item.prueba_no1.scarlet_ore": "Scarlet Ore",
   "block.prueba_no1.deepslate_scarlet_ore": "Deepslate Scarlet Ore",
   "item.prueba_no1.deepslate_scarlet_ore": "Deepslate Scarlet Ore",
-  "block.prueba_no1.scarlet_block": "Scarlet of Block",
-  "item.prueba_no1.scarlet_block": "Scarlet of Block",
+  "block.prueba_no1.scarlet_block": "Block of Scarlet",
+  "item.prueba_no1.scarlet_block": "Block of Scarlet",
   "item.prueba_no1.scarlet_sword": "Scarlet Sword",
   "item.prueba_no1.scarlet_pickaxe": "Scarlet Pickaxe",
   "item.prueba_no1.scarlet_axe": "Scarlet Axe",
@@ -15,5 +15,6 @@
   "item.prueba_no1.scarlet_helmet": "Scarlet Helmet",
   "item.prueba_no1.scarlet_chestplate": "Scarlet Chestplate",
   "item.prueba_no1.scarlet_leggings": "Scarlet Leggings",
-  "item.prueba_no1.scarlet_boots": "Scarlet Boots"
+  "item.prueba_no1.scarlet_boots": "Scarlet Boots",
+  "item.prueba_no1.scarty": "Scarty"
 }

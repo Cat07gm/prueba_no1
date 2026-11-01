@@ -1,4 +1,5 @@
 {
+  "itemgroup.prueba_no1.scarlet_group": "Arsenal Escarlata",
   "item.prueba_no1.scarlet_ingot": "Lingote de escarlata",
   "block.prueba_no1.scarlet_ore": "Mineral de escarlata",
   "item.prueba_no1.scarlet_ore": "Mineral de escarlata",
@@ -14,5 +15,6 @@
   "item.prueba_no1.scarlet_helmet": "Casco de escarlata",
   "item.prueba_no1.scarlet_chestplate": "Pechera de escarlata",
   "item.prueba_no1.scarlet_leggings": "Grebas de escarlata",
-  "item.prueba_no1.scarlet_boots": "Botas de escarlata"
+  "item.prueba_no1.scarlet_boots": "Botas de escarlata",
+  "item.prueba_no1.scarty": "Scarty"
 }

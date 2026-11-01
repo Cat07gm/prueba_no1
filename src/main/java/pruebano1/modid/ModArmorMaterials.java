@@ -19,6 +19,12 @@ public class ModArmorMaterials {
             Identifier.of(Prueba_no1.MOD_ID, "scarlet")
     );
 
+    // Llave Visual para las alas 3D de Scarty (Elytra Scarlet)
+    public static final RegistryKey<EquipmentAsset> SCARTY_ASSET_KEY = RegistryKey.of(
+            EquipmentAssetKeys.REGISTRY_KEY,
+            Identifier.of(Prueba_no1.MOD_ID, "scarty")
+    );
+
     // 2. El Material Cerrado (Record)
     public static final ArmorMaterial SCARLET = new ArmorMaterial(
             33, // Multiplicador de durabilidad base
