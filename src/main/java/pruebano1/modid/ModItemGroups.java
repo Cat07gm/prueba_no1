@@ -34,12 +34,14 @@ public class ModItemGroups {
                 entries.add(ModItem.SCARLET_SHOVEL);
                 entries.add(ModItem.SCARLET_HOE);
 
-                // Armadura y Alas Especiales
+                // Armadura, Alas y Reliquias
                 entries.add(ModItem.SCARLET_HELMET);
                 entries.add(ModItem.SCARLET_CHESTPLATE);
                 entries.add(ModItem.SCARLET_LEGGINGS);
                 entries.add(ModItem.SCARLET_BOOTS);
                 entries.add(ModItem.SCARTY);
+                entries.add(ModItem.SCARLET_BRACELET);
+                entries.add(ModItem.GOLDEN_SCARLET_BRACELET);
             })
             .build();
 

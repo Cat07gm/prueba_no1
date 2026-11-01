@@ -130,6 +130,26 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .input('D', Items.DIAMOND)
                         .criterion(hasItem(ModItem.SCARLET_INGOT), conditionsFromItem(ModItem.SCARLET_INGOT))
                         .offerTo(exporter);
+
+                // 6. Brazalete de Escarlata (Versión 1: Lingote de Escarlata + Diamante)
+                createShaped(RecipeCategory.TOOLS, ModItem.SCARLET_BRACELET)
+                        .pattern(" # ")
+                        .pattern("# #")
+                        .pattern(" D ")
+                        .input('#', ModItem.SCARLET_INGOT)
+                        .input('D', Items.DIAMOND)
+                        .criterion(hasItem(ModItem.SCARLET_INGOT), conditionsFromItem(ModItem.SCARLET_INGOT))
+                        .offerTo(exporter);
+
+                // 7. Brazalete de Escarlata Dorado (Versión 2: Brazalete V1 rodeado de Lingotes de Oro)
+                createShaped(RecipeCategory.TOOLS, ModItem.GOLDEN_SCARLET_BRACELET)
+                        .pattern("GGG")
+                        .pattern("GBG")
+                        .pattern("GGG")
+                        .input('G', Items.GOLD_INGOT)
+                        .input('B', ModItem.SCARLET_BRACELET)
+                        .criterion(hasItem(ModItem.SCARLET_BRACELET), conditionsFromItem(ModItem.SCARLET_BRACELET))
+                        .offerTo(exporter);
             }
         };
     }

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "GGG",
+    "GBG",
+    "GGG"
+  ],
+  "key": {
+    "G": "minecraft:gold_ingot",
+    "B": "prueba_no1:scarlet_bracelet"
+  },
+  "result": {
+    "id": "prueba_no1:golden_scarlet_bracelet",
+    "count": 1
+  }
+}

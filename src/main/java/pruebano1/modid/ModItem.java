@@ -134,6 +134,39 @@ public class ModItem {
                     )
     );
 
+    // --- BRAZALETES DE ESCARLATA (Versión 1 y Versión 2 Dorada) ---
+    public static final RegistryKey<Item> SCARLET_BRACELET_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "scarlet_bracelet")
+    );
+    public static final RegistryKey<Item> GOLDEN_SCARLET_BRACELET_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "golden_scarlet_bracelet")
+    );
+
+    // Versión 1: Cura 4 corazones (8.0F), Cooldown 25s, 100 usos, reparable con lingote Scarlet y sin encantar
+    public static final Item SCARLET_BRACELET = new ScarletBraceletItem(
+            8.0F,
+            25,
+            false,
+            new Item.Settings()
+                    .registryKey(SCARLET_BRACELET_KEY)
+                    .maxDamage(100)
+                    .repairable(ModToolMaterials.SCARLET_REPAIR)
+    );
+
+    // Versión 2 (Dorada): Cura 6 corazones (12.0F), Prisa Minera I (10s), Cooldown 22s, 80 usos, reparable y sin encantar
+    public static final Item GOLDEN_SCARLET_BRACELET = new ScarletBraceletItem(
+            12.0F,
+            22,
+            true,
+            new Item.Settings()
+                    .registryKey(GOLDEN_SCARLET_BRACELET_KEY)
+                    .maxDamage(80)
+                    .rarity(Rarity.RARE)
+                    .repairable(ModToolMaterials.SCARLET_REPAIR)
+    );
+
     // 4. Método ayudante de registro
     private static Item registerItem(RegistryKey<Item> key, Item item) {
         return Registry.register(Registries.ITEM, key, item);
@@ -159,6 +192,10 @@ public class ModItem {
         // Registrar Scarty (Elytra Scarlet)
         registerItem(SCARTY_KEY, SCARTY);
 
+        // Registrar Brazaletes de Escarlata (Versión 1 y 2)
+        registerItem(SCARLET_BRACELET_KEY, SCARLET_BRACELET);
+        registerItem(GOLDEN_SCARLET_BRACELET_KEY, GOLDEN_SCARLET_BRACELET);
+
         // Pestaña Ingredientes
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> {
             entries.add(SCARLET_INGOT);
@@ -181,6 +218,8 @@ public class ModItem {
             entries.add(SCARLET_SHOVEL);
             entries.add(SCARLET_HOE);
             entries.add(SCARTY);
+            entries.add(SCARLET_BRACELET);
+            entries.add(GOLDEN_SCARLET_BRACELET);
         });
     }
 }

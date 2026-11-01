@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "###",
+    "# #",
+    "#D#"
+  ],
+  "key": {
+    "#": "prueba_no1:scarlet_ingot",
+    "D": "minecraft:diamond"
+  },
+  "result": {
+    "id": "prueba_no1:scarlet_bracelet",
+    "count": 1
+  }
+}
