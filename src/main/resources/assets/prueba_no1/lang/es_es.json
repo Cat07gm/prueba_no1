@@ -1,5 +1,5 @@
 {
-  "itemgroup.prueba_no1.scarlet_group": "Arsenal Scarlet",
+  "itemgroup.prueba_no1.scarlet_group": "Scarlet",
   "item.prueba_no1.scarlet_ingot": "barra flipante de color rojo",
   "block.prueba_no1.scarlet_ore": "Mineral rojito de ostias",
   "item.prueba_no1.scarlet_ore": "Mineral rojito de Ostias",
@@ -16,7 +16,10 @@
   "item.prueba_no1.scarlet_chestplate": "Pechera rojiza blindada",
   "item.prueba_no1.scarlet_leggings": "Pantalones rojizos",
   "item.prueba_no1.scarlet_boots": "Botas rojizas a todo gas",
-  "item.prueba_no1.scarty": "Scarty",
-  "item.prueba_no1.scarlet_bracelet": "Brazalete de Escarlata",
-  "item.prueba_no1.golden_scarlet_bracelet": "Brazalete de Escarlata Dorado"
+  "item.prueba_no1.scarty": "Yetpack god",
+  "item.prueba_no1.scarlet_bracelet": "Pulceron de Escarlata",
+  "item.prueba_no1.golden_scarlet_bracelet": "Pulceron de Escarlata Robado",
+  "item.prueba_no1.nazitotem": "Nazitotem god",
+  "item.prueba_no1.isratotem": "Isratotem deidad",
+  "item.prueba_no1.lontotem": "Lontotem 288470"
 }

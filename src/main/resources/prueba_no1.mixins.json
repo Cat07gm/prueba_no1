@@ -3,7 +3,8 @@
 	"package": "pruebano1.modid.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
+		"ExampleMixin",
+		"TotemUseMixin"
 	],
 	"client": [
 		"ScartyElytraRendererMixin"

@@ -1,5 +1,5 @@
 {
-  "itemgroup.prueba_no1.scarlet_group": "Scarlet Arsenal",
+  "itemgroup.prueba_no1.scarlet_group": "Scarlet",
   "item.prueba_no1.scarlet_ingot": "Scarlet Ingot",
   "block.prueba_no1.scarlet_ore": "Scarlet Ore",
   "item.prueba_no1.scarlet_ore": "Scarlet Ore",
@@ -18,5 +18,8 @@
   "item.prueba_no1.scarlet_boots": "Scarlet Boots",
   "item.prueba_no1.scarty": "Scarty",
   "item.prueba_no1.scarlet_bracelet": "Scarlet Bracelet",
-  "item.prueba_no1.golden_scarlet_bracelet": "Golden Scarlet Bracelet"
+  "item.prueba_no1.golden_scarlet_bracelet": "Golden Scarlet Bracelet",
+  "item.prueba_no1.nazitotem": "Nazitotem",
+  "item.prueba_no1.isratotem": "Isratotem",
+  "item.prueba_no1.lontotem": "Lontotem"
 }

@@ -39,7 +39,7 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItem.SCARLET_SHOVEL, Models.HANDHELD);
         itemModelGenerator.register(ModItem.SCARLET_HOE, Models.HANDHELD);
 
-        // Piezas de armadura, Scarty y Brazaletes en el inventario
+        // Piezas de armadura, Scarty, Brazaletes y Tótems en el inventario
         itemModelGenerator.register(ModItem.SCARLET_HELMET, Models.GENERATED);
         itemModelGenerator.register(ModItem.SCARLET_CHESTPLATE, Models.GENERATED);
         itemModelGenerator.register(ModItem.SCARLET_LEGGINGS, Models.GENERATED);
@@ -47,5 +47,8 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItem.SCARTY, Models.GENERATED);
         itemModelGenerator.register(ModItem.SCARLET_BRACELET, Models.GENERATED);
         itemModelGenerator.register(ModItem.GOLDEN_SCARLET_BRACELET, Models.GENERATED);
+        itemModelGenerator.register(ModItem.NAZITOTEM, Models.GENERATED);
+        itemModelGenerator.register(ModItem.ISRATOTEM, Models.GENERATED);
+        itemModelGenerator.register(ModItem.LONTOTEM, Models.GENERATED);
     }
 }

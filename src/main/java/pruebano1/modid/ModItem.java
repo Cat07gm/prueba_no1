@@ -4,11 +4,17 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.component.type.DeathProtectionComponent;
 import net.minecraft.component.type.EquippableComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.*;
+import net.minecraft.item.consume.ApplyEffectsConsumeEffect;
+import net.minecraft.item.consume.ClearAllEffectsConsumeEffect;
 import net.minecraft.item.equipment.EquipmentType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -18,6 +24,8 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Unit;
+
+import java.util.List;
 
 public class ModItem {
 
@@ -134,7 +142,7 @@ public class ModItem {
                     )
     );
 
-    // --- BRAZALETES DE ESCARLATA (Versión 1 y Versión 2 Dorada) ---
+    //BRAZALETES DE ESCARLATA Versión 1 y Versión 2 Dorada
     public static final RegistryKey<Item> SCARLET_BRACELET_KEY = RegistryKey.of(
             RegistryKeys.ITEM,
             Identifier.of(Prueba_no1.MOD_ID, "scarlet_bracelet")
@@ -144,7 +152,7 @@ public class ModItem {
             Identifier.of(Prueba_no1.MOD_ID, "golden_scarlet_bracelet")
     );
 
-    // Versión 1: Cura 4 corazones (8.0F), Cooldown 25s, 100 usos, reparable con lingote Scarlet y sin encantar
+    //Versión 1 Cura 4 corazones (8.0F), Cooldown 25s, 100 usos, reparable con lingote Scarlet y sin encantar
     public static final Item SCARLET_BRACELET = new ScarletBraceletItem(
             8.0F,
             25,
@@ -155,7 +163,7 @@ public class ModItem {
                     .repairable(ModToolMaterials.SCARLET_REPAIR)
     );
 
-    // Versión 2 (Dorada): Cura 6 corazones (12.0F), Prisa Minera I (10s), Cooldown 22s, 80 usos, reparable y sin encantar
+    //Versión 2 Dorada Cura 6 corazones (12.0F), Prisa Minera I (10s), Cooldown 22s, 80 usos, reparable y sin encantar
     public static final Item GOLDEN_SCARLET_BRACELET = new ScarletBraceletItem(
             12.0F,
             22,
@@ -167,7 +175,83 @@ public class ModItem {
                     .repairable(ModToolMaterials.SCARLET_REPAIR)
     );
 
-    // 4. Método ayudante de registro
+    //TÓTEMS PERSONALIZADOS Solo en Creativo
+    public static final RegistryKey<Item> NAZITOTEM_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "nazitotem"));
+    public static final RegistryKey<Item> ISRATOTEM_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "isratotem"));
+    public static final RegistryKey<Item> LONTOTEM_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "lontotem"));
+
+    //                                                   NAZITOTEM
+    //1 segundo = 20 ticks, se multiplica en status effects - 0 amplifier es 1(ej. regeneracion 1).
+    //Regeneración II (5s = 100 ticks), Resistencia I (10s), Resistencia al Fuego (10s),
+    //Caída Lenta (10s) y Fuerza II (35s)
+    public static final Item NAZITOTEM = new Item(
+            new Item.Settings()
+                    .registryKey(NAZITOTEM_KEY)
+                    .maxCount(1)
+                    .rarity(Rarity.UNCOMMON)
+                    .component(
+                            DataComponentTypes.DEATH_PROTECTION,
+                            new DeathProtectionComponent(List.of(
+                                    ClearAllEffectsConsumeEffect.INSTANCE,
+                                    new ApplyEffectsConsumeEffect(List.of(
+                                            new StatusEffectInstance(StatusEffects.REGENERATION, 5 * 20, 1),
+                                            new StatusEffectInstance(StatusEffects.RESISTANCE, 10 * 20, 0),
+                                            new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 10 * 20, 0),
+                                            new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10 * 20, 0),
+                                            new StatusEffectInstance(StatusEffects.STRENGTH, 35 * 20, 1)
+                                    ))
+                            ))
+                    )
+    );
+
+    //                                      ISRATOTEM
+    //Efectos del tótem tradicional (Regeneración II 45s, Resistencia al Fuego 40s) +
+    //Absorción de 5 corazones (10.0F (2.0F = 1 corazón)) + Caida lenta por 8 segundos (160) Levitación I por 5 segundos (100 ticks).
+    public static final Item ISRATOTEM = new Item(
+            new Item.Settings()
+                    .registryKey(ISRATOTEM_KEY)
+                    .maxCount(1)
+                    .rarity(Rarity.RARE)
+                    .component(
+                            DataComponentTypes.DEATH_PROTECTION,
+                            new DeathProtectionComponent(List.of(
+                                    ClearAllEffectsConsumeEffect.INSTANCE,
+                                    new ApplyEffectsConsumeEffect(List.of(
+                                            new StatusEffectInstance(StatusEffects.REGENERATION, 45 * 20, 1),
+                                            new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 40 * 20, 0),
+                                            new StatusEffectInstance(StatusEffects.ABSORPTION, 5 * 20, 2),
+                                            new StatusEffectInstance(StatusEffects.SLOW_FALLING, 8 * 20, 0),
+                                            new StatusEffectInstance(StatusEffects.LEVITATION, 5 * 20, 0)
+                                    ))
+                            ))
+                    )
+    );
+
+    //                                                    LONTOTEM (el mas god)
+    //El doble que el totem tradicional (Regeneración II 90s, Resistencia al Fuego 80s, Absorción de 8 corazones por 15 segundos)  +
+    //Velocidad I por 25 segundos + Visión Nocturna por 1 minuto + luminiscencia por 15 segundos tambien.
+    public static final Item LONTOTEM = new Item(
+            new Item.Settings()
+                    .registryKey(LONTOTEM_KEY)
+                    .maxCount(1)
+                    .rarity(Rarity.EPIC)
+                    .component(
+                            DataComponentTypes.DEATH_PROTECTION,
+                            new DeathProtectionComponent(List.of(
+                                    ClearAllEffectsConsumeEffect.INSTANCE,
+                                    new ApplyEffectsConsumeEffect(List.of(
+                                            new StatusEffectInstance(StatusEffects.REGENERATION, 90 * 20, 1),
+                                            new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 80 * 20, 0),
+                                            new StatusEffectInstance(StatusEffects.ABSORPTION, 15 * 20, 3),
+                                            new StatusEffectInstance(StatusEffects.SPEED, 25 * 20, 0),
+                                            new StatusEffectInstance(StatusEffects.NIGHT_VISION, 60 * 20, 0),
+                                            new StatusEffectInstance(StatusEffects.GLOWING, 15 * 20, 0)
+                                    ))
+                            ))
+                    )
+    );
+
+    //Método ayudante de registro
     private static Item registerItem(RegistryKey<Item> key, Item item) {
         return Registry.register(Registries.ITEM, key, item);
     }
@@ -183,25 +267,30 @@ public class ModItem {
         registerItem(SCARLET_SHOVEL_KEY, SCARLET_SHOVEL);
         registerItem(SCARLET_HOE_KEY, SCARLET_HOE);
 
-        // --- ARMADURA SCARLET: 3. Registrar en la base de datos ---
+        //ARMADURA SCARLET 3. Registrar en la base de datos
         registerItem(SCARLET_HELMET_KEY, SCARLET_HELMET);
         registerItem(SCARLET_CHESTPLATE_KEY, SCARLET_CHESTPLATE);
         registerItem(SCARLET_LEGGINGS_KEY, SCARLET_LEGGINGS);
         registerItem(SCARLET_BOOTS_KEY, SCARLET_BOOTS);
 
-        // Registrar Scarty (Elytra Scarlet)
+        //Registrar Scarty (Elytra Scarlet)
         registerItem(SCARTY_KEY, SCARTY);
 
-        // Registrar Brazaletes de Escarlata (Versión 1 y 2)
+        //Registrar Brazaletes de Escarlata (Versión 1 y 2)
         registerItem(SCARLET_BRACELET_KEY, SCARLET_BRACELET);
         registerItem(GOLDEN_SCARLET_BRACELET_KEY, GOLDEN_SCARLET_BRACELET);
 
-        // Pestaña Ingredientes
+        //Registrar los 3 Tótems personalizados
+        registerItem(NAZITOTEM_KEY, NAZITOTEM);
+        registerItem(ISRATOTEM_KEY, ISRATOTEM);
+        registerItem(LONTOTEM_KEY, LONTOTEM);
+
+        //Pestaña Ingredientes
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> {
             entries.add(SCARLET_INGOT);
         });
 
-        // Pestaña Combate (Espada + Set completo de Armadura + Scarty)
+        //Pestaña Combate
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> {
             entries.add(SCARLET_SWORD);
             entries.add(SCARLET_HELMET);
@@ -209,9 +298,12 @@ public class ModItem {
             entries.add(SCARLET_LEGGINGS);
             entries.add(SCARLET_BOOTS);
             entries.add(SCARTY);
+            entries.add(NAZITOTEM);
+            entries.add(ISRATOTEM);
+            entries.add(LONTOTEM);
         });
 
-        // Pestaña Herramientas
+        //Pestaña Herramientas
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> {
             entries.add(SCARLET_PICKAXE);
             entries.add(SCARLET_AXE);

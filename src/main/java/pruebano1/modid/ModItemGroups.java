@@ -34,7 +34,7 @@ public class ModItemGroups {
                 entries.add(ModItem.SCARLET_SHOVEL);
                 entries.add(ModItem.SCARLET_HOE);
 
-                // Armadura, Alas y Reliquias
+                // Armadura, Alas, Reliquias y Tótems
                 entries.add(ModItem.SCARLET_HELMET);
                 entries.add(ModItem.SCARLET_CHESTPLATE);
                 entries.add(ModItem.SCARLET_LEGGINGS);
@@ -42,6 +42,9 @@ public class ModItemGroups {
                 entries.add(ModItem.SCARTY);
                 entries.add(ModItem.SCARLET_BRACELET);
                 entries.add(ModItem.GOLDEN_SCARLET_BRACELET);
+                entries.add(ModItem.NAZITOTEM);
+                entries.add(ModItem.ISRATOTEM);
+                entries.add(ModItem.LONTOTEM);
             })
             .build();
 
