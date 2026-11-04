@@ -6,6 +6,7 @@ import net.minecraft.util.Identifier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pruebano1.modid.entity.ModEntities;
 
 public class Prueba_no1 implements ModInitializer {
 	public static final String MOD_ID = "prueba_no1";
@@ -22,6 +23,7 @@ public class Prueba_no1 implements ModInitializer {
 		// Proceed with mild caution.
 
 		LOGGER.info("Hello Fabric world!");
+		ModEntities.registerModEntities();
 		ModItemGroups.registerItemGroups();
 		ModItem.registerModItems();
 		ModBlocks.registerModBlocks();

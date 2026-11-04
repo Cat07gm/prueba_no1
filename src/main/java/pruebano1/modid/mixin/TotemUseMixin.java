@@ -43,8 +43,8 @@ public abstract class TotemUseMixin extends Entity {
     }
 
     /**
-     * Antes de que Minecraft consuma el tótem de la mano, guardamos una copia
-     * para saber exactamente qué tótem (tradicional, Nazitotem, Isratotem o Lontotem) tenía el jugador.
+     * Antes de que Minecraft consuma el tótem de la mano, guardará una copia
+     * para saber exactamente qué tótem tenía el jugador.
      */
     @Inject(method = "tryUseDeathProtector", at = @At("HEAD"))
     private void captureTotemBeforeUse(DamageSource source, CallbackInfoReturnable<Boolean> cir) {
@@ -75,10 +75,8 @@ public abstract class TotemUseMixin extends Entity {
 
         // Ajustar corazones exactos de absorción según el tótem personalizado
         if (totemStack.isOf(ModItem.ISRATOTEM)) {
-            // 5 corazones de absorción exactos (cada corazón son 2.0F puntos -> 10.0F)
             this.setAbsorptionAmount(10.0F);
         } else if (totemStack.isOf(ModItem.LONTOTEM)) {
-            // El doble de vida base que el tótem tradicional (2.0F) y 8 corazones de absorción (16.0F)
             this.setHealth(2.0F);
             this.setAbsorptionAmount(16.0F);
         }
@@ -92,20 +90,20 @@ public abstract class TotemUseMixin extends Entity {
             String description;
             Formatting color;
             if (totemStack.isOf(ModItem.NAZITOTEM)) {
-                description = "¡" + playerName + " ha consumido un " + totemName + " y desató una furia explosiva!";
+                description = "¡" + playerName + " valió ñionga y consumió " + totemName + " bro...!";
                 color = Formatting.RED;
             } else if (totemStack.isOf(ModItem.ISRATOTEM)) {
-                description = "¡" + playerName + " ha consumido un " + totemName + " y comenzó a levitar con escudo divino!";
+                description = "¡" + playerName + " valió cola y consumió " + totemName + " hermano...!";
                 color = Formatting.AQUA;
             } else if (totemStack.isOf(ModItem.LONTOTEM)) {
-                description = "¡" + playerName + " ha consumido un " + totemName + " obteniendo el doble de poder inmortal!";
+                description = "¡" + playerName + " valió cagad* y consumió " + totemName + " realmente...!";
                 color = Formatting.LIGHT_PURPLE;
             } else {
-                description = "¡" + playerName + " ha consumido un " + totemName + " y engañó a la muerte!";
+                description = "¡" + playerName + " casí muere y consumió " + totemName + " uwu!";
                 color = Formatting.GOLD;
             }
 
-            Text chatMessage = Text.literal("💥 [TÓTEM] ").formatted(Formatting.DARK_RED, Formatting.BOLD)
+            Text chatMessage = Text.literal("💥 TÓTEM ").formatted(Formatting.DARK_RED, Formatting.RESET)
                     .append(Text.literal(description).formatted(color));
 
             // Enviar mensaje a todos los jugadores en el chat

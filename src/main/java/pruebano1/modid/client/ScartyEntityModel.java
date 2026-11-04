@@ -7,10 +7,7 @@ import net.minecraft.util.math.MathHelper;
 
 /**
  * Modelo 3D personalizado de Scarty para la espalda del jugador.
- * Reproduce en 3D el boceto original:
- * - Un núcleo central en forma de "H" con barras horizontales y centro de Diamante.
- * - 5 cuchillas/alas en 3D por cada lado (cuerno interno, ala superior de rejilla,
- *   cuchilla central larga, cuchilla media-baja y aleta inferior en zigzag).
+ * Reproduce en 3D
  */
 public class ScartyEntityModel extends ElytraEntityModel {
 
@@ -30,9 +27,8 @@ public class ScartyEntityModel extends ElytraEntityModel {
         ModelData modelData = new ModelData();
         ModelPartData root = modelData.getRoot();
 
-        // =========================================================================
-        // 1. ARNÉS CENTRAL EN FORMA DE "H" (Fijo en el centro de la espalda)
-        // =========================================================================
+        // ARNÉS CENTRAL EN FORMA DE "H" (Fijo en el centro de la espalda)
+
         ModelPartBuilder harnessBuilder = ModelPartBuilder.create()
                 // Columna vertical izquierda de la "H" (Escarlata)
                 .uv(16, 12).cuboid(1.5F, 1.5F, 0.4F, 2.0F, 8.5F, 2.0F)
@@ -47,9 +43,8 @@ public class ScartyEntityModel extends ElytraEntityModel {
 
         root.addChild("harness", harnessBuilder, ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-        // =========================================================================
-        // 2. ALA IZQUIERDA (+X) Y ALA DERECHA (-X) CON LAS 5 PUNTAS EN 3D
-        // =========================================================================
+        //ALA IZQUIERDA (+X) Y ALA DERECHA (-X) CON LAS 5 PUNTAS EN 3D
+
         addWingSide(root, "left_wing", 1.0F);
         addWingSide(root, "right_wing", -1.0F);
 
@@ -62,7 +57,7 @@ public class ScartyEntityModel extends ElytraEntityModel {
 
     /**
      * Construye las 5 puntas/alas en 3D para un lado (sign = +1.0F izquierdo, -1.0F derecho).
-     * Puedes ajustar aquí el largo, grosor o ángulo de cualquiera de las 5 piezas cuando quieras.
+     * ajustar aquí el largo, grosor o ángulo de cualquiera de las 5 piezas.
      */
     private static void addWingSide(ModelPartData root, String name, float sign) {
         // Nodo raíz del ala (pivote junto al pilar de la "H" en la espalda)
@@ -72,7 +67,7 @@ public class ScartyEntityModel extends ElytraEntityModel {
                 ModelTransform.pivot(sign * 3.0F, 5.0F, 1.4F)
         );
 
-        // --- PUNTA 1: Cuerno superior interno (sube junto al borde superior de la "H") ---
+        // PUNTA 1: Cuerno superior interno (sube junto al borde superior de la "H") ---
         float hornX = sign > 0 ? -0.5F : -1.5F;
         float hornTipX = sign > 0 ? 0.0F : -1.5F;
         wing.addChild(
@@ -83,7 +78,7 @@ public class ScartyEntityModel extends ElytraEntityModel {
                 ModelTransform.of(0.0F, -1.5F, 0.0F, 0.0F, 0.0F, sign * -0.15F)
         );
 
-        // --- PUNTA 2: Ala diagonal superior con rejilla (Escarlata + Membrana de Phantom) ---
+        //PUNTA 2: Ala diagonal superior con rejilla (Escarlata + Membrana de Phantom) ---
         float upperX = sign > 0 ? 0.0F : -3.0F;
         float upperTipX = sign > 0 ? 0.5F : -2.5F;
         wing.addChild(
@@ -97,7 +92,7 @@ public class ScartyEntityModel extends ElytraEntityModel {
                 ModelTransform.of(sign * 1.0F, -1.5F, 0.0F, 0.0F, 0.0F, sign * 0.78F)
         );
 
-        // --- PUNTA 3: Cuchilla central larga (sale horizontalmente hacia afuera) ---
+        // PUNTA 3: Cuchilla central larga (sale horizontalmente hacia afuera) ---
         float midMainX = sign > 0 ? 0.0F : -10.5F;
         float midTipX = sign > 0 ? 10.5F : -12.5F;
         float midStepX = sign > 0 ? 0.0F : -6.5F;
@@ -113,7 +108,7 @@ public class ScartyEntityModel extends ElytraEntityModel {
                 ModelTransform.of(sign * 0.5F, -0.5F, 0.1F, 0.0F, 0.0F, sign * 0.04F)
         );
 
-        // --- PUNTA 4: Cuchilla media-baja (sale debajo de la central hacia afuera) ---
+        // PUNTA 4: Cuchilla media-baja (sale debajo de la central hacia afuera) ---
         float lowMidX = sign > 0 ? 0.0F : -7.5F;
         float lowMidTipX = sign > 0 ? 7.5F : -9.0F;
         wing.addChild(
@@ -125,7 +120,7 @@ public class ScartyEntityModel extends ElytraEntityModel {
                 ModelTransform.of(sign * 0.5F, 1.8F, 0.0F, 0.0F, 0.0F, sign * -0.32F)
         );
 
-        // --- PUNTA 5: Aleta inferior en zigzag (baja en diagonal con 3 escalones 3D) ---
+        // PUNTA 5: Aleta inferior en zigzag (baja en diagonal con 3 escalones 3D) ---
         float tail1X = sign > 0 ? -0.5F : -2.0F;
         float tail2X = sign > 0 ? 0.3F : -2.8F;
         float tail3X = sign > 0 ? 1.1F : -3.1F;

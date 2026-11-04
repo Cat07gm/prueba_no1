@@ -37,21 +37,21 @@ public class ScarletBraceletItem extends Item {
         ItemStack stack = user.getStackInHand(hand);
 
         if (!world.isClient()) {
-            // 1. Curar de golpe al jugador (8.0F = 4 corazones / 12.0F = 6 corazones)
+            // Curar de golpe al jugador (8.0F = 4 corazones / 12.0F = 6 corazones)
             user.heal(this.healAmount);
 
-            // 2. Si es la versión 2 (dorada), dar Prisa Minera I (amplificador 0) por 10 segundos (200 ticks)
+            // Si es la versión 2 (dorada), dar Prisa Minera I (amplificador 0) por 10 segundos (200 ticks)
             if (this.giveHaste) {
                 user.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 10 * 20, 0));
             }
 
-            // 3. Activar el tiempo de recarga (Cooldown)
+            // Activar el tiempo de recarga (Cooldown)
             user.getItemCooldownManager().set(stack, this.cooldownTicks);
 
-            // 4. Gastar 1 uso de durabilidad
+            // Gastar 1 uso de durabilidad
             stack.damage(1, user, LivingEntity.getSlotForHand(hand));
 
-            // 5. Sonido al activarlo
+            // Sonido al activarlo
             world.playSound(
                     null,
                     user.getX(),

@@ -45,6 +45,8 @@ public class ModItemGroups {
                 entries.add(ModItem.NAZITOTEM);
                 entries.add(ModItem.ISRATOTEM);
                 entries.add(ModItem.LONTOTEM);
+                entries.add(ModItem.ARREST_WARRANT);
+                entries.add(ModItem.PI_DIDI_SPAWN_EGG);
             })
             .build();
 

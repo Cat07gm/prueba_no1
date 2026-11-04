@@ -21,5 +21,8 @@
   "item.prueba_no1.golden_scarlet_bracelet": "Pulceron de Escarlata Robado",
   "item.prueba_no1.nazitotem": "Nazitotem god",
   "item.prueba_no1.isratotem": "Isratotem deidad",
-  "item.prueba_no1.lontotem": "Lontotem 288470"
+  "item.prueba_no1.lontotem": "Lontotem 288470",
+  "item.prueba_no1.arrest_warrant": "Orden de arresto",
+  "item.prueba_no1.pi_didi_spawn_egg": "Generar Pi Didi",
+  "entity.prueba_no1.pi_didi": "Pi Didi"
 }

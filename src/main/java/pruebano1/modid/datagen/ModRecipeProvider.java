@@ -30,12 +30,12 @@ public class ModRecipeProvider extends FabricRecipeProvider {
         return new RecipeGenerator(registryLookup, exporter) {
             @Override
             public void generate() {
-                // 1. Fundición en Horno y Alto Horno (Smelting & Blasting)
+                // Fundición en Horno y Alto Horno
                 List<ItemConvertible> scarletOres = List.of(ModBlocks.SCARLET_ORE, ModBlocks.DEEPSLATE_SCARLET_ORE);
                 offerSmelting(scarletOres, RecipeCategory.MISC, ModItem.SCARLET_INGOT, 1.0f, 200, "scarlet_ingot");
                 offerBlasting(scarletOres, RecipeCategory.MISC, ModItem.SCARLET_INGOT, 1.0f, 100, "scarlet_ingot");
 
-                // 2. Compactación reversible: 9 Lingotes <-> 1 Bloque de Scarlet (crea ambas recetas de golpe)
+                // Compactación reversible: 9 Lingotes <-> 1 Bloque de Scarlet (crea ambas recetas de golpe)
                 offerReversibleCompactingRecipes(
                         RecipeCategory.MISC,
                         ModItem.SCARLET_INGOT,
@@ -43,7 +43,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         ModBlocks.SCARLET_BLOCK
                 );
 
-                // 3. Herramientas Scarlet (usando cobbled_deepslate como mango como en tus recetas actuales)
+                //Herramientas Scarlet (usando cobbled_deepslate como mango como en tus recetas actuales)
                 createShaped(RecipeCategory.COMBAT, ModItem.SCARLET_SWORD)
                         .pattern("#")
                         .pattern("#")
@@ -89,7 +89,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .criterion(hasItem(ModItem.SCARLET_INGOT), conditionsFromItem(ModItem.SCARLET_INGOT))
                         .offerTo(exporter);
 
-                // 4. Armadura Scarlet
+                // Armadura Scarlet
                 createShaped(RecipeCategory.COMBAT, ModItem.SCARLET_HELMET)
                         .pattern("###")
                         .pattern("# #")
@@ -120,7 +120,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .criterion(hasItem(ModItem.SCARLET_INGOT), conditionsFromItem(ModItem.SCARLET_INGOT))
                         .offerTo(exporter);
 
-                // 5. Scarty (Elytra de Escarlata: Membrana de Phantom + Lingote de Escarlata + Diamante)
+                // Scarty (Elytra de Escarlata: Membrana de Phantom + Lingote de Escarlata + Diamante)
                 createShaped(RecipeCategory.COMBAT, ModItem.SCARTY)
                         .pattern("M#M")
                         .pattern("#D#")
@@ -131,7 +131,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .criterion(hasItem(ModItem.SCARLET_INGOT), conditionsFromItem(ModItem.SCARLET_INGOT))
                         .offerTo(exporter);
 
-                // 6. Brazalete de Escarlata (Versión 1: Lingote de Escarlata + Diamante)
+                // Brazalete de Escarlata (Versión 1: Lingote de Escarlata + Diamante)
                 createShaped(RecipeCategory.TOOLS, ModItem.SCARLET_BRACELET)
                         .pattern(" # ")
                         .pattern("# #")
@@ -141,7 +141,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .criterion(hasItem(ModItem.SCARLET_INGOT), conditionsFromItem(ModItem.SCARLET_INGOT))
                         .offerTo(exporter);
 
-                // 7. Brazalete de Escarlata Dorado (Versión 2: Brazalete V1 rodeado de Lingotes de Oro)
+                // Brazalete de Escarlata Dorado (Versión 2: Brazalete V1 rodeado de Lingotes de Oro)
                 createShaped(RecipeCategory.TOOLS, ModItem.GOLDEN_SCARLET_BRACELET)
                         .pattern("GGG")
                         .pattern("GBG")

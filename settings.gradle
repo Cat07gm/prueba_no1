@@ -9,5 +9,5 @@ pluginManagement {
 	}
 }
 
-// Should match your modid
-rootProject.name = 'prueba_no1'
+// Nombre del archivo .jar al compilar el mod
+rootProject.name = 'Lon_Terry'

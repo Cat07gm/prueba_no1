@@ -2,14 +2,17 @@
 	"schemaVersion": 1,
 	"id": "prueba_no1",
 	"version": "${version}",
-	"name": "prueba_no1",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Lon Terry",
+	"description": "Te cae mal Lonterry?? Lon288470 para los conocedores. Pues en este mod tendrás que acabar con el si o si we, pero para eso deber derrotar a los diferentes enemigos de la vida de lon terry, no puedes solo we, tendras que aliarte con los israeldeanos para acabar con los nazisllagers, jeffri penestein, pi didi, charli KIRK, la maestra elvira, entre muchos otros. Buena suerte we.",
 	"authors": [
-		"Me!"
+		"Cuackleb", "Lon Terry"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/FabricMC/fabric-example-mod",
+		"instagram": "https://www.instagram.com/milokgms?srtk=MXNlOHRmMjlqNWltaA==",
+		"CanalLonTerry": "https://whatsapp.com/channel/0029Vaz9S5VIiRowWW7Zwy2b",
+		"CanalMilofans": "https://whatsapp.com/channel/0029Vb7yf8e8fewuDpPhlO1b"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/prueba_no1/icon.png",
@@ -17,6 +20,9 @@
 	"entrypoints": {
 		"main": [
 			"pruebano1.modid.Prueba_no1"
+		],
+		"client": [
+			"pruebano1.modid.Prueba_no1Client"
 		],
 		"fabric-datagen": [
 			"pruebano1.modid.Prueba_no1DataGenerator"
@@ -29,6 +35,7 @@
 		"fabricloader": ">=0.19.3",
 		"minecraft": "~1.21.4",
 		"java": ">=21",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"geckolib": ">=4.8.4"
 	}
 }

@@ -21,5 +21,8 @@
   "item.prueba_no1.golden_scarlet_bracelet": "Brazalete de escarlata dorado",
   "item.prueba_no1.nazitotem": "Nazitotem",
   "item.prueba_no1.isratotem": "Isratotem",
-  "item.prueba_no1.lontotem": "Lontotem"
+  "item.prueba_no1.lontotem": "Lontotem",
+  "item.prueba_no1.arrest_warrant": "Orden de arresto",
+  "item.prueba_no1.pi_didi_spawn_egg": "Generar Pi Didi",
+  "entity.prueba_no1.pi_didi": "Pi Didi"
 }

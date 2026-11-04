@@ -50,5 +50,7 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItem.NAZITOTEM, Models.GENERATED);
         itemModelGenerator.register(ModItem.ISRATOTEM, Models.GENERATED);
         itemModelGenerator.register(ModItem.LONTOTEM, Models.GENERATED);
+        itemModelGenerator.register(ModItem.ARREST_WARRANT, Models.GENERATED);
+        itemModelGenerator.register(ModItem.PI_DIDI_SPAWN_EGG, Models.GENERATED);
     }
 }

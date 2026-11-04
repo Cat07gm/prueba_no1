@@ -24,36 +24,37 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Unit;
+import pruebano1.modid.entity.ModEntities;
 
 import java.util.List;
 
 public class ModItem {
 
-    // 1. Llave y creación del Lingote
+    //Llave y creación del Lingote
     public static final RegistryKey<Item> SCARLET_INGOT_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "scarlet_ingot"));
     public static final Item SCARLET_INGOT = new Item(new Item.Settings().registryKey(SCARLET_INGOT_KEY));
 
-    // 2. Llaves para las Herramientas y Armas
+    //Llaves para las Herramientas y Armas
     public static final RegistryKey<Item> SCARLET_SWORD_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "scarlet_sword"));
     public static final RegistryKey<Item> SCARLET_PICKAXE_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "scarlet_pickaxe"));
     public static final RegistryKey<Item> SCARLET_AXE_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "scarlet_axe"));
     public static final RegistryKey<Item> SCARLET_SHOVEL_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "scarlet_shovel"));
     public static final RegistryKey<Item> SCARLET_HOE_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "scarlet_hoe"));
 
-    // 3. Creación de las Herramientas
+    //Creación de las Herramientas
     public static final Item SCARLET_SWORD = new SwordItem(ModToolMaterials.SCARLET, 3, -2.4F, new Item.Settings().registryKey(SCARLET_SWORD_KEY));
     public static final Item SCARLET_PICKAXE = new PickaxeItem(ModToolMaterials.SCARLET, 1, -2.8F, new Item.Settings().registryKey(SCARLET_PICKAXE_KEY));
     public static final Item SCARLET_AXE = new AxeItem(ModToolMaterials.SCARLET, 5.0F, -3.0F, new Item.Settings().registryKey(SCARLET_AXE_KEY));
     public static final Item SCARLET_SHOVEL = new ShovelItem(ModToolMaterials.SCARLET, 1.5F, -3.0F, new Item.Settings().registryKey(SCARLET_SHOVEL_KEY));
     public static final Item SCARLET_HOE = new HoeItem(ModToolMaterials.SCARLET, -3.0F, 0.0F, new Item.Settings().registryKey(SCARLET_HOE_KEY));
 
-    // --- ARMADURA SCARLET: 1. Llaves de Registro ---
+    //ARMADURA SCARLET Llaves de Registro
     public static final RegistryKey<Item> SCARLET_HELMET_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "scarlet_helmet"));
     public static final RegistryKey<Item> SCARLET_CHESTPLATE_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "scarlet_chestplate"));
     public static final RegistryKey<Item> SCARLET_LEGGINGS_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "scarlet_leggings"));
     public static final RegistryKey<Item> SCARLET_BOOTS_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "scarlet_boots"));
 
-    // --- ARMADURA SCARLET: 2. Creación de las 4 piezas ---
+    //ARMADURA SCARLET Creación de las 4 piezas
     public static final Item SCARLET_HELMET = new ArmorItem(
             ModArmorMaterials.SCARLET,
             EquipmentType.HELMET,
@@ -75,18 +76,18 @@ public class ModItem {
             new Item.Settings().registryKey(SCARLET_BOOTS_KEY)
     );
 
-    // --- SCARTY (Scarlet + Elytra): Llave y Creación ---
+    //SCARTY (Scarlet + Elytra): Llave y Creación
     public static final RegistryKey<Item> SCARTY_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, "scarty"));
 
     public static final Item SCARTY = new Item(
             new Item.Settings()
                     .registryKey(SCARTY_KEY)
-                    .maxDamage(532) // Mayor durabilidad que la Elytra normal (432)
+                    .maxDamage(532)
                     .rarity(Rarity.RARE)
                     .repairable(ModToolMaterials.SCARLET_REPAIR) // Se repara con Lingote de Escarlata
-                    // 1. Permite planear exactamente como una Elytra convencional y usar cohetes
+                    //Permite planear exactamente como una Elytra convencional y usar cohetes
                     .component(DataComponentTypes.GLIDER, Unit.INSTANCE)
-                    // 2. Se equipa en el pecho (CHEST) y muestra las alas 3D "scarty"
+                    //Se equipa en el pecho y muestra las alas 3D scarty
                     .component(
                             DataComponentTypes.EQUIPPABLE,
                             EquippableComponent.builder(EquipmentSlot.CHEST)
@@ -95,10 +96,10 @@ public class ModItem {
                                     .damageOnHurt(true)
                                     .build()
                     )
-                    // 3. Atributos especiales al llevarla equipada en el pecho
+                    //Atributos especiales al llevarla equipada en el pecho
                     .attributeModifiers(
                             AttributeModifiersComponent.builder()
-                                    // Protección de una pechera de hierro (+6 de Armadura)
+                                    //Protección de una pechera de hierro (+6 de Armadura)
                                     .add(
                                             EntityAttributes.ARMOR,
                                             new EntityAttributeModifier(
@@ -108,7 +109,7 @@ public class ModItem {
                                             ),
                                             AttributeModifierSlot.CHEST
                                     )
-                                    // +10% más de daño a los ataques
+                                    //+10% más de daño a los ataques
                                     .add(
                                             EntityAttributes.ATTACK_DAMAGE,
                                             new EntityAttributeModifier(
@@ -118,7 +119,7 @@ public class ModItem {
                                             ),
                                             AttributeModifierSlot.CHEST
                                     )
-                                    // Resistencia al daño por caída (-75% de daño recibido al caer)
+                                    //Resistencia al daño por caída (-75% de daño recibido al caer)
                                     .add(
                                             EntityAttributes.FALL_DAMAGE_MULTIPLIER,
                                             new EntityAttributeModifier(
@@ -128,7 +129,7 @@ public class ModItem {
                                             ),
                                             AttributeModifierSlot.CHEST
                                     )
-                                    // +4 bloques extra de caída segura sin recibir nada de daño
+                                    //+4 bloques extra de caída segura sin recibir nada de daño
                                     .add(
                                             EntityAttributes.SAFE_FALL_DISTANCE,
                                             new EntityAttributeModifier(
@@ -251,6 +252,28 @@ public class ModItem {
                     )
     );
 
+    //ORDEN DE ARRESTO (Trofeo del Mini Jefe Pi Didi para invocar al jefe final de la dungeon)
+    public static final RegistryKey<Item> ARREST_WARRANT_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "arrest_warrant")
+    );
+    public static final Item ARREST_WARRANT = new Item(
+            new Item.Settings()
+                    .registryKey(ARREST_WARRANT_KEY)
+                    .maxCount(1)
+                    .rarity(Rarity.RARE)
+    );
+
+    //HUEVO GENERADOR DE PI DIDI (Para invocarlo desde Creativo)
+    public static final RegistryKey<Item> PI_DIDI_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "pi_didi_spawn_egg")
+    );
+    public static final Item PI_DIDI_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.PI_DIDI,
+            new Item.Settings().registryKey(PI_DIDI_SPAWN_EGG_KEY)
+    );
+
     //Método ayudante de registro
     private static Item registerItem(RegistryKey<Item> key, Item item) {
         return Registry.register(Registries.ITEM, key, item);
@@ -285,9 +308,19 @@ public class ModItem {
         registerItem(ISRATOTEM_KEY, ISRATOTEM);
         registerItem(LONTOTEM_KEY, LONTOTEM);
 
+        //Registrar Orden de Arresto y Huevo Generador de Pi Didi
+        registerItem(ARREST_WARRANT_KEY, ARREST_WARRANT);
+        registerItem(PI_DIDI_SPAWN_EGG_KEY, PI_DIDI_SPAWN_EGG);
+
         //Pestaña Ingredientes
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> {
             entries.add(SCARLET_INGOT);
+            entries.add(ARREST_WARRANT);
+        });
+
+        //Pestaña Huevos Generadores (Spawn Eggs)
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(entries -> {
+            entries.add(PI_DIDI_SPAWN_EGG);
         });
 
         //Pestaña Combate
