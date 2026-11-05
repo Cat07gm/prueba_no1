@@ -21,6 +21,13 @@ public class ModSounds {
             SoundEvent.of(FER_OVILLA_BANANA_HIT_ID)
     );
 
+    public static final Identifier PLAYER_DEATH_KO_ID = Identifier.of(Prueba_no1.MOD_ID, "player_death_ko");
+    public static final SoundEvent PLAYER_DEATH_KO = Registry.register(
+            Registries.SOUND_EVENT,
+            PLAYER_DEATH_KO_ID,
+            SoundEvent.of(PLAYER_DEATH_KO_ID)
+    );
+
     public static void registerModSounds() {
         Prueba_no1.LOGGER.info("Registrando sonidos personalizados para " + Prueba_no1.MOD_ID);
     }

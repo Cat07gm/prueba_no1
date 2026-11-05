@@ -2,16 +2,22 @@ package pruebano1.modid;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.util.math.Box;
 import pruebano1.modid.client.BananaProjectileRenderer;
 import pruebano1.modid.client.FerOvillaRenderer;
 import pruebano1.modid.client.PiDidiBossMusicInstance;
 import pruebano1.modid.client.PiDidiRenderer;
+import pruebano1.modid.client.PlayerDeathKoOverlay;
 import pruebano1.modid.client.VitorJugoRenderer;
 import pruebano1.modid.client.YostinBiberRenderer;
 import pruebano1.modid.entity.ModEntities;
 import pruebano1.modid.entity.PiDidiEntity;
+import pruebano1.modid.network.PlayerDeathKoPayload;
 
 import java.util.List;
 
@@ -27,8 +33,33 @@ public class Prueba_no1Client implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.FER_OVILLA, FerOvillaRenderer::new);
         EntityRendererRegistry.register(ModEntities.BANANA_PROJECTILE, BananaProjectileRenderer::new);
 
-        // Detectar cuando Pi Didi entra en batalla cerca del jugador para reproducir su soundtrack de fondo
+        // Recibir aviso cuando cualquier jugador muere para activar el sonido y el GIF/efecto K.O. en pantalla
+        ClientPlayNetworking.registerGlobalReceiver(PlayerDeathKoPayload.ID, (payload, context) -> {
+            context.client().execute(() -> PlayerDeathKoOverlay.trigger(payload.deadPlayerName()));
+        });
+
+        // Dibujar el efecto K.O. en el HUD de todos los jugadores vivos
+        HudRenderCallback.EVENT.register((drawContext, tickCounter) -> {
+            if (PlayerDeathKoOverlay.isActive()) {
+                PlayerDeathKoOverlay.render(drawContext, tickCounter.getTickDelta(false));
+            }
+        });
+
+        // Dibujar también el efecto K.O. encima de la pantalla de muerte ("¡Has muerto!") del jugador caído
+        ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+            if (screen instanceof DeathScreen) {
+                ScreenEvents.afterRender(screen).register((scr, drawContext, mouseX, mouseY, tickDelta) -> {
+                    if (PlayerDeathKoOverlay.isActive()) {
+                        PlayerDeathKoOverlay.render(drawContext, tickDelta);
+                    }
+                });
+            }
+        });
+
+        // Tick de cliente: actualizar contador del efecto K.O. y detectar soundtrack de Pi Didi
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            PlayerDeathKoOverlay.tick();
+
             if (client.world == null || client.player == null || !client.player.isAlive()) {
                 activeBossMusic = null;
                 return;

@@ -14,5 +14,13 @@
         "stream": false
       }
     ]
+  },
+  "player_death_ko": {
+    "sounds": [
+      {
+        "name": "prueba_no1:player_death_ko",
+        "stream": false
+      }
+    ]
   }
 }
