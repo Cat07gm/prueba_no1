@@ -52,5 +52,10 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItem.LONTOTEM, Models.GENERATED);
         itemModelGenerator.register(ModItem.ARREST_WARRANT, Models.GENERATED);
         itemModelGenerator.register(ModItem.PI_DIDI_SPAWN_EGG, Models.GENERATED);
+        itemModelGenerator.register(ModItem.YOSTIN_BIBER_SPAWN_EGG, Models.GENERATED);
+        itemModelGenerator.register(ModItem.VITOR_JUGO_SPAWN_EGG, Models.GENERATED);
+        itemModelGenerator.register(ModItem.MARIJUANA, Models.GENERATED);
+        itemModelGenerator.register(ModItem.FER_OVILLA_SPAWN_EGG, Models.GENERATED);
+        itemModelGenerator.register(ModItem.BANANA, Models.GENERATED);
     }
 }

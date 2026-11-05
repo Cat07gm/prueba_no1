@@ -23,6 +23,7 @@ public class Prueba_no1 implements ModInitializer {
 		// Proceed with mild caution.
 
 		LOGGER.info("Hello Fabric world!");
+		ModSounds.registerModSounds();
 		ModEntities.registerModEntities();
 		ModItemGroups.registerItemGroups();
 		ModItem.registerModItems();

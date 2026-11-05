@@ -1,0 +1,18 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"spin": {
+			"loop": true,
+			"animation_length": 0.4,
+			"bones": {
+				"platano_bumeran": {
+					"rotation": {
+						"0.0": {"vector": [0, 0, 10]},
+						"0.2": {"vector": [0, 360, -10]},
+						"0.4": {"vector": [0, 720, 10]}
+					}
+				}
+			}
+		}
+	}
+}

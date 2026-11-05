@@ -8,6 +8,9 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.ServerBossBar;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
@@ -41,6 +44,12 @@ public class PiDidiEntity extends HostileEntity implements GeoEntity {
     private static final RawAnimation ATTACK_ANIM = RawAnimation.begin().thenPlay("attack");
     private static final RawAnimation SPECIAL_ANIM = RawAnimation.begin().thenPlay("special");
 
+    // Sincroniza con el cliente si Pi Didi está en combate para activar/detener su soundtrack de jefe
+    private static final TrackedData<Boolean> IN_COMBAT = DataTracker.registerData(
+            PiDidiEntity.class,
+            TrackedDataHandlerRegistry.BOOLEAN
+    );
+
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
     // Barra de jefe del color de jefes menores (Amarillo)
@@ -61,6 +70,20 @@ public class PiDidiEntity extends HostileEntity implements GeoEntity {
         super(entityType, world);
         this.setPersistent(); // No desaparece nunca al alejarse
         this.experiencePoints = 160; // 9 niveles de experiencia
+    }
+
+    @Override
+    protected void initDataTracker(DataTracker.Builder builder) {
+        super.initDataTracker(builder);
+        builder.add(IN_COMBAT, false);
+    }
+
+    public boolean isInCombat() {
+        return this.dataTracker.get(IN_COMBAT);
+    }
+
+    public void setInCombat(boolean inCombat) {
+        this.dataTracker.set(IN_COMBAT, inCombat);
     }
 
     public static DefaultAttributeContainer.Builder createPiDidiAttributes() {
@@ -93,10 +116,13 @@ public class PiDidiEntity extends HostileEntity implements GeoEntity {
 
         LivingEntity target = this.getTarget();
         if (target == null || !target.isAlive()) {
+            this.setInCombat(false);
             this.normalAttackWindup = -1;
             this.specialChargeTicks = -1;
             return;
         }
+
+        this.setInCombat(true);
 
         this.getLookControl().lookAt(target, 30.0F, 30.0F);
         double distanceSq = this.squaredDistanceTo(target);

@@ -6,6 +6,7 @@ import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.DeathProtectionComponent;
 import net.minecraft.component.type.EquippableComponent;
+import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -274,6 +275,56 @@ public class ModItem {
             new Item.Settings().registryKey(PI_DIDI_SPAWN_EGG_KEY)
     );
 
+    //HUEVO GENERADOR DE YOSTIN BIBER (Secuaz de la Dungeon Isla Epstein)
+    public static final RegistryKey<Item> YOSTIN_BIBER_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "yostin_biber_spawn_egg")
+    );
+    public static final Item YOSTIN_BIBER_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.YOSTIN_BIBER,
+            new Item.Settings().registryKey(YOSTIN_BIBER_SPAWN_EGG_KEY)
+    );
+
+    //HUEVO GENERADOR DE VITOR JUGO (Secuaz flotante de la Dungeon Isla Epstein)
+    public static final RegistryKey<Item> VITOR_JUGO_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "vitor_jugo_spawn_egg")
+    );
+    public static final Item VITOR_JUGO_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.VITOR_JUGO,
+            new Item.Settings().registryKey(VITOR_JUGO_SPAWN_EGG_KEY)
+    );
+
+    //MARIJUANA (Drop de Vitor Jugo, por ahora sin utilidad)
+    public static final RegistryKey<Item> MARIJUANA_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "marijuana")
+    );
+    public static final Item MARIJUANA = new Item(
+            new Item.Settings().registryKey(MARIJUANA_KEY)
+    );
+
+    //HUEVO GENERADOR DE FER OVILLA (Francotiradora de la Dungeon Isla Epstein)
+    public static final RegistryKey<Item> FER_OVILLA_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "fer_ovilla_spawn_egg")
+    );
+    public static final Item FER_OVILLA_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.FER_OVILLA,
+            new Item.Settings().registryKey(FER_OVILLA_SPAWN_EGG_KEY)
+    );
+
+    //PLÁTANO (Drop comestible de Fer Ovilla: restaura 2 muslitos y medio de hambre)
+    public static final RegistryKey<Item> BANANA_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "banana")
+    );
+    public static final Item BANANA = new Item(
+            new Item.Settings()
+                    .registryKey(BANANA_KEY)
+                    .food(new FoodComponent.Builder().nutrition(5).saturationModifier(0.6F).build())
+    );
+
     //Método ayudante de registro
     private static Item registerItem(RegistryKey<Item> key, Item item) {
         return Registry.register(Registries.ITEM, key, item);
@@ -308,19 +359,33 @@ public class ModItem {
         registerItem(ISRATOTEM_KEY, ISRATOTEM);
         registerItem(LONTOTEM_KEY, LONTOTEM);
 
-        //Registrar Orden de Arresto y Huevo Generador de Pi Didi
+        //Registrar Orden de Arresto y Huevos Generadores
         registerItem(ARREST_WARRANT_KEY, ARREST_WARRANT);
         registerItem(PI_DIDI_SPAWN_EGG_KEY, PI_DIDI_SPAWN_EGG);
+        registerItem(YOSTIN_BIBER_SPAWN_EGG_KEY, YOSTIN_BIBER_SPAWN_EGG);
+        registerItem(VITOR_JUGO_SPAWN_EGG_KEY, VITOR_JUGO_SPAWN_EGG);
+        registerItem(MARIJUANA_KEY, MARIJUANA);
+        registerItem(FER_OVILLA_SPAWN_EGG_KEY, FER_OVILLA_SPAWN_EGG);
+        registerItem(BANANA_KEY, BANANA);
 
         //Pestaña Ingredientes
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> {
             entries.add(SCARLET_INGOT);
             entries.add(ARREST_WARRANT);
+            entries.add(MARIJUANA);
+        });
+
+        //Pestaña Comida y Bebida
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FOOD_AND_DRINK).register(entries -> {
+            entries.add(BANANA);
         });
 
         //Pestaña Huevos Generadores (Spawn Eggs)
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(entries -> {
             entries.add(PI_DIDI_SPAWN_EGG);
+            entries.add(YOSTIN_BIBER_SPAWN_EGG);
+            entries.add(VITOR_JUGO_SPAWN_EGG);
+            entries.add(FER_OVILLA_SPAWN_EGG);
         });
 
         //Pestaña Combate

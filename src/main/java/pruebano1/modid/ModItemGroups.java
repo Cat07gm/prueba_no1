@@ -47,6 +47,11 @@ public class ModItemGroups {
                 entries.add(ModItem.LONTOTEM);
                 entries.add(ModItem.ARREST_WARRANT);
                 entries.add(ModItem.PI_DIDI_SPAWN_EGG);
+                entries.add(ModItem.YOSTIN_BIBER_SPAWN_EGG);
+                entries.add(ModItem.VITOR_JUGO_SPAWN_EGG);
+                entries.add(ModItem.MARIJUANA);
+                entries.add(ModItem.FER_OVILLA_SPAWN_EGG);
+                entries.add(ModItem.BANANA);
             })
             .build();
 

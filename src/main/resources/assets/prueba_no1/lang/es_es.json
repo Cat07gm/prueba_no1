@@ -24,5 +24,14 @@
   "item.prueba_no1.lontotem": "Lontotem 288470",
   "item.prueba_no1.arrest_warrant": "Orden de arresto",
   "item.prueba_no1.pi_didi_spawn_egg": "Generar Pi Didi",
-  "entity.prueba_no1.pi_didi": "Pi Didi"
+  "entity.prueba_no1.pi_didi": "Pi Didi",
+  "item.prueba_no1.yostin_biber_spawn_egg": "Generar Yostin Biber",
+  "entity.prueba_no1.yostin_biber": "Yostin Biber",
+  "item.prueba_no1.vitor_jugo_spawn_egg": "Generar Vitor Jugo",
+  "entity.prueba_no1.vitor_jugo": "Vitor Jugo",
+  "item.prueba_no1.marijuana": "Marijuana",
+  "item.prueba_no1.fer_ovilla_spawn_egg": "Generar Fer Ovilla",
+  "entity.prueba_no1.fer_ovilla": "Fer Ovilla",
+  "entity.prueba_no1.banana_projectile": "Plátano Bumerán",
+  "item.prueba_no1.banana": "Plátano"
 }

@@ -1,0 +1,18 @@
+{
+  "pi_didi_boss_music": {
+    "sounds": [
+      {
+        "name": "prueba_no1:pi_didi_boss_music",
+        "stream": true
+      }
+    ]
+  },
+  "fer_ovilla_banana_hit": {
+    "sounds": [
+      {
+        "name": "prueba_no1:fer_ovilla_banana_hit",
+        "stream": false
+      }
+    ]
+  }
+}
