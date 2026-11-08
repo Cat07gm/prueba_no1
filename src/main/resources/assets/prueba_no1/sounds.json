@@ -22,5 +22,13 @@
         "stream": false
       }
     ]
+  },
+  "valentina_explosion": {
+    "sounds": [
+      {
+        "name": "prueba_no1:valentina_explosion",
+        "stream": false
+      }
+    ]
   }
 }

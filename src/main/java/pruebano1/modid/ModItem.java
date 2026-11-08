@@ -325,6 +325,16 @@ public class ModItem {
                     .food(new FoodComponent.Builder().nutrition(5).saturationModifier(0.6F).build())
     );
 
+    //HUEVO GENERADOR DE VALENTINA PRIETA (Secuaz de la Dungeon Isla Epstein)
+    public static final RegistryKey<Item> VALENTINA_PRIETA_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "valentina_prieta_spawn_egg")
+    );
+    public static final Item VALENTINA_PRIETA_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.VALENTINA_PRIETA,
+            new Item.Settings().registryKey(VALENTINA_PRIETA_SPAWN_EGG_KEY)
+    );
+
     //Método ayudante de registro
     private static Item registerItem(RegistryKey<Item> key, Item item) {
         return Registry.register(Registries.ITEM, key, item);
@@ -367,6 +377,7 @@ public class ModItem {
         registerItem(MARIJUANA_KEY, MARIJUANA);
         registerItem(FER_OVILLA_SPAWN_EGG_KEY, FER_OVILLA_SPAWN_EGG);
         registerItem(BANANA_KEY, BANANA);
+        registerItem(VALENTINA_PRIETA_SPAWN_EGG_KEY, VALENTINA_PRIETA_SPAWN_EGG);
 
         //Pestaña Ingredientes
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> {
@@ -386,6 +397,7 @@ public class ModItem {
             entries.add(YOSTIN_BIBER_SPAWN_EGG);
             entries.add(VITOR_JUGO_SPAWN_EGG);
             entries.add(FER_OVILLA_SPAWN_EGG);
+            entries.add(VALENTINA_PRIETA_SPAWN_EGG);
         });
 
         //Pestaña Combate

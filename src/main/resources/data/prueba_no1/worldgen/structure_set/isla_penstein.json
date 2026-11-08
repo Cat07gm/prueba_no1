@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "prueba_no1:isla_penstein",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 180,
+    "separation": 60,
+    "salt": 194827364
+  }
+}

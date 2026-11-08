@@ -1,0 +1,37 @@
+{
+  "type": "prueba_no1:isla_penstein",
+  "biomes": "#minecraft:is_deep_ocean",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": [
+        {
+          "type": "prueba_no1:yostin_biber",
+          "weight": 30,
+          "minCount": 2,
+          "maxCount": 3
+        },
+        {
+          "type": "prueba_no1:vitor_jugo",
+          "weight": 20,
+          "minCount": 1,
+          "maxCount": 2
+        },
+        {
+          "type": "prueba_no1:fer_ovilla",
+          "weight": 25,
+          "minCount": 1,
+          "maxCount": 2
+        },
+        {
+          "type": "prueba_no1:valentina_prieta",
+          "weight": 25,
+          "minCount": 1,
+          "maxCount": 2
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "prueba_no1:block/jefri_mailbox_body",
+    "body": "prueba_no1:block/jefri_mailbox_body",
+    "front": "prueba_no1:block/jefri_mailbox_front",
+    "post": "prueba_no1:block/jefri_mailbox_post",
+    "flag": "prueba_no1:block/jefri_mailbox_flag"
+  },
+  "elements": [
+    {
+      "name": "post_base",
+      "from": [5.5, 0, 5.5],
+      "to": [10.5, 1.5, 10.5],
+      "faces": {
+        "north": { "uv": [3, 14, 13, 16], "texture": "#post" },
+        "east":  { "uv": [3, 14, 13, 16], "texture": "#post" },
+        "south": { "uv": [3, 14, 13, 16], "texture": "#post" },
+        "west":  { "uv": [3, 14, 13, 16], "texture": "#post" },
+        "up":    { "uv": [3, 3, 13, 13], "texture": "#post" },
+        "down":  { "uv": [3, 3, 13, 13], "texture": "#post", "cullface": "down" }
+      }
+    },
+    {
+      "name": "post_pillar",
+      "from": [6.5, 1.5, 6.5],
+      "to": [9.5, 9, 9.5],
+      "faces": {
+        "north": { "uv": [5, 2, 11, 15], "texture": "#post" },
+        "east":  { "uv": [5, 2, 11, 15], "texture": "#post" },
+        "south": { "uv": [5, 2, 11, 15], "texture": "#post" },
+        "west":  { "uv": [5, 2, 11, 15], "texture": "#post" }
+      }
+    },
+    {
+      "name": "post_support_plate",
+      "from": [5, 8.5, 3.5],
+      "to": [11, 9.5, 12.5],
+      "faces": {
+        "north": { "uv": [2, 6, 14, 8], "texture": "#post" },
+        "east":  { "uv": [2, 6, 14, 8], "texture": "#post" },
+        "south": { "uv": [2, 6, 14, 8], "texture": "#post" },
+        "west":  { "uv": [2, 6, 14, 8], "texture": "#post" },
+        "up":    { "uv": [2, 2, 14, 14], "texture": "#post" },
+        "down":  { "uv": [2, 2, 14, 14], "texture": "#post" }
+      }
+    },
+    {
+      "name": "mailbox_main_box",
+      "from": [4, 9.5, 2],
+      "to": [12, 14.5, 14],
+      "faces": {
+        "north": { "uv": [0, 0, 16, 16], "texture": "#front" },
+        "east":  { "uv": [0, 3, 16, 14], "texture": "#body" },
+        "south": { "uv": [0, 2, 16, 14], "texture": "#body" },
+        "west":  { "uv": [0, 3, 16, 14], "texture": "#body" },
+        "up":    { "uv": [0, 0, 16, 16], "texture": "#body" },
+        "down":  { "uv": [0, 0, 16, 16], "texture": "#body" }
+      }
+    },
+    {
+      "name": "mailbox_curved_roof",
+      "from": [5, 14.5, 2],
+      "to": [11, 16, 14],
+      "faces": {
+        "north": { "uv": [2, 0, 14, 3], "texture": "#body" },
+        "east":  { "uv": [0, 0, 16, 3], "texture": "#body" },
+        "south": { "uv": [2, 0, 14, 3], "texture": "#body" },
+        "west":  { "uv": [0, 0, 16, 3], "texture": "#body" },
+        "up":    { "uv": [2, 0, 14, 16], "texture": "#body" }
+      }
+    },
+    {
+      "name": "mailbox_flag_stem",
+      "from": [12, 11.5, 4.5],
+      "to": [12.7, 15.5, 5.5],
+      "faces": {
+        "north": { "uv": [0, 0, 4, 16], "texture": "#flag" },
+        "east":  { "uv": [0, 0, 4, 16], "texture": "#flag" },
+        "south": { "uv": [0, 0, 4, 16], "texture": "#flag" },
+        "west":  { "uv": [0, 0, 4, 16], "texture": "#flag" },
+        "up":    { "uv": [0, 0, 4, 4], "texture": "#flag" },
+        "down":  { "uv": [0, 0, 4, 4], "texture": "#flag" }
+      }
+    },
+    {
+      "name": "mailbox_flag_banner",
+      "from": [12, 14, 4.5],
+      "to": [12.7, 15.8, 7.2],
+      "faces": {
+        "north": { "uv": [0, 0, 8, 8], "texture": "#flag" },
+        "east":  { "uv": [0, 0, 12, 8], "texture": "#flag" },
+        "south": { "uv": [0, 0, 8, 8], "texture": "#flag" },
+        "west":  { "uv": [0, 0, 12, 8], "texture": "#flag" },
+        "up":    { "uv": [0, 0, 8, 12], "texture": "#flag" },
+        "down":  { "uv": [0, 0, 8, 12], "texture": "#flag" }
+      }
+    }
+  ]
+}

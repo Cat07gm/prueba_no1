@@ -28,6 +28,13 @@ public class ModSounds {
             SoundEvent.of(PLAYER_DEATH_KO_ID)
     );
 
+    public static final Identifier VALENTINA_EXPLOSION_ID = Identifier.of(Prueba_no1.MOD_ID, "valentina_explosion");
+    public static final SoundEvent VALENTINA_EXPLOSION = Registry.register(
+            Registries.SOUND_EVENT,
+            VALENTINA_EXPLOSION_ID,
+            SoundEvent.of(VALENTINA_EXPLOSION_ID)
+    );
+
     public static void registerModSounds() {
         Prueba_no1.LOGGER.info("Registrando sonidos personalizados para " + Prueba_no1.MOD_ID);
     }

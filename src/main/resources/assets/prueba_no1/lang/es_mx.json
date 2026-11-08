@@ -33,5 +33,9 @@
   "item.prueba_no1.fer_ovilla_spawn_egg": "Generar Fer Ovilla",
   "entity.prueba_no1.fer_ovilla": "Fer Ovilla",
   "entity.prueba_no1.banana_projectile": "Plátano Bumerán",
-  "item.prueba_no1.banana": "Plátano"
+  "item.prueba_no1.banana": "Plátano",
+  "item.prueba_no1.valentina_prieta_spawn_egg": "Generar Valentina Prieta",
+  "entity.prueba_no1.valentina_prieta": "Valentina Prieta",
+  "block.prueba_no1.jefri_mailbox": "Buzón de Jefri penstein",
+  "item.prueba_no1.jefri_mailbox": "Buzón de Jefri penstein"
 }

@@ -3,6 +3,7 @@ package pruebano1.modid;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -10,9 +11,11 @@ import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.util.math.Box;
 import pruebano1.modid.client.BananaProjectileRenderer;
 import pruebano1.modid.client.FerOvillaRenderer;
+import pruebano1.modid.client.HelloKittyParticle;
 import pruebano1.modid.client.PiDidiBossMusicInstance;
 import pruebano1.modid.client.PiDidiRenderer;
 import pruebano1.modid.client.PlayerDeathKoOverlay;
+import pruebano1.modid.client.ValentinaPrietaRenderer;
 import pruebano1.modid.client.VitorJugoRenderer;
 import pruebano1.modid.client.YostinBiberRenderer;
 import pruebano1.modid.entity.ModEntities;
@@ -32,6 +35,9 @@ public class Prueba_no1Client implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.VITOR_JUGO, VitorJugoRenderer::new);
         EntityRendererRegistry.register(ModEntities.FER_OVILLA, FerOvillaRenderer::new);
         EntityRendererRegistry.register(ModEntities.BANANA_PROJECTILE, BananaProjectileRenderer::new);
+        EntityRendererRegistry.register(ModEntities.VALENTINA_PRIETA, ValentinaPrietaRenderer::new);
+
+        ParticleFactoryRegistry.getInstance().register(ModParticles.HELLO_KITTY, HelloKittyParticle.Factory::new);
 
         // Recibir aviso cuando cualquier jugador muere para activar el sonido y el GIF/efecto K.O. en pantalla
         ClientPlayNetworking.registerGlobalReceiver(PlayerDeathKoPayload.ID, (payload, context) -> {

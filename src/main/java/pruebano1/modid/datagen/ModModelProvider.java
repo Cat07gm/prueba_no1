@@ -39,7 +39,8 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItem.SCARLET_SHOVEL, Models.HANDHELD);
         itemModelGenerator.register(ModItem.SCARLET_HOE, Models.HANDHELD);
 
-        // Piezas de armadura, Scarty, Brazaletes y Tótems en el inventario
+        // Piezas de armadura, Scarty, Brazaletes y Tótems en el inventario, orden de arresto,
+        // boss, mini boss, niños, items especiales
         itemModelGenerator.register(ModItem.SCARLET_HELMET, Models.GENERATED);
         itemModelGenerator.register(ModItem.SCARLET_CHESTPLATE, Models.GENERATED);
         itemModelGenerator.register(ModItem.SCARLET_LEGGINGS, Models.GENERATED);
@@ -57,5 +58,6 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItem.MARIJUANA, Models.GENERATED);
         itemModelGenerator.register(ModItem.FER_OVILLA_SPAWN_EGG, Models.GENERATED);
         itemModelGenerator.register(ModItem.BANANA, Models.GENERATED);
+        itemModelGenerator.register(ModItem.VALENTINA_PRIETA_SPAWN_EGG, Models.GENERATED);
     }
 }
