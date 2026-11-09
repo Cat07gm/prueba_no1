@@ -21,8 +21,10 @@ import net.minecraft.structure.StructureStart;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Box;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pruebano1.modid.entity.JefriPensteinEntity;
 import pruebano1.modid.entity.ModEntities;
 import pruebano1.modid.network.PlayerDeathKoPayload;
 import pruebano1.modid.world.IslaPensteinCustomEdits;
@@ -54,6 +56,21 @@ public class Prueba_no1 implements ModInitializer {
 
 		// Registrar paquete de red para el efecto de muerte del jugador
 		PayloadTypeRegistry.playS2C().register(PlayerDeathKoPayload.ID, PlayerDeathKoPayload.CODEC);
+
+		// Inmunidad total para los jugadores mientras Jefri penstein está en cinemática de invocación o cinemática final de muerte
+		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+			if (entity instanceof ServerPlayerEntity player && player.getWorld() instanceof ServerWorld serverWorld) {
+				boolean cinematicActive = !serverWorld.getEntitiesByClass(
+						JefriPensteinEntity.class,
+						new Box(player.getBlockPos()).expand(80.0D),
+						JefriPensteinEntity::isInAnyCinematic
+				).isEmpty();
+				if (cinematicActive) {
+					return false;
+				}
+			}
+			return true;
+		});
 
 		// Cuando cualquier jugador muere, hacer caer un rayo y enviar el sonido y el efecto visual a todos los jugadores
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {

@@ -59,5 +59,7 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItem.FER_OVILLA_SPAWN_EGG, Models.GENERATED);
         itemModelGenerator.register(ModItem.BANANA, Models.GENERATED);
         itemModelGenerator.register(ModItem.VALENTINA_PRIETA_SPAWN_EGG, Models.GENERATED);
+        itemModelGenerator.register(ModItem.JEFRI_PENSTEIN_SPAWN_EGG, Models.GENERATED);
+        itemModelGenerator.register(ModItem.TOALLA_KOTEX, Models.GENERATED);
     }
 }

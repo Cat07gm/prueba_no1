@@ -37,5 +37,9 @@
   "item.prueba_no1.valentina_prieta_spawn_egg": "Valentina Prieta Spawn Egg",
   "entity.prueba_no1.valentina_prieta": "Valentina Prieta",
   "block.prueba_no1.jefri_mailbox": "Buzón de Jefri penstein",
-  "item.prueba_no1.jefri_mailbox": "Buzón de Jefri penstein"
+  "item.prueba_no1.jefri_mailbox": "Buzón de Jefri penstein",
+  "item.prueba_no1.jefri_penstein_spawn_egg": "Jefri penstein Spawn Egg",
+  "entity.prueba_no1.jefri_penstein": "Jefri penstein",
+  "entity.prueba_no1.kotex_projectile": "Toalla Kotex",
+  "item.prueba_no1.toalla_kotex": "Toalla Kotex"
 }

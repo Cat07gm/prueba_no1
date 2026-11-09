@@ -35,6 +35,27 @@ public class ModSounds {
             SoundEvent.of(VALENTINA_EXPLOSION_ID)
     );
 
+    public static final Identifier JEFRI_BOSS_MUSIC_ID = Identifier.of(Prueba_no1.MOD_ID, "jefri_boss_music");
+    public static final SoundEvent JEFRI_BOSS_MUSIC = Registry.register(
+            Registries.SOUND_EVENT,
+            JEFRI_BOSS_MUSIC_ID,
+            SoundEvent.of(JEFRI_BOSS_MUSIC_ID)
+    );
+
+    public static final Identifier SONIDO_ATAQUE_ESPECIAL_1_ID = Identifier.of(Prueba_no1.MOD_ID, "sonido_ataqueespecial1");
+    public static final SoundEvent SONIDO_ATAQUE_ESPECIAL_1 = Registry.register(
+            Registries.SOUND_EVENT,
+            SONIDO_ATAQUE_ESPECIAL_1_ID,
+            SoundEvent.of(SONIDO_ATAQUE_ESPECIAL_1_ID)
+    );
+
+    public static final Identifier JEFRI_DEATH_FART_ID = Identifier.of(Prueba_no1.MOD_ID, "jefri_death_fart");
+    public static final SoundEvent JEFRI_DEATH_FART = Registry.register(
+            Registries.SOUND_EVENT,
+            JEFRI_DEATH_FART_ID,
+            SoundEvent.of(JEFRI_DEATH_FART_ID)
+    );
+
     public static void registerModSounds() {
         Prueba_no1.LOGGER.info("Registrando sonidos personalizados para " + Prueba_no1.MOD_ID);
     }

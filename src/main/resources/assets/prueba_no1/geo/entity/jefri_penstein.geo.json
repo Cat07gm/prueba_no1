@@ -1,0 +1,93 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.jefri_penstein",
+				"texture_width": 64,
+				"texture_height": 64,
+				"visible_bounds_width": 12,
+				"visible_bounds_height": 6.5,
+				"visible_bounds_offset": [0, 2.75, 0]
+			},
+			"bones": [
+				{
+					"name": "cuerpo_completo",
+					"pivot": [0, 12, 0]
+				},
+				{
+					"name": "cabeza",
+					"parent": "cuerpo_completo",
+					"pivot": [0, 24, 0],
+					"cubes": [
+						{"origin": [-4, 24, -3], "size": [8, 8, 8], "uv": [0, 0]},
+						{"origin": [-4, 24, -3], "size": [8, 8, 8], "inflate": 0.25, "uv": [32, 0]}
+					]
+				},
+				{
+					"name": "torso",
+					"parent": "cuerpo_completo",
+					"pivot": [0, 20, 0],
+					"cubes": [
+						{"origin": [-4, 12, -1], "size": [8, 12, 4], "uv": [16, 16]},
+						{"origin": [-4, 12, -1], "size": [8, 12, 4], "inflate": 0.2, "uv": [16, 32]}
+					]
+				},
+				{
+					"name": "brazo_iziquierdo",
+					"parent": "cuerpo_completo",
+					"pivot": [5, 23, 1],
+					"cubes": [
+						{"origin": [4, 18, -1], "size": [4, 6, 4], "uv": [40, 16]},
+						{"origin": [4, 18, -1], "size": [4, 6, 4], "inflate": 0.2, "uv": [40, 32]}
+					]
+				},
+				{
+					"name": "brazo_izquierdo2",
+					"parent": "brazo_iziquierdo",
+					"pivot": [6, 18, 1],
+					"cubes": [
+						{"origin": [4, 12, -1], "size": [4, 6, 4], "uv": [40, 22]},
+						{"origin": [4, 12, -1], "size": [4, 6, 4], "inflate": 0.2, "uv": [40, 38]}
+					]
+				},
+				{
+					"name": "brazo_derecho",
+					"parent": "cuerpo_completo",
+					"pivot": [-5, 23, 1],
+					"cubes": [
+						{"origin": [-8, 18, -1], "size": [4, 6, 4], "uv": [32, 48]},
+						{"origin": [-8, 18, -1], "size": [4, 6, 4], "inflate": 0.2, "uv": [48, 48]}
+					]
+				},
+				{
+					"name": "brazo_derecho2",
+					"parent": "brazo_derecho",
+					"pivot": [-6, 18, 1],
+					"cubes": [
+						{"origin": [-8, 12, -1], "size": [4, 6, 4], "uv": [32, 54]},
+						{"origin": [-8, 12, -1], "size": [4, 6, 4], "inflate": 0.2, "uv": [48, 54]}
+					]
+				},
+				{
+					"name": "pierna_izquierda",
+					"parent": "cuerpo_completo",
+					"pivot": [2, 11, 0],
+					"cubes": [
+						{"origin": [0, 6, -1], "size": [4, 6, 4], "uv": [0, 16]},
+						{"origin": [0, 0, -1], "size": [4, 6, 4], "uv": [0, 22]}
+					]
+				},
+				{
+					"name": "pierna_derecha",
+					"parent": "cuerpo_completo",
+					"pivot": [-2, 11, 0],
+					"cubes": [
+						{"origin": [-4, 6, -1], "size": [4, 6, 4], "uv": [16, 48]},
+						{"origin": [-4, 0, -1], "size": [4, 6, 4], "uv": [16, 54]}
+					]
+				}
+			]
+		}
+	]
+}

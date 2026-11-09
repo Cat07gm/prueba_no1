@@ -108,6 +108,35 @@ public class ModEntities {
                     .build(VALENTINA_PRIETA_KEY)
     );
 
+    public static final RegistryKey<EntityType<?>> JEFRI_PENSTEIN_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "jefri_penstein")
+    );
+
+    public static final EntityType<JefriPensteinEntity> JEFRI_PENSTEIN = Registry.register(
+            Registries.ENTITY_TYPE,
+            JEFRI_PENSTEIN_KEY,
+            EntityType.Builder.create(JefriPensteinEntity::new, SpawnGroup.MONSTER)
+                    .dimensions(0.8F, 2.2F) // Tamaño normal de jefe igual a Pi Didi
+                    .maxTrackingRange(64)
+                    .build(JEFRI_PENSTEIN_KEY)
+    );
+
+    public static final RegistryKey<EntityType<?>> KOTEX_PROJECTILE_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "kotex_projectile")
+    );
+
+    public static final EntityType<KotexProjectileEntity> KOTEX_PROJECTILE = Registry.register(
+            Registries.ENTITY_TYPE,
+            KOTEX_PROJECTILE_KEY,
+            EntityType.Builder.<KotexProjectileEntity>create(KotexProjectileEntity::new, SpawnGroup.MISC)
+                    .dimensions(0.45F, 0.25F)
+                    .maxTrackingRange(64)
+                    .trackingTickInterval(10)
+                    .build(KOTEX_PROJECTILE_KEY)
+    );
+
     public static void registerModEntities() {
         Prueba_no1.LOGGER.info("Registrando entidades para " + Prueba_no1.MOD_ID);
         FabricDefaultAttributeRegistry.register(PI_DIDI, PiDidiEntity.createPiDidiAttributes());
@@ -115,6 +144,7 @@ public class ModEntities {
         FabricDefaultAttributeRegistry.register(VITOR_JUGO, VitorJugoEntity.createVitorJugoAttributes());
         FabricDefaultAttributeRegistry.register(FER_OVILLA, FerOvillaEntity.createFerOvillaAttributes());
         FabricDefaultAttributeRegistry.register(VALENTINA_PRIETA, ValentinaPrietaEntity.createValentinaPrietaAttributes());
+        FabricDefaultAttributeRegistry.register(JEFRI_PENSTEIN, JefriPensteinEntity.createJefriPensteinAttributes());
 
         // Permitir spawneo natural de los 4 niños en la Isla Penstein tanto de día como de noche,
         // manteniendo un límite local (máximo 12 niños en un radio de 28 bloques) para que sea abundante pero controlable para 2 jugadores full diamante.

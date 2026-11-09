@@ -30,5 +30,29 @@
         "stream": false
       }
     ]
+  },
+  "jefri_boss_music": {
+    "sounds": [
+      {
+        "name": "prueba_no1:jefri_boss_music",
+        "stream": true
+      }
+    ]
+  },
+  "sonido_ataqueespecial1": {
+    "sounds": [
+      {
+        "name": "prueba_no1:sonido_ataqueespecial1",
+        "stream": false
+      }
+    ]
+  },
+  "jefri_death_fart": {
+    "sounds": [
+      {
+        "name": "prueba_no1:jefri_death_fart",
+        "stream": false
+      }
+    ]
   }
 }

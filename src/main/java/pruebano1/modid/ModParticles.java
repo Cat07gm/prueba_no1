@@ -14,6 +14,12 @@ public class ModParticles {
             FabricParticleTypes.simple(true)
     );
 
+    public static final SimpleParticleType WEED_LEAF = Registry.register(
+            Registries.PARTICLE_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "weed_leaf"),
+            FabricParticleTypes.simple(true)
+    );
+
     public static void registerModParticles() {
         Prueba_no1.LOGGER.info("Registrando partículas personalizadas para " + Prueba_no1.MOD_ID);
     }

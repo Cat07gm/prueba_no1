@@ -335,6 +335,25 @@ public class ModItem {
             new Item.Settings().registryKey(VALENTINA_PRIETA_SPAWN_EGG_KEY)
     );
 
+    //HUEVO GENERADOR DE JEFRI PENSTEIN (Jefe Final de la Dungeon Isla Penstein)
+    public static final RegistryKey<Item> JEFRI_PENSTEIN_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "jefri_penstein_spawn_egg")
+    );
+    public static final Item JEFRI_PENSTEIN_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.JEFRI_PENSTEIN,
+            new Item.Settings().registryKey(JEFRI_PENSTEIN_SPAWN_EGG_KEY)
+    );
+
+    //TOALLA KOTEX (Proyectil tipo flecha de Jefri penstein y usable con Arco/Ballesta o lanzándola con la mano)
+    public static final RegistryKey<Item> TOALLA_KOTEX_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "toalla_kotex")
+    );
+    public static final Item TOALLA_KOTEX = new ToallaKotexItem(
+            new Item.Settings().registryKey(TOALLA_KOTEX_KEY)
+    );
+
     //Método ayudante de registro
     private static Item registerItem(RegistryKey<Item> key, Item item) {
         return Registry.register(Registries.ITEM, key, item);
@@ -378,6 +397,8 @@ public class ModItem {
         registerItem(FER_OVILLA_SPAWN_EGG_KEY, FER_OVILLA_SPAWN_EGG);
         registerItem(BANANA_KEY, BANANA);
         registerItem(VALENTINA_PRIETA_SPAWN_EGG_KEY, VALENTINA_PRIETA_SPAWN_EGG);
+        registerItem(JEFRI_PENSTEIN_SPAWN_EGG_KEY, JEFRI_PENSTEIN_SPAWN_EGG);
+        registerItem(TOALLA_KOTEX_KEY, TOALLA_KOTEX);
 
         //Pestaña Ingredientes
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> {
@@ -393,6 +414,7 @@ public class ModItem {
 
         //Pestaña Huevos Generadores (Spawn Eggs)
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(entries -> {
+            entries.add(JEFRI_PENSTEIN_SPAWN_EGG);
             entries.add(PI_DIDI_SPAWN_EGG);
             entries.add(YOSTIN_BIBER_SPAWN_EGG);
             entries.add(VITOR_JUGO_SPAWN_EGG);
@@ -411,6 +433,7 @@ public class ModItem {
             entries.add(NAZITOTEM);
             entries.add(ISRATOTEM);
             entries.add(LONTOTEM);
+            entries.add(TOALLA_KOTEX);
         });
 
         //Pestaña Herramientas
