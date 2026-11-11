@@ -12,6 +12,8 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
+import net.minecraft.block.piston.PistonBehavior;
+import pruebano1.modid.block.DrafteaBlock;
 import pruebano1.modid.block.JefriMailboxBlock;
 
 public class ModBlocks {
@@ -68,6 +70,26 @@ public class ModBlocks {
             .nonOpaque()
             .sounds(BlockSoundGroup.LANTERN));
 
+    // DRAFTEA (Máquina tragamonedas de 2 bloques de alto que funciona con Tony Coins)
+    public static final RegistryKey<Block> DRAFTEA_KEY = RegistryKey.of(
+            RegistryKeys.BLOCK,
+            Identifier.of(Prueba_no1.MOD_ID, "draftea")
+    );
+    public static final RegistryKey<Item> DRAFTEA_ITEM_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "draftea")
+    );
+
+    // Indestructible en supervivencia como la Bedrock (en creativo sí se rompe). Solo se obtiene en creativo o con /give.
+    public static final Block DRAFTEA = new DrafteaBlock(AbstractBlock.Settings.create()
+            .registryKey(DRAFTEA_KEY)
+            .strength(-1.0f, 3600000.0f)
+            .dropsNothing()
+            .nonOpaque()
+            .luminance(state -> 6) // La pantalla brilla un poco
+            .pistonBehavior(PistonBehavior.BLOCK)
+            .sounds(BlockSoundGroup.METAL));
+
     //REGISTERS
     public static void registerModBlocks() {
         Prueba_no1.LOGGER.info("Registrando bloques para " + Prueba_no1.MOD_ID);
@@ -76,6 +98,7 @@ public class ModBlocks {
         registerBlock(DEEPSLATE_SCARLET_ORE_KEY, DEEPSLATE_SCARLET_ORE_ITEM_KEY, DEEPSLATE_SCARLET_ORE);
         registerBlock(SCARLET_BLOCK_KEY, SCARLET_BLOCK_ITEM_KEY, SCARLET_BLOCK);
         registerBlock(JEFRI_MAILBOX_KEY, JEFRI_MAILBOX_ITEM_KEY, JEFRI_MAILBOX);
+        registerBlock(DRAFTEA_KEY, DRAFTEA_ITEM_KEY, DRAFTEA);
 
         //Inyectar al inventario del creativo
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> {
@@ -86,6 +109,7 @@ public class ModBlocks {
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> {
             entries.add(JEFRI_MAILBOX);
+            entries.add(DRAFTEA);
         });
     }
 }

@@ -51,6 +51,7 @@ public class Prueba_no1 implements ModInitializer {
 		ModItemGroups.registerItemGroups();
 		ModItem.registerModItems();
 		ModBlocks.registerModBlocks();
+		ModBlockEntities.registerModBlockEntities();
 		ModStructures.registerModStructures();
 		ModWorldGeneration.generateModWorldGen();
 

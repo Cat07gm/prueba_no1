@@ -56,6 +56,28 @@ public class ModSounds {
             SoundEvent.of(JEFRI_DEATH_FART_ID)
     );
 
+    // SONIDOS DE LA DRAFTEA (en sounds.json apuntan a sonidos de vanilla; se pueden cambiar por .ogg propios)
+    public static final Identifier DRAFTEA_COIN_ID = Identifier.of(Prueba_no1.MOD_ID, "draftea_coin");
+    public static final SoundEvent DRAFTEA_COIN = Registry.register(
+            Registries.SOUND_EVENT,
+            DRAFTEA_COIN_ID,
+            SoundEvent.of(DRAFTEA_COIN_ID)
+    );
+
+    public static final Identifier DRAFTEA_SPIN_ID = Identifier.of(Prueba_no1.MOD_ID, "draftea_spin");
+    public static final SoundEvent DRAFTEA_SPIN = Registry.register(
+            Registries.SOUND_EVENT,
+            DRAFTEA_SPIN_ID,
+            SoundEvent.of(DRAFTEA_SPIN_ID)
+    );
+
+    public static final Identifier DRAFTEA_WIN_ID = Identifier.of(Prueba_no1.MOD_ID, "draftea_win");
+    public static final SoundEvent DRAFTEA_WIN = Registry.register(
+            Registries.SOUND_EVENT,
+            DRAFTEA_WIN_ID,
+            SoundEvent.of(DRAFTEA_WIN_ID)
+    );
+
     public static void registerModSounds() {
         Prueba_no1.LOGGER.info("Registrando sonidos personalizados para " + Prueba_no1.MOD_ID);
     }

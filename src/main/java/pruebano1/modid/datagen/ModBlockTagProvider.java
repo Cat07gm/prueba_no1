@@ -31,5 +31,11 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 .add(ModBlocks.SCARLET_ORE)
                 .add(ModBlocks.DEEPSLATE_SCARLET_ORE)
                 .add(ModBlocks.SCARLET_BLOCK);
+
+        // Bloques que el Wither y el Ender Dragon no pueden destruir (como la Bedrock)
+        getOrCreateTagBuilder(BlockTags.WITHER_IMMUNE)
+                .add(ModBlocks.DRAFTEA);
+        getOrCreateTagBuilder(BlockTags.DRAGON_IMMUNE)
+                .add(ModBlocks.DRAFTEA);
     }
 }

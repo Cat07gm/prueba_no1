@@ -70,6 +70,10 @@ jar {
 	}
 }
 
+sourcesJar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 // configure the maven publication
 publishing {
 	publications {

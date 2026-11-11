@@ -41,5 +41,13 @@
   "item.prueba_no1.jefri_penstein_spawn_egg": "Jefri penstein Spawn Egg",
   "entity.prueba_no1.jefri_penstein": "Jefri penstein",
   "entity.prueba_no1.kotex_projectile": "Toalla Kotex",
-  "item.prueba_no1.toalla_kotex": "Toalla Kotex"
+  "item.prueba_no1.toalla_kotex": "Toalla Kotex",
+  "block.prueba_no1.draftea": "Draftea",
+  "item.prueba_no1.draftea": "Draftea",
+  "item.prueba_no1.tony_coin": "Tony Coin",
+  "subtitles.prueba_no1.draftea_coin": "Coin inserted",
+  "subtitles.prueba_no1.draftea_spin": "Draftea spins",
+  "subtitles.prueba_no1.draftea_win": "Draftea pays out",
+  "category.prueba_no1.lon_terry": "Lon Terry",
+  "key.prueba_no1.encyclopedia": "Open Mod Encyclopedia"
 }

@@ -265,6 +265,18 @@ public class ModItem {
                     .rarity(Rarity.RARE)
     );
 
+    //TONY COIN (Moneda para jugar en la máquina Draftea)
+    public static final RegistryKey<Item> TONY_COIN_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "tony_coin")
+    );
+    public static final Item TONY_COIN = new Item(
+            new Item.Settings()
+                    .registryKey(TONY_COIN_KEY)
+                    .maxCount(64)
+                    .rarity(Rarity.UNCOMMON)
+    );
+
     //HUEVO GENERADOR DE PI DIDI (Para invocarlo desde Creativo)
     public static final RegistryKey<Item> PI_DIDI_SPAWN_EGG_KEY = RegistryKey.of(
             RegistryKeys.ITEM,
@@ -390,6 +402,7 @@ public class ModItem {
 
         //Registrar Orden de Arresto y Huevos Generadores
         registerItem(ARREST_WARRANT_KEY, ARREST_WARRANT);
+        registerItem(TONY_COIN_KEY, TONY_COIN);
         registerItem(PI_DIDI_SPAWN_EGG_KEY, PI_DIDI_SPAWN_EGG);
         registerItem(YOSTIN_BIBER_SPAWN_EGG_KEY, YOSTIN_BIBER_SPAWN_EGG);
         registerItem(VITOR_JUGO_SPAWN_EGG_KEY, VITOR_JUGO_SPAWN_EGG);
@@ -404,6 +417,7 @@ public class ModItem {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> {
             entries.add(SCARLET_INGOT);
             entries.add(ARREST_WARRANT);
+            entries.add(TONY_COIN);
             entries.add(MARIJUANA);
         });
 

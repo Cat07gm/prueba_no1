@@ -147,6 +147,13 @@ public class JefriPensteinEntity extends HostileEntity implements GeoEntity {
         return this.dataTracker.get(DEVIL_MODE);
     }
 
+    /** Updates devil mode purely on the client preview entity (e.g. inside the encyclopedia 3D viewer). */
+    public void setClientPreviewDevilMode(boolean devilMode) {
+        if (this.getWorld().isClient()) {
+            this.dataTracker.set(DEVIL_MODE, devilMode);
+        }
+    }
+
     public boolean isInSpawnCinematic() {
         int t = this.dataTracker.get(SPAWN_CINEMATIC_TICKS);
         return t > 0 && t <= 120;

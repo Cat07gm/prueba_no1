@@ -57,7 +57,11 @@ public class ModItemGroups {
                 entries.add(ModItem.BANANA);
                 entries.add(ModItem.MARIJUANA);
 
-                // 7. Huevos Generadores (Jefes y Familia de Niños)
+                // 7. Casino Draftea
+                entries.add(ModBlocks.DRAFTEA);
+                entries.add(ModItem.TONY_COIN);
+
+                // 8. Huevos Generadores (Jefes y Familia de Niños)
                 entries.add(ModItem.JEFRI_PENSTEIN_SPAWN_EGG);
                 entries.add(ModItem.PI_DIDI_SPAWN_EGG);
                 entries.add(ModItem.YOSTIN_BIBER_SPAWN_EGG);

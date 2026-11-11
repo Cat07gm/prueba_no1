@@ -32,7 +32,7 @@ import java.util.List;
 
 /**
  * Bloque indestructible de invocación: "Buzón de Jefri penstein".
- * Al hacer clic derecho con la "Orden de arresto" (o en Creativo), invoca a Jefri penstein
+ * Al hacer clic derecho con la "Orden de arresto", invoca a Jefri penstein
  * iniciando su cinemática de aparición mágica en el cielo con música y edición de cámara estilo TikTok.
  */
 public class JefriMailboxBlock extends HorizontalFacingBlock {
@@ -88,7 +88,7 @@ public class JefriMailboxBlock extends HorizontalFacingBlock {
             );
             if (!activeBosses.isEmpty()) {
                 player.sendMessage(
-                        Text.literal("¡Jefri penstein ya ha sido invocado!")
+                        Text.literal("Jefri penstein ya ha sido invocado")
                                 .formatted(Formatting.RED, Formatting.BOLD),
                         true
                 );
@@ -97,10 +97,10 @@ public class JefriMailboxBlock extends HorizontalFacingBlock {
 
             ItemStack held = player.getMainHandStack();
             boolean hasWarrant = held.isOf(ModItem.ARREST_WARRANT) || player.getOffHandStack().isOf(ModItem.ARREST_WARRANT);
-            if (!hasWarrant && !player.isCreative()) {
+            if (!hasWarrant) {
                 world.playSound(null, pos, SoundEvents.BLOCK_IRON_TRAPDOOR_CLOSE, SoundCategory.BLOCKS, 0.9F, 0.8F);
                 player.sendMessage(
-                        Text.literal("📬 Buzón de Jefri penstein: ")
+                        Text.literal(" Buzón de Jefri penstein: ")
                                 .formatted(Formatting.GOLD, Formatting.BOLD)
                                 .append(Text.literal("Necesitas depositar la 'Orden de arresto' de Pi Didi para invocar a Jefri.")
                                         .formatted(Formatting.YELLOW)),
@@ -109,7 +109,7 @@ public class JefriMailboxBlock extends HorizontalFacingBlock {
                 return ActionResult.SUCCESS;
             }
 
-            if (hasWarrant && !player.isCreative()) {
+            if (!player.isCreative()) {
                 if (held.isOf(ModItem.ARREST_WARRANT)) {
                     held.decrement(1);
                 } else {

@@ -2,6 +2,7 @@ package pruebano1.modid;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
@@ -9,11 +10,18 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DeathScreen;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.Perspective;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 import pruebano1.modid.client.BananaProjectileRenderer;
+import pruebano1.modid.client.DrafteaBlockEntityRenderer;
+import pruebano1.modid.client.encyclopedia.EncyclopediaScreen;
 import pruebano1.modid.client.FerOvillaRenderer;
 import pruebano1.modid.client.HelloKittyParticle;
 import pruebano1.modid.client.JefriBossMusicInstance;
@@ -42,9 +50,22 @@ public class Prueba_no1Client implements ClientModInitializer {
     private static boolean wasInJefriCinematic = false;
     private static boolean savedHudHidden = false;
     private static Perspective savedPerspective = Perspective.FIRST_PERSON;
+    private static KeyBinding encyclopediaKey = null;
+
+    @Nullable
+    public static KeyBinding getEncyclopediaKey() {
+        return encyclopediaKey;
+    }
 
     @Override
     public void onInitializeClient() {
+        encyclopediaKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.prueba_no1.encyclopedia",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_G,
+                "category.prueba_no1.lon_terry"
+        ));
+
         EntityRendererRegistry.register(ModEntities.PI_DIDI, PiDidiRenderer::new);
         EntityRendererRegistry.register(ModEntities.YOSTIN_BIBER, YostinBiberRenderer::new);
         EntityRendererRegistry.register(ModEntities.VITOR_JUGO, VitorJugoRenderer::new);
@@ -53,6 +74,9 @@ public class Prueba_no1Client implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.VALENTINA_PRIETA, ValentinaPrietaRenderer::new);
         EntityRendererRegistry.register(ModEntities.JEFRI_PENSTEIN, JefriPensteinRenderer::new);
         EntityRendererRegistry.register(ModEntities.KOTEX_PROJECTILE, KotexProjectileRenderer::new);
+
+        // Pantalla de la Draftea: dibuja los ítems de los rodillos
+        BlockEntityRendererFactories.register(ModBlockEntities.DRAFTEA, DrafteaBlockEntityRenderer::new);
 
         ParticleFactoryRegistry.getInstance().register(ModParticles.HELLO_KITTY, HelloKittyParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(ModParticles.WEED_LEAF, WeedLeafParticle.Factory::new);
@@ -104,6 +128,14 @@ public class Prueba_no1Client implements ClientModInitializer {
                 activeBossMusic = null;
                 activeJefriMusic = null;
                 return;
+            }
+
+            if (encyclopediaKey != null) {
+                while (encyclopediaKey.wasPressed()) {
+                    if (client.currentScreen == null) {
+                        client.setScreen(new EncyclopediaScreen());
+                    }
+                }
             }
 
             Box jefriSearchBox = client.player.getBoundingBox().expand(64.0D);
