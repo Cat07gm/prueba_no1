@@ -55,12 +55,40 @@ public class Prueba_no1 implements ModInitializer {
 		ModStructures.registerModStructures();
 		ModWorldGeneration.generateModWorldGen();
 
-		// Registrar paquete de red para el efecto de muerte del jugador
+		// Registrar paquetes de red del mod
 		PayloadTypeRegistry.playS2C().register(PlayerDeathKoPayload.ID, PlayerDeathKoPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(
+				pruebano1.modid.network.CasinoBoundsPayload.ID,
+				pruebano1.modid.network.CasinoBoundsPayload.CODEC
+		);
 
-		// Inmunidad total para los jugadores mientras Jefri penstein está en cinemática de invocación o cinemática final de muerte
+		// Música del casino (DJ Controller): canciones, órdenes del DJ y estado para los clientes
+		pruebano1.modid.casino.CasinoSongs.registerCasinoSongs();
+		PayloadTypeRegistry.playC2S().register(
+				pruebano1.modid.network.CasinoMusicControlPayload.ID,
+				pruebano1.modid.network.CasinoMusicControlPayload.CODEC
+		);
+		PayloadTypeRegistry.playS2C().register(
+				pruebano1.modid.network.CasinoMusicStatePayload.ID,
+				pruebano1.modid.network.CasinoMusicStatePayload.CODEC
+		);
+		ServerPlayNetworking.registerGlobalReceiver(pruebano1.modid.network.CasinoMusicControlPayload.ID, (payload, context) ->
+				context.server().execute(() -> pruebano1.modid.casino.CasinoMusicManager.handleControl(context.player(), payload))
+		);
+		net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
+				pruebano1.modid.casino.CasinoMusicManager.sendTo(handler.getPlayer())
+		);
+
+		// Cargar cambios guardados del casino único y registrar su protección, zona segura y comandos
+		pruebano1.modid.world.DrafteaCasinoCustomEdits.ensureLoaded();
+		pruebano1.modid.world.DrafteaCasinoProtection.registerServer();
+
+		// Inmunidad total para los jugadores en la zona segura del casino o en cinemáticas de Jefri Penstein
 		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
 			if (entity instanceof ServerPlayerEntity player && player.getWorld() instanceof ServerWorld serverWorld) {
+				if (pruebano1.modid.world.DrafteaCasinoProtection.isImmuneInSafeZone(player, serverWorld, source)) {
+					return false;
+				}
 				boolean cinematicActive = !serverWorld.getEntitiesByClass(
 						JefriPensteinEntity.class,
 						new Box(player.getBlockPos()).expand(80.0D),

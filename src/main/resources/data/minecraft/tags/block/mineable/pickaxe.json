@@ -3,6 +3,12 @@
   "values": [
     "prueba_no1:scarlet_ore",
     "prueba_no1:deepslate_scarlet_ore",
-    "prueba_no1:scarlet_block"
+    "prueba_no1:scarlet_block",
+    "prueba_no1:casino_light",
+    "prueba_no1:draftea_light",
+    "prueba_no1:casino_chair",
+    "prueba_no1:dj_turntable",
+    "prueba_no1:dj_mixer",
+    "prueba_no1:dj_controller"
   ]
 }

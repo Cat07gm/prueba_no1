@@ -81,5 +81,45 @@
         "stream": false
       }
     ]
+  },
+  "casino_music_brazino_777": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/brazino_777",
+        "stream": true
+      }
+    ]
+  },
+  "casino_music_ebb_tide": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/ebb_tide",
+        "stream": true
+      }
+    ]
+  },
+  "casino_music_glide_with_me": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/glide_with_me",
+        "stream": true
+      }
+    ]
+  },
+  "casino_music_hit_the_road_jack": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/hit_the_road_jack",
+        "stream": true
+      }
+    ]
+  },
+  "casino_music_voy_buscando": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/voy_buscando",
+        "stream": true
+      }
+    ]
   }
 }

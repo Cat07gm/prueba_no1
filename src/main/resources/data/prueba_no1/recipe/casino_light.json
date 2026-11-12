@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "QRQ",
+    "PDG",
+    "QYQ"
+  ],
+  "key": {
+    "Q": "minecraft:glowstone_dust",
+    "R": "minecraft:red_dye",
+    "P": "minecraft:purple_dye",
+    "G": "minecraft:green_dye",
+    "Y": "minecraft:yellow_dye",
+    "D": "prueba_no1:draftea_light"
+  },
+  "result": {
+    "id": "prueba_no1:casino_light",
+    "count": 4
+  }
+}

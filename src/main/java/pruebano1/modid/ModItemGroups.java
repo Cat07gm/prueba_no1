@@ -59,6 +59,12 @@ public class ModItemGroups {
 
                 // 7. Casino Draftea
                 entries.add(ModBlocks.DRAFTEA);
+                entries.add(ModBlocks.CASINO_LIGHT);
+                entries.add(ModBlocks.DRAFTEA_LIGHT);
+                entries.add(ModBlocks.CASINO_CHAIR);
+                entries.add(ModBlocks.DJ_TURNTABLE);
+                entries.add(ModBlocks.DJ_MIXER);
+                entries.add(ModBlocks.DJ_CONTROLLER);
                 entries.add(ModItem.TONY_COIN);
 
                 // 8. Huevos Generadores (Jefes y Familia de Niños)
@@ -68,6 +74,9 @@ public class ModItemGroups {
                 entries.add(ModItem.VITOR_JUGO_SPAWN_EGG);
                 entries.add(ModItem.FER_OVILLA_SPAWN_EGG);
                 entries.add(ModItem.VALENTINA_PRIETA_SPAWN_EGG);
+                entries.add(ModItem.TONY_FASE1_SPAWN_EGG);
+                entries.add(ModItem.TONY_FASE2_SPAWN_EGG);
+                entries.add(ModItem.TONY_FASE3_SPAWN_EGG);
             })
             .build();
 

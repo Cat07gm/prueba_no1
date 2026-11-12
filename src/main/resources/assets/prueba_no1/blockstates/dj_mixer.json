@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "prueba_no1:block/dj_mixer" },
+    "facing=east":  { "model": "prueba_no1:block/dj_mixer", "y": 90 },
+    "facing=south": { "model": "prueba_no1:block/dj_mixer", "y": 180 },
+    "facing=west":  { "model": "prueba_no1:block/dj_mixer", "y": 270 }
+  }
+}

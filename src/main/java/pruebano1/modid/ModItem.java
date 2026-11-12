@@ -357,6 +357,36 @@ public class ModItem {
             new Item.Settings().registryKey(JEFRI_PENSTEIN_SPAWN_EGG_KEY)
     );
 
+    // HUEVO GENERADOR DE TONY FASE 1 (Bartender fijo de sudadera verde del Casino Draftea Tony Diaz)
+    public static final RegistryKey<Item> TONY_FASE1_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "tony_fase1_spawn_egg")
+    );
+    public static final Item TONY_FASE1_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.TONY_FASE1,
+            new Item.Settings().registryKey(TONY_FASE1_SPAWN_EGG_KEY)
+    );
+
+    // HUEVO GENERADOR DE TONY FASE 2 (Cliente de sudadera blanca del Casino Draftea Tony Diaz)
+    public static final RegistryKey<Item> TONY_FASE2_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "tony_fase2_spawn_egg")
+    );
+    public static final Item TONY_FASE2_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.TONY_FASE2,
+            new Item.Settings().registryKey(TONY_FASE2_SPAWN_EGG_KEY)
+    );
+
+    // HUEVO GENERADOR DE TONY FASE 3 (Guardia de sudadera negra del Casino Draftea Tony Diaz)
+    public static final RegistryKey<Item> TONY_FASE3_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "tony_fase3_spawn_egg")
+    );
+    public static final Item TONY_FASE3_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.TONY_FASE3,
+            new Item.Settings().registryKey(TONY_FASE3_SPAWN_EGG_KEY)
+    );
+
     //TOALLA KOTEX (Proyectil tipo flecha de Jefri penstein y usable con Arco/Ballesta o lanzándola con la mano)
     public static final RegistryKey<Item> TOALLA_KOTEX_KEY = RegistryKey.of(
             RegistryKeys.ITEM,
@@ -411,6 +441,9 @@ public class ModItem {
         registerItem(BANANA_KEY, BANANA);
         registerItem(VALENTINA_PRIETA_SPAWN_EGG_KEY, VALENTINA_PRIETA_SPAWN_EGG);
         registerItem(JEFRI_PENSTEIN_SPAWN_EGG_KEY, JEFRI_PENSTEIN_SPAWN_EGG);
+        registerItem(TONY_FASE1_SPAWN_EGG_KEY, TONY_FASE1_SPAWN_EGG);
+        registerItem(TONY_FASE2_SPAWN_EGG_KEY, TONY_FASE2_SPAWN_EGG);
+        registerItem(TONY_FASE3_SPAWN_EGG_KEY, TONY_FASE3_SPAWN_EGG);
         registerItem(TOALLA_KOTEX_KEY, TOALLA_KOTEX);
 
         //Pestaña Ingredientes
@@ -434,6 +467,9 @@ public class ModItem {
             entries.add(VITOR_JUGO_SPAWN_EGG);
             entries.add(FER_OVILLA_SPAWN_EGG);
             entries.add(VALENTINA_PRIETA_SPAWN_EGG);
+            entries.add(TONY_FASE1_SPAWN_EGG);
+            entries.add(TONY_FASE2_SPAWN_EGG);
+            entries.add(TONY_FASE3_SPAWN_EGG);
         });
 
         //Pestaña Combate

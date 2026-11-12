@@ -137,6 +137,63 @@ public class ModEntities {
                     .build(KOTEX_PROJECTILE_KEY)
     );
 
+    public static final RegistryKey<EntityType<?>> SEAT_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "seat")
+    );
+
+    public static final EntityType<SeatEntity> SEAT = Registry.register(
+            Registries.ENTITY_TYPE,
+            SEAT_KEY,
+            EntityType.Builder.<SeatEntity>create(SeatEntity::new, SpawnGroup.MISC)
+                    .dimensions(0.0F, 0.0F)
+                    .maxTrackingRange(32)
+                    .trackingTickInterval(10)
+                    .build(SEAT_KEY)
+    );
+
+    public static final RegistryKey<EntityType<?>> TONY_FASE1_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "tony_fase1")
+    );
+
+    public static final EntityType<TonyFase1Entity> TONY_FASE1 = Registry.register(
+            Registries.ENTITY_TYPE,
+            TONY_FASE1_KEY,
+            EntityType.Builder.<TonyFase1Entity>create(TonyFase1Entity::new, SpawnGroup.CREATURE)
+                    .dimensions(0.6F, 1.9F)
+                    .maxTrackingRange(64)
+                    .build(TONY_FASE1_KEY)
+    );
+
+    public static final RegistryKey<EntityType<?>> TONY_FASE2_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "tony_fase2")
+    );
+
+    public static final EntityType<TonyFase2Entity> TONY_FASE2 = Registry.register(
+            Registries.ENTITY_TYPE,
+            TONY_FASE2_KEY,
+            EntityType.Builder.<TonyFase2Entity>create(TonyFase2Entity::new, SpawnGroup.CREATURE)
+                    .dimensions(0.6F, 1.9F)
+                    .maxTrackingRange(64)
+                    .build(TONY_FASE2_KEY)
+    );
+
+    public static final RegistryKey<EntityType<?>> TONY_FASE3_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "tony_fase3")
+    );
+
+    public static final EntityType<TonyFase3Entity> TONY_FASE3 = Registry.register(
+            Registries.ENTITY_TYPE,
+            TONY_FASE3_KEY,
+            EntityType.Builder.<TonyFase3Entity>create(TonyFase3Entity::new, SpawnGroup.CREATURE)
+                    .dimensions(0.6F, 1.9F)
+                    .maxTrackingRange(64)
+                    .build(TONY_FASE3_KEY)
+    );
+
     public static void registerModEntities() {
         Prueba_no1.LOGGER.info("Registrando entidades para " + Prueba_no1.MOD_ID);
         FabricDefaultAttributeRegistry.register(PI_DIDI, PiDidiEntity.createPiDidiAttributes());
@@ -145,6 +202,9 @@ public class ModEntities {
         FabricDefaultAttributeRegistry.register(FER_OVILLA, FerOvillaEntity.createFerOvillaAttributes());
         FabricDefaultAttributeRegistry.register(VALENTINA_PRIETA, ValentinaPrietaEntity.createValentinaPrietaAttributes());
         FabricDefaultAttributeRegistry.register(JEFRI_PENSTEIN, JefriPensteinEntity.createJefriPensteinAttributes());
+        FabricDefaultAttributeRegistry.register(TONY_FASE1, TonyFase1Entity.createTonyFase1Attributes());
+        FabricDefaultAttributeRegistry.register(TONY_FASE2, TonyFase2Entity.createTonyFase2Attributes());
+        FabricDefaultAttributeRegistry.register(TONY_FASE3, TonyFase3Entity.createTonyFase3Attributes());
 
         // Permitir spawneo natural de los 4 niños en la Isla Penstein tanto de día como de noche,
         // manteniendo un límite local (máximo 12 niños en un radio de 28 bloques) para que sea abundante pero controlable para 2 jugadores full diamante.

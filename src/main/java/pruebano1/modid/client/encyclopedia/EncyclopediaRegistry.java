@@ -548,6 +548,81 @@ public final class EncyclopediaRegistry {
                 .related("tony_coin", "Ver Tony Coin")
                 .keywords("draftea casino tragamonedas maquina premio")
                 .build());
+
+        list.add(EncyclopediaEntry.builder("draftea_light", "Luz Morada Draftea")
+                .type("Bloque de Iluminación Neón")
+                .category(EncyclopediaCategory.BLOCKS)
+                .rarity(EncyclopediaRarity.UNCOMMON)
+                .icon(ModBlocks.DRAFTEA_LIGHT)
+                .description("Bloque luminoso de color morado característico de las máquinas Draftea con un suave pulso de luz. Perfecto para combinar con decoración negra y blanca en el casino.")
+                .stats(
+                        new StatInfo("Iluminación", "Nivel 15 (Máxima)", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Color principal", "Morado Neón Draftea", EncyclopediaEntry.PURPLE_STAT_COLOR),
+                        new StatInfo("Brillo propio", "Visible en oscuridad")
+                )
+                .obtaining(ObtainingMethod.shaped(
+                        "Mesa de Crafteo",
+                        List.of(
+                                SlotRef.of(Items.PURPLE_DYE), SlotRef.of(Items.QUARTZ), SlotRef.of(Items.PURPLE_DYE),
+                                SlotRef.of(Items.QUARTZ), SlotRef.of(Items.GLOWSTONE), SlotRef.of(Items.QUARTZ),
+                                SlotRef.of(Items.PURPLE_DYE), SlotRef.of(Items.QUARTZ), SlotRef.of(Items.PURPLE_DYE)
+                        ),
+                        SlotRef.of(ModBlocks.DRAFTEA_LIGHT, 4),
+                        "Receta de iluminación característica del casino Draftea Tony Diaz."
+                ))
+                .related("casino_light", "Ver Luz de Casino")
+                .keywords("luz draftea morado neon iluminacion casino bloque")
+                .build());
+
+        list.add(EncyclopediaEntry.builder("casino_light", "Luz Animada de Casino")
+                .type("Bloque de Iluminación Animado")
+                .category(EncyclopediaCategory.BLOCKS)
+                .rarity(EncyclopediaRarity.RARE)
+                .icon(ModBlocks.CASINO_LIGHT)
+                .description("Bloque de neón animado para letreros, fachadas y carruseles que alterna entre morado, rojo, amarillo y verde con destellos de transición al estilo de un casino clásico.")
+                .stats(
+                        new StatInfo("Iluminación", "Nivel 15 (Máxima)", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Colores", "Morado, Rojo, Amarillo y Verde", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new StatInfo("Animación", "Transición brillante", EncyclopediaEntry.GREEN_STAT_COLOR)
+                )
+                .obtaining(ObtainingMethod.shaped(
+                        "Mesa de Crafteo",
+                        List.of(
+                                SlotRef.of(Items.GLOWSTONE_DUST), SlotRef.of(Items.RED_DYE), SlotRef.of(Items.GLOWSTONE_DUST),
+                                SlotRef.of(Items.PURPLE_DYE), SlotRef.link(ModBlocks.DRAFTEA_LIGHT, "draftea_light"), SlotRef.of(Items.GREEN_DYE),
+                                SlotRef.of(Items.GLOWSTONE_DUST), SlotRef.of(Items.YELLOW_DYE), SlotRef.of(Items.GLOWSTONE_DUST)
+                        ),
+                        SlotRef.of(ModBlocks.CASINO_LIGHT, 4),
+                        "Combina tinta de los 4 colores con Polvo de Piedra Luminosa y una Luz Morada Draftea."
+                ))
+                .related("draftea_tony_diaz", "Ver Casino Draftea Tony Diaz")
+                .keywords("luz casino animada colores morado rojo amarillo verde neon iluminacion")
+                .build());
+
+        list.add(EncyclopediaEntry.builder("casino_chair", "Silla Negra de Casino")
+                .type("Mobiliario · Asiento Funcional")
+                .category(EncyclopediaCategory.BLOCKS)
+                .rarity(EncyclopediaRarity.COMMON)
+                .icon(ModBlocks.CASINO_CHAIR)
+                .description("Elegante banquito negro de casino con pedestal metálico, reposapiés cromado y respaldo acolchado. Haz clic derecho sobre la silla para sentarte frente a las máquinas Draftea, mesas de juego o en la barra del bar.")
+                .stats(
+                        new StatInfo("Interacción", "Clic derecho para sentarse", EncyclopediaEntry.GREEN_STAT_COLOR),
+                        new StatInfo("Acabado", "Cuero negro y acero cromado", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Uso", "Salón Draftea y Barra VIP")
+                )
+                .obtaining(ObtainingMethod.shaped(
+                        "Mesa de Crafteo",
+                        List.of(
+                                SlotRef.empty(), SlotRef.of(Items.BLACK_WOOL), SlotRef.empty(),
+                                SlotRef.empty(), SlotRef.of(Items.IRON_INGOT), SlotRef.empty(),
+                                SlotRef.empty(), SlotRef.of(Items.POLISHED_BLACKSTONE), SlotRef.empty()
+                        ),
+                        SlotRef.of(ModBlocks.CASINO_CHAIR, 2),
+                        "Fabricable con Lana Negra, Lingote de Hierro y Piedra Negra Pulida."
+                ))
+                .related("draftea", "Ver Máquina Draftea")
+                .keywords("silla negra casino banquito taburete asiento sentarse")
+                .build());
     }
 
     private static void registerEntities(List<EncyclopediaEntry> list) {
@@ -694,6 +769,78 @@ public final class EncyclopediaRegistry {
                 ))
                 .related("isla_penstein", "Ir a Isla Penstein")
                 .keywords("valentina prieta nino enemigo isla 3d")
+                .build());
+
+        list.add(EncyclopediaEntry.builder("entity_tony_fase1", "Tony Fase 1")
+                .type("Personal del Casino · Entidad 3D")
+                .category(EncyclopediaCategory.ENTITIES)
+                .rarity(EncyclopediaRarity.UNCOMMON)
+                .icon(Items.BREWING_STAND)
+                .entityPreview(new EntityPreviewConfig(
+                        () -> ModEntities.TONY_FASE1,
+                        50.0F, 13.0F, 1.05F, -20.0F, 8.0F, false
+                ))
+                .description("Bartender oficial del casino Draftea Tony Diaz con su característica sudadera verde. Atiende fijo detrás de la barra batiendo bebidas con coctelera y puliendo vasos.")
+                .statsSupplier(() -> buildEntityStats(ModEntities.TONY_FASE1, List.of(
+                        new StatInfo("Actitud", "Pasivo", EncyclopediaEntry.GREEN_STAT_COLOR),
+                        new StatInfo("Rol", "Bartender Fijo", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Ubicación", "Barra Norte del Casino", EncyclopediaEntry.PURPLE_STAT_COLOR)
+                )))
+                .obtaining(ObtainingMethod.info(
+                        "Dónde habita",
+                        SlotRef.link(ModBlocks.CASINO_LIGHT, "draftea_tony_diaz"),
+                        "Se encuentra atendiendo el Lounge Bar dentro del casino Draftea Tony Diaz."
+                ))
+                .related("draftea_tony_diaz", "Ver Casino Draftea Tony Diaz")
+                .keywords("tony fase 1 bartender bar sudadera verde pasivo casino 3d")
+                .build());
+
+        list.add(EncyclopediaEntry.builder("entity_tony_fase2", "Tony Fase 2")
+                .type("Cliente del Casino · Entidad 3D")
+                .category(EncyclopediaCategory.ENTITIES)
+                .rarity(EncyclopediaRarity.COMMON)
+                .icon(ModBlocks.DRAFTEA)
+                .entityPreview(new EntityPreviewConfig(
+                        () -> ModEntities.TONY_FASE2,
+                        50.0F, 13.0F, 1.05F, 22.0F, 8.0F, false
+                ))
+                .description("Cliente habitual del casino Draftea Tony Diaz con sudadera blanca. Varios de ellos recorren las salas del casino o se detienen a jugar frente a las máquinas Draftea.")
+                .statsSupplier(() -> buildEntityStats(ModEntities.TONY_FASE2, List.of(
+                        new StatInfo("Actitud", "Pasivo", EncyclopediaEntry.GREEN_STAT_COLOR),
+                        new StatInfo("Rol", "Cliente del Casino", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new StatInfo("Actividad", "Pasea y juega Drafteas", EncyclopediaEntry.CYAN_STAT_COLOR)
+                )))
+                .obtaining(ObtainingMethod.info(
+                        "Dónde habita",
+                        SlotRef.link(ModBlocks.DRAFTEA, "draftea_tony_diaz"),
+                        "Un grupo de clientes pasea y juega por la planta baja y el Mezzanine VIP del casino."
+                ))
+                .related("draftea_tony_diaz", "Ver Casino Draftea Tony Diaz")
+                .keywords("tony fase 2 cliente sudadera blanca pasivo draftea casino 3d")
+                .build());
+
+        list.add(EncyclopediaEntry.builder("entity_tony_fase3", "Tony Fase 3")
+                .type("Guardia del Casino · Entidad 3D")
+                .category(EncyclopediaCategory.ENTITIES)
+                .rarity(EncyclopediaRarity.RARE)
+                .icon(ModBlocks.CASINO_CHAIR)
+                .entityPreview(new EntityPreviewConfig(
+                        () -> ModEntities.TONY_FASE3,
+                        50.0F, 13.0F, 1.05F, -18.0F, 8.0F, false
+                ))
+                .description("Personal de seguridad y vigilancia del casino Draftea Tony Diaz con sudadera negra. Dos custodian la entrada principal y cuatro vigilan el interior con firmes posturas de guardia.")
+                .statsSupplier(() -> buildEntityStats(ModEntities.TONY_FASE3, List.of(
+                        new StatInfo("Actitud", "Pasivo", EncyclopediaEntry.GREEN_STAT_COLOR),
+                        new StatInfo("Rol", "Guardia de Seguridad", EncyclopediaEntry.PURPLE_STAT_COLOR),
+                        new StatInfo("Puestos", "2 en Entrada · 4 en Interior", EncyclopediaEntry.CYAN_STAT_COLOR)
+                )))
+                .obtaining(ObtainingMethod.info(
+                        "Dónde habita",
+                        SlotRef.link(ModBlocks.CASINO_LIGHT, "draftea_tony_diaz"),
+                        "Vigila los arcos de entrada y las zonas clave dentro del casino Draftea Tony Diaz."
+                ))
+                .related("draftea_tony_diaz", "Ver Casino Draftea Tony Diaz")
+                .keywords("tony fase 3 guardia seguridad sudadera negra pasivo casino 3d")
                 .build());
     }
 
@@ -892,6 +1039,70 @@ public final class EncyclopediaRegistry {
                         "Navega o vuela sobre océanos profundos hasta avistar la gran isla con muelles, palmeras y edificios blancos de cuarzo."
                 ))
                 .keywords("isla penstein estructura dungeon oceano mansion jefri pi didi como vencer")
+                .build());
+
+        list.add(EncyclopediaEntry.builder("draftea_tony_diaz", "Casino Draftea Tony Diaz")
+                .type("Estructura Única · Zona Segura")
+                .category(EncyclopediaCategory.STRUCTURES)
+                .rarity(EncyclopediaRarity.EPIC)
+                .icon(ModBlocks.CASINO_LIGHT)
+                .description("Monumental casino único por mundo que se genera cerca del spawn inicial. Destaca por su fachada Art-Deco con letrero luminoso CASINO, palmeras, fuentes y dos pisos decorados con carruseles Draftea, mesas de juego, barra de bar y zona VIP. Dentro ningún jugador recibe daño y el recinto está protegido contra destrucción.")
+                .stats(
+                        new StatInfo("Aparición", "1 única vez cerca del spawn", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Protección", "Bloques indestructibles", EncyclopediaEntry.GREEN_STAT_COLOR),
+                        new StatInfo("Zona Segura", "Invulnerabilidad total (PvP activo)", EncyclopediaEntry.PURPLE_STAT_COLOR),
+                        new StatInfo("Entrada", "Subtítulo Draftea Tony Diaz", EncyclopediaEntry.GOLD_STAT_COLOR)
+                )
+                .structureContents(
+                        StructureFeatureInfo.link(
+                                "Carruseles y Máquinas Draftea",
+                                "Dos carruseles centrales gigantes y múltiples hileras de tragamonedas Draftea con sillas giratorias listas para apostar tus Tony Coins.",
+                                ModBlocks.DRAFTEA,
+                                "draftea"
+                        ),
+                        StructureFeatureInfo.link(
+                                "Letrero Neón y Luces del Casino",
+                                "Fachada escalonada iluminada con luces animadas de casino y bloques de luz morada Draftea en arcos, coronas y marquesina.",
+                                ModBlocks.CASINO_LIGHT,
+                                "casino_light"
+                        ),
+                        StructureFeatureInfo.link(
+                                "Mesas de Blackjack, Bar y Mezzanine VIP",
+                                "Ala este con mesas de juego, zona norte con barra de bar y escalinatas hacia el balcón VIP y escenario musical del segundo piso.",
+                                ModBlocks.DRAFTEA_LIGHT,
+                                "draftea_light"
+                        ),
+                        StructureFeatureInfo.link(
+                                "Refugio Seguro de Jugadores",
+                                "Al cruzar la entrada recibes invulnerabilidad completa contra todo daño mientras juegas o convives con otros jugadores.",
+                                ModItem.TONY_COIN,
+                                "tony_coin"
+                        )
+                )
+                .structureSteps(
+                        StructureStepInfo.link(
+                                1,
+                                "Ubica el casino saliendo del spawn",
+                                "Camina unos 175–220 bloques desde el punto de aparición (normalmente hacia el Norte) buscando la gran fachada negra, blanca y morada con luces de neón y palmeras.",
+                                ModBlocks.CASINO_LIGHT,
+                                "casino_light"
+                        ),
+                        StructureStepInfo.link(
+                                2,
+                                "Entra y juega tus Tony Coins",
+                                "Al entrar aparecerá el subtítulo 'Draftea Tony Diaz'. No podrás romper ni colocar bloques en supervivencia y serás invulnerable mientras usas las máquinas Draftea.",
+                                ModItem.TONY_COIN,
+                                "tony_coin"
+                        ),
+                        StructureStepInfo.of(
+                                3,
+                                "Personalización en modo Creativo",
+                                "Los administradores en modo Creativo pueden modificar detalles del edificio y guardar la plantilla para futuros mundos con el comando /drafteacasino guardar.",
+                                Items.COMMAND_BLOCK
+                        )
+                )
+                .related("draftea", "Ver Máquina Draftea")
+                .keywords("casino draftea tony diaz estructura spawn seguro invulnerable tragamonedas")
                 .build());
     }
 

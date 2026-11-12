@@ -43,7 +43,18 @@ public class ModStructures {
             Identifier.of(Prueba_no1.MOD_ID, "isla_penstein_feature_placed")
     );
 
+    public static final Feature<DefaultFeatureConfig> DRAFTEA_CASINO_FEATURE = Registry.register(
+            Registries.FEATURE,
+            Identifier.of(Prueba_no1.MOD_ID, "draftea_casino_feature"),
+            new DrafteaCasinoFeature(DefaultFeatureConfig.CODEC)
+    );
+
+    public static final RegistryKey<PlacedFeature> DRAFTEA_CASINO_PLACED_KEY = RegistryKey.of(
+            RegistryKeys.PLACED_FEATURE,
+            Identifier.of(Prueba_no1.MOD_ID, "draftea_casino_feature_placed")
+    );
+
     public static void registerModStructures() {
-        Prueba_no1.LOGGER.info("Registrando estructura Isla Penstein (520x520 bloques) para " + Prueba_no1.MOD_ID);
+        Prueba_no1.LOGGER.info("Registrando Isla Penstein y Casino único 'Draftea Tony Diaz' para " + Prueba_no1.MOD_ID);
     }
 }

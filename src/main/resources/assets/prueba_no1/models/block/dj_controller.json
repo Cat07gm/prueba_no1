@@ -1,0 +1,97 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "prueba_no1:block/dj_controller_pads",
+    "chassis": "prueba_no1:block/dj_chassis",
+    "rear": "prueba_no1:block/dj_rear_io",
+    "pads": "prueba_no1:block/dj_controller_pads",
+    "screen": "prueba_no1:block/dj_controller_screen",
+    "back_led": "prueba_no1:block/dj_controller_back_led",
+    "metal": "prueba_no1:block/casino_chair_metal",
+    "trim": "prueba_no1:block/dj_neon_trim"
+  },
+  "elements": [
+    {
+      "name": "chassis",
+      "from": [0.5, 0, 0.8],
+      "to": [15.5, 4.2, 15.2],
+      "faces": {
+        "north": { "uv": [0, 2, 16, 15], "texture": "#chassis" },
+        "east":  { "uv": [0, 2, 16, 15], "texture": "#chassis" },
+        "south": { "uv": [0, 0, 16, 16], "texture": "#rear" },
+        "west":  { "uv": [0, 2, 16, 15], "texture": "#chassis" },
+        "up":    { "uv": [0, 0, 16, 16], "texture": "#chassis" },
+        "down":  { "uv": [0, 0, 16, 16], "texture": "#chassis", "cullface": "down" }
+      }
+    },
+    {
+      "name": "performance_pad_deck",
+      "from": [1.0, 4.2, 1.2],
+      "to": [15.0, 4.9, 9.6],
+      "shade": false,
+      "light_emission": 8,
+      "faces": {
+        "north": { "uv": [1, 1, 15, 4], "texture": "#metal" },
+        "east":  { "uv": [1, 1, 10, 4], "texture": "#metal" },
+        "west":  { "uv": [1, 1, 10, 4], "texture": "#metal" },
+        "up":    { "uv": [0, 0, 16, 16], "texture": "#pads" }
+      }
+    },
+    {
+      "name": "screen_hood",
+      "from": [1.5, 4.2, 10.6],
+      "to": [14.5, 9.4, 14.8],
+      "faces": {
+        "north": { "uv": [1, 1, 15, 14], "texture": "#metal" },
+        "east":  { "uv": [1, 1, 8, 14], "texture": "#metal" },
+        "south": { "uv": [1, 1, 15, 14], "texture": "#metal" },
+        "west":  { "uv": [1, 1, 8, 14], "texture": "#metal" },
+        "up":    { "uv": [1, 1, 15, 8], "texture": "#metal" }
+      }
+    },
+    {
+      "name": "tilted_waveform_screen",
+      "from": [2.2, 5.1, 10.0],
+      "to": [13.8, 9.9, 10.7],
+      "shade": false,
+      "light_emission": 14,
+      "rotation": { "origin": [8, 5.1, 10.2], "axis": "x", "angle": 22.5 },
+      "faces": {
+        "north": { "uv": [0, 0, 16, 16], "texture": "#screen" },
+        "east":  { "uv": [2, 2, 4, 14], "texture": "#metal" },
+        "south": { "uv": [2, 2, 14, 14], "texture": "#metal" },
+        "west":  { "uv": [2, 2, 4, 14], "texture": "#metal" },
+        "up":    { "uv": [2, 2, 14, 4], "texture": "#metal" },
+        "down":  { "uv": [2, 2, 14, 4], "texture": "#metal" }
+      }
+    },
+    {
+      "name": "rear_club_equalizer_panel",
+      "from": [2.4, 4.8, 14.8],
+      "to": [13.6, 8.9, 15.1],
+      "shade": false,
+      "light_emission": 14,
+      "faces": {
+        "east":  { "uv": [2, 2, 4, 14], "texture": "#metal" },
+        "south": { "uv": [0, 0, 16, 16], "texture": "#back_led" },
+        "west":  { "uv": [2, 2, 4, 14], "texture": "#metal" },
+        "up":    { "uv": [2, 2, 14, 4], "texture": "#metal" },
+        "down":  { "uv": [2, 2, 14, 4], "texture": "#metal" }
+      }
+    },
+    {
+      "name": "front_neon_strip",
+      "from": [1.0, 1.5, 0.5],
+      "to": [15.0, 2.4, 0.8],
+      "shade": false,
+      "light_emission": 12,
+      "faces": {
+        "north": { "uv": [0, 5, 16, 11], "texture": "#trim" },
+        "east":  { "uv": [0, 5, 4, 11], "texture": "#trim" },
+        "west":  { "uv": [0, 5, 4, 11], "texture": "#trim" },
+        "up":    { "uv": [0, 5, 16, 8], "texture": "#trim" },
+        "down":  { "uv": [0, 5, 16, 8], "texture": "#trim" }
+      }
+    }
+  ]
+}

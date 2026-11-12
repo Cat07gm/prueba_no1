@@ -48,6 +48,13 @@ public class ModWorldGeneration {
                 ModStructures.ISLA_PENSTEIN_PLACED_KEY
         );
 
+        // Generador único del casino "Draftea Tony Diaz" cerca del spawn inicial
+        BiomeModifications.addFeature(
+                BiomeSelectors.foundInOverworld(),
+                GenerationStep.Feature.SURFACE_STRUCTURES,
+                ModStructures.DRAFTEA_CASINO_PLACED_KEY
+        );
+
         // Permitir que los 4 niños spawneen en toda el área de 520x520 de la Isla Penstein
         // (ModEntities.canIslandChildSpawn filtra para que SOLO aparezcan dentro de la Isla Penstein)
         BiomeModifications.addSpawn(BiomeSelectors.tag(BiomeTags.IS_OCEAN), SpawnGroup.MONSTER, ModEntities.YOSTIN_BIBER, 30, 2, 3);

@@ -515,7 +515,9 @@ public class EncyclopediaScreen extends Screen {
 
         context.drawText(this.textRenderer, "✦", centerX + 8, centerY + 7, ACCENT_TEAL, false);
         context.drawText(this.textRenderer, selectedCategory.getHeaderTitle().toUpperCase(), centerX + 17, centerY + 7, TEXT_PRIMARY, false);
-        String countText = filteredEntries.size() + (selectedCategory == EncyclopediaCategory.STRUCTURES ? " zona" : " items");
+        String countText = filteredEntries.size() + (selectedCategory == EncyclopediaCategory.STRUCTURES
+                ? (filteredEntries.size() == 1 ? " zona" : " zonas")
+                : " items");
         int cw = this.textRenderer.getWidth(countText);
         context.drawText(this.textRenderer, countText, centerX + centerW - cw - 10, centerY + 7, TEXT_MUTED, false);
 

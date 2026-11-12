@@ -24,7 +24,13 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
         getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
                 .add(ModBlocks.SCARLET_ORE)
                 .add(ModBlocks.DEEPSLATE_SCARLET_ORE)
-                .add(ModBlocks.SCARLET_BLOCK);
+                .add(ModBlocks.SCARLET_BLOCK)
+                .add(ModBlocks.CASINO_LIGHT)
+                .add(ModBlocks.DRAFTEA_LIGHT)
+                .add(ModBlocks.CASINO_CHAIR)
+                .add(ModBlocks.DJ_TURNTABLE)
+                .add(ModBlocks.DJ_MIXER)
+                .add(ModBlocks.DJ_CONTROLLER);
 
         // Bloques que requieren al menos pico de hierro (o puedes usar NEEDS_DIAMOND_TOOL)
         getOrCreateTagBuilder(BlockTags.NEEDS_IRON_TOOL)

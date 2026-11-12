@@ -30,6 +30,9 @@ import pruebano1.modid.client.KotexProjectileRenderer;
 import pruebano1.modid.client.PiDidiBossMusicInstance;
 import pruebano1.modid.client.PiDidiRenderer;
 import pruebano1.modid.client.PlayerDeathKoOverlay;
+import pruebano1.modid.client.TonyFase1Renderer;
+import pruebano1.modid.client.TonyFase2Renderer;
+import pruebano1.modid.client.TonyFase3Renderer;
 import pruebano1.modid.client.ValentinaPrietaRenderer;
 import pruebano1.modid.client.VitorJugoRenderer;
 import pruebano1.modid.client.WeedLeafParticle;
@@ -74,6 +77,10 @@ public class Prueba_no1Client implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.VALENTINA_PRIETA, ValentinaPrietaRenderer::new);
         EntityRendererRegistry.register(ModEntities.JEFRI_PENSTEIN, JefriPensteinRenderer::new);
         EntityRendererRegistry.register(ModEntities.KOTEX_PROJECTILE, KotexProjectileRenderer::new);
+        EntityRendererRegistry.register(ModEntities.SEAT, net.minecraft.client.render.entity.EmptyEntityRenderer::new);
+        EntityRendererRegistry.register(ModEntities.TONY_FASE1, TonyFase1Renderer::new);
+        EntityRendererRegistry.register(ModEntities.TONY_FASE2, TonyFase2Renderer::new);
+        EntityRendererRegistry.register(ModEntities.TONY_FASE3, TonyFase3Renderer::new);
 
         // Pantalla de la Draftea: dibuja los ítems de los rodillos
         BlockEntityRendererFactories.register(ModBlockEntities.DRAFTEA, DrafteaBlockEntityRenderer::new);
@@ -84,6 +91,40 @@ public class Prueba_no1Client implements ClientModInitializer {
         // Recibir aviso cuando cualquier jugador muere para activar el sonido y el GIF/efecto K.O. en pantalla
         ClientPlayNetworking.registerGlobalReceiver(PlayerDeathKoPayload.ID, (payload, context) -> {
             context.client().execute(() -> PlayerDeathKoOverlay.trigger(payload.deadPlayerName()));
+        });
+
+        // Recibir límites protegidos del casino "Draftea Tony Diaz" y bloquear clics en cliente sin parpadeo
+        ClientPlayNetworking.registerGlobalReceiver(pruebano1.modid.network.CasinoBoundsPayload.ID, (payload, context) -> {
+            context.client().execute(() -> pruebano1.modid.world.DrafteaCasinoManager.setClientBounds(payload));
+        });
+
+        // Música del casino: recibir lo que eligió el DJ, abrir su interfaz y reproducir solo dentro del casino
+        ClientPlayNetworking.registerGlobalReceiver(pruebano1.modid.network.CasinoMusicStatePayload.ID, (payload, context) ->
+                context.client().execute(() -> pruebano1.modid.client.CasinoMusicClient.onState(payload))
+        );
+        pruebano1.modid.block.DjControllerBlock.clientScreenOpener = pos ->
+                MinecraftClient.getInstance().setScreen(new pruebano1.modid.client.DjControllerScreen(pos));
+        ClientTickEvents.END_CLIENT_TICK.register(pruebano1.modid.client.CasinoMusicClient::tick);
+        net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register((handler, client) ->
+                client.execute(pruebano1.modid.client.CasinoMusicClient::reset)
+        );
+
+        net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register((handler, client) ->
+                pruebano1.modid.world.DrafteaCasinoManager.clearClientBounds()
+        );
+
+        net.fabricmc.fabric.api.event.player.AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
+            if (world.isClient() && pruebano1.modid.world.DrafteaCasinoProtection.shouldCancelBlockAttack(world, player, pos)) {
+                return net.minecraft.util.ActionResult.FAIL;
+            }
+            return net.minecraft.util.ActionResult.PASS;
+        });
+
+        net.fabricmc.fabric.api.event.player.UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+            if (world.isClient() && pruebano1.modid.world.DrafteaCasinoProtection.shouldCancelBlockUse(world, player, hand, hitResult)) {
+                return net.minecraft.util.ActionResult.FAIL;
+            }
+            return net.minecraft.util.ActionResult.PASS;
         });
 
         // Dibujar el efecto K.O. y los destellos/barras de cinemática estilo Edit de TikTok de Jefri penstein
