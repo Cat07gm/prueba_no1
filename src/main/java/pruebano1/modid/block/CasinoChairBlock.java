@@ -5,33 +5,25 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import pruebano1.modid.entity.ModEntities;
-import pruebano1.modid.entity.SeatEntity;
 
-import java.util.List;
 
 /**
  * Silla negra / banquito de casino con asiento giratorio en el que los jugadores pueden sentarse con clic derecho.
  */
-public class CasinoChairBlock extends HorizontalFacingBlock {
+public class CasinoChairBlock extends HorizontalFacingBlock implements CasinoSeat {
 
     public static final MapCodec<CasinoChairBlock> CODEC = createCodec(CasinoChairBlock::new);
 
@@ -78,44 +70,18 @@ public class CasinoChairBlock extends HorizontalFacingBlock {
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (player.isSpectator() || player.hasVehicle()) {
-            return ActionResult.PASS;
-        }
+        return CasinoSeat.sit(world, pos, player, state.get(FACING).getPositiveHorizontalDegrees());
+    }
 
-        if (!world.isClient() && world instanceof ServerWorld serverWorld) {
-            List<SeatEntity> seats = world.getEntitiesByClass(SeatEntity.class, new Box(pos), e -> true);
-            for (SeatEntity existing : seats) {
-                if (existing.hasPassengers()) {
-                    if (existing.hasPassenger(player)) {
-                        return ActionResult.SUCCESS;
-                    }
-                    player.sendMessage(Text.literal("Este asiento ya está ocupado.").formatted(Formatting.RED), true);
-                    return ActionResult.SUCCESS;
-                }
-                existing.discard();
-            }
-
-            SeatEntity seat = ModEntities.SEAT.create(serverWorld, SpawnReason.TRIGGERED);
-            if (seat != null) {
-                float seatYaw = state.get(FACING).getPositiveHorizontalDegrees();
-                seat.refreshPositionAndAngles(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, seatYaw, 0.0F);
-                serverWorld.spawnEntity(seat);
-                player.setYaw(seatYaw);
-                player.setHeadYaw(seatYaw);
-                player.startRiding(seat, true);
-            }
-        }
-        return ActionResult.SUCCESS;
+    @Override
+    public double getSeatHeight() {
+        return 0.59; // Superficie superior del cojín de cuero negro (9.5 px / 16)
     }
 
     @Override
     protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock()) && !world.isClient()) {
-            List<SeatEntity> seats = world.getEntitiesByClass(SeatEntity.class, new Box(pos), e -> true);
-            for (SeatEntity seat : seats) {
-                seat.removeAllPassengers();
-                seat.discard();
-            }
+        if (!state.isOf(newState.getBlock())) {
+            CasinoSeat.clearSeats(world, pos);
         }
         super.onStateReplaced(state, world, pos, newState, moved);
     }

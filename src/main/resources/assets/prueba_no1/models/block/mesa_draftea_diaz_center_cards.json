@@ -1,0 +1,146 @@
+{
+    "parent":  "minecraft:block/block",
+    "textures":  {
+                     "particle":  "prueba_no1:block/mesa_felt",
+                     "felt":  "prueba_no1:block/mesa_felt",
+                     "bets":  "prueba_no1:block/mesa_felt_bets",
+                     "cards":  "prueba_no1:block/mesa_felt_cards",
+                     "chips":  "prueba_no1:block/mesa_chips",
+                     "leather":  "prueba_no1:block/casino_chair_leather",
+                     "metal":  "prueba_no1:block/casino_chair_metal",
+                     "chrome":  "prueba_no1:block/casino_chair_chrome",
+                     "velvet":  "prueba_no1:block/casino_velvet"
+                 },
+    "elements":  [
+                     {
+                         "from":  [
+                                      0,
+                                      10,
+                                      0
+                                  ],
+                         "to":  [
+                                    16,
+                                    13,
+                                    16
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#leather"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#leather"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#leather"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#leather"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#cards",
+                                                  "rotation":  180
+                                              },
+                                       "down":  {
+                                                    "texture":  "#metal"
+                                                }
+                                   }
+                     },
+                     {
+                         "from":  [
+                                      0,
+                                      0,
+                                      3
+                                  ],
+                         "to":  [
+                                    16,
+                                    1,
+                                    13
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#metal"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#metal"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#metal"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#metal"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#metal"
+                                              },
+                                       "down":  {
+                                                    "texture":  "#metal",
+                                                    "cullface":  "down"
+                                                }
+                                   }
+                     },
+                     {
+                         "from":  [
+                                      0,
+                                      1,
+                                      4
+                                  ],
+                         "to":  [
+                                    16,
+                                    10,
+                                    12
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#leather"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#leather"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#leather"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#leather"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#leather"
+                                              },
+                                       "down":  {
+                                                    "texture":  "#leather"
+                                                }
+                                   }
+                     },
+                     {
+                         "from":  [
+                                      0,
+                                      7,
+                                      3.8
+                                  ],
+                         "to":  [
+                                    16,
+                                    8,
+                                    12.2
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#velvet"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#velvet"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#velvet"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#velvet"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#velvet"
+                                              },
+                                       "down":  {
+                                                    "texture":  "#velvet"
+                                                }
+                                   }
+                     }
+                 ]
+}

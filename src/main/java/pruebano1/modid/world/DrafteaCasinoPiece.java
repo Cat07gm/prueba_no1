@@ -18,6 +18,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
@@ -48,10 +49,13 @@ public final class DrafteaCasinoPiece {
     private static final int BLDG_MIN_Z = -31;
     private static final int BLDG_MAX_Z = 23;
 
-    private static final int PLAZA_MIN_X = -44;
-    private static final int PLAZA_MAX_X = 44;
-    private static final int PLAZA_MIN_Z = -35;
-    private static final int PLAZA_MAX_Z = 38;
+    static final int PLAZA_MIN_X = -44;
+    static final int PLAZA_MAX_X = 44;
+    static final int PLAZA_MIN_Z = -35;
+    static final int PLAZA_MAX_Z = 38;
+
+    /** Bloques alrededor de la plaza donde el terreno más alto se rebaja en talud en vez de cortarse en vertical. */
+    private static final int GRADE_RANGE = 8;
 
     private static final int MEZZ_Y = 9;      // Suelo del segundo piso VIP
     private static final int WING_TOP_Y = 17; // Techo de las alas laterales
@@ -113,10 +117,10 @@ public final class DrafteaCasinoPiece {
             int baseY,
             int centerZ
     ) {
-        int minX = Math.max(centerX + DrafteaCasinoWorldState.PROTECTED_MIN_DX, chunkBox.getMinX());
-        int maxX = Math.min(centerX + DrafteaCasinoWorldState.PROTECTED_MAX_DX, chunkBox.getMaxX());
-        int minZ = Math.max(centerZ + DrafteaCasinoWorldState.PROTECTED_MIN_DZ, chunkBox.getMinZ());
-        int maxZ = Math.min(centerZ + DrafteaCasinoWorldState.PROTECTED_MAX_DZ, chunkBox.getMaxZ());
+        int minX = Math.max(centerX + PLAZA_MIN_X - GRADE_RANGE, chunkBox.getMinX());
+        int maxX = Math.min(centerX + PLAZA_MAX_X + GRADE_RANGE, chunkBox.getMaxX());
+        int minZ = Math.max(centerZ + PLAZA_MIN_Z - GRADE_RANGE, chunkBox.getMinZ());
+        int maxZ = Math.min(centerZ + PLAZA_MAX_Z + GRADE_RANGE, chunkBox.getMaxZ());
 
         if (minX > maxX || minZ > maxZ) {
             return;
@@ -164,12 +168,21 @@ public final class DrafteaCasinoPiece {
                         Math.max(PLAZA_MIN_X - dx, dx - PLAZA_MAX_X),
                         Math.max(PLAZA_MIN_Z - dz, dz - PLAZA_MAX_Z)
                 );
-                if (distOut >= 1 && distOut <= 4) {
+                if (distOut < 1) {
+                    continue;
+                }
+
+                // Terreno más alto que la plaza: en vez de un corte vertical se rebaja en talud
+                // (2 de alto por bloque de distancia) y se vuelve a cubrir de pasto.
+                gradeTerrainAroundPlaza(world, pos, wx, wz, baseY + distOut * 2 - 1);
+
+                if (distOut <= 4) {
                     int stepY = baseY - distOut;
+                    // Solo rellena huecos: el terreno natural que ya existe no se toca
                     for (int y = bottomY; y < stepY; y++) {
                         pos.set(wx, y, wz);
                         BlockState cur = world.getBlockState(pos);
-                        if (y >= stepY - 1 || cur.isAir() || cur.isLiquid() || cur.isReplaceable()) {
+                        if (cur.isAir() || cur.isLiquid() || cur.isReplaceable()) {
                             world.setBlockState(pos, foundation, Block.NOTIFY_LISTENERS);
                         }
                     }
@@ -185,15 +198,49 @@ public final class DrafteaCasinoPiece {
                             world.setBlockState(pos, stepState, Block.NOTIFY_LISTENERS);
                         }
                     }
-
-                    // Despejar árboles o colinas bloqueando la vista frontal / escalinata
-                    int keepFloorY = Math.max(stepY + 1, baseY + 1);
-                    for (int y = keepFloorY; y <= Math.min(world.getTopYInclusive(), baseY + 28); y++) {
-                        pos.set(wx, y, wz);
-                        world.setBlockState(pos, air, Block.NOTIFY_LISTENERS);
-                    }
                 }
             }
+        }
+    }
+
+    /**
+     * Quita todo lo que sobresalga por encima de capY en la columna y, si se recortó suelo,
+     * deja la nueva superficie con pasto/tierra para que no quede piedra o tierra expuesta.
+     */
+    private static void gradeTerrainAroundPlaza(
+            StructureWorldAccess world,
+            BlockPos.Mutable pos,
+            int wx,
+            int wz,
+            int capY
+    ) {
+        BlockState air = Blocks.AIR.getDefaultState();
+        boolean removedGround = false;
+        for (int y = world.getTopYInclusive(); y > capY; y--) {
+            pos.set(wx, y, wz);
+            BlockState cur = world.getBlockState(pos);
+            if (cur.isAir()) {
+                continue;
+            }
+            if (cur.isIn(BlockTags.DIRT) || cur.isIn(BlockTags.BASE_STONE_OVERWORLD)) {
+                removedGround = true;
+            }
+            world.setBlockState(pos, air, Block.NOTIFY_LISTENERS);
+        }
+        if (!removedGround) {
+            return;
+        }
+        for (int depth = 0; depth < 3; depth++) {
+            pos.set(wx, capY - depth, wz);
+            BlockState cur = world.getBlockState(pos);
+            if (!cur.isIn(BlockTags.DIRT) && !cur.isIn(BlockTags.BASE_STONE_OVERWORLD)) {
+                break;
+            }
+            world.setBlockState(
+                    pos,
+                    depth == 0 ? Blocks.GRASS_BLOCK.getDefaultState() : Blocks.DIRT.getDefaultState(),
+                    Block.NOTIFY_LISTENERS
+            );
         }
     }
 

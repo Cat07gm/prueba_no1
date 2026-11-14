@@ -1,0 +1,130 @@
+{
+    "parent":  "minecraft:block/block",
+    "textures":  {
+                     "particle":  "prueba_no1:block/casino_pot",
+                     "pot":  "prueba_no1:block/casino_pot",
+                     "soil":  "minecraft:block/coarse_dirt",
+                     "plant":  "prueba_no1:block/casino_plant_monstera"
+                 },
+    "elements":  [
+                     {
+                         "from":  [
+                                      4,
+                                      0,
+                                      4
+                                  ],
+                         "to":  [
+                                    12,
+                                    8,
+                                    12
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#pot"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#pot"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#pot"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#pot"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#soil"
+                                              },
+                                       "down":  {
+                                                    "texture":  "#pot",
+                                                    "cullface":  "down"
+                                                }
+                                   }
+                     },
+                     {
+                         "from":  [
+                                      0.8,
+                                      7,
+                                      8
+                                  ],
+                         "to":  [
+                                    15.2,
+                                    23,
+                                    8
+                                ],
+                         "shade":  false,
+                         "rotation":  {
+                                          "origin":  [
+                                                         8,
+                                                         8,
+                                                         8
+                                                     ],
+                                          "axis":  "y",
+                                          "angle":  45,
+                                          "rescale":  true
+                                      },
+                         "faces":  {
+                                       "north":  {
+                                                     "uv":  [
+                                                                0,
+                                                                0,
+                                                                16,
+                                                                16
+                                                            ],
+                                                     "texture":  "#plant"
+                                                 },
+                                       "south":  {
+                                                     "uv":  [
+                                                                0,
+                                                                0,
+                                                                16,
+                                                                16
+                                                            ],
+                                                     "texture":  "#plant"
+                                                 }
+                                   }
+                     },
+                     {
+                         "from":  [
+                                      0.8,
+                                      7,
+                                      8
+                                  ],
+                         "to":  [
+                                    15.2,
+                                    23,
+                                    8
+                                ],
+                         "shade":  false,
+                         "rotation":  {
+                                          "origin":  [
+                                                         8,
+                                                         8,
+                                                         8
+                                                     ],
+                                          "axis":  "y",
+                                          "angle":  -45,
+                                          "rescale":  true
+                                      },
+                         "faces":  {
+                                       "north":  {
+                                                     "uv":  [
+                                                                0,
+                                                                0,
+                                                                16,
+                                                                16
+                                                            ],
+                                                     "texture":  "#plant"
+                                                 },
+                                       "south":  {
+                                                     "uv":  [
+                                                                0,
+                                                                0,
+                                                                16,
+                                                                16
+                                                            ],
+                                                     "texture":  "#plant"
+                                                 }
+                                   }
+                     }
+                 ]
+}

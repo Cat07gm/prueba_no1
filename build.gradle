@@ -35,6 +35,12 @@ dependencies {
 
 	// GeckoLib para modelos 3D y animaciones avanzadas desde Blockbench
 	modImplementation "software.bernie.geckolib:geckolib-fabric-${project.minecraft_version}:${project.geckolib_version}"
+
+	// Compatibilidad opcional en tiempo de compilación con Waystones y Balm (si están instalados en mods/)
+	modCompileOnly files(
+			"run/mods/waystones-fabric-1.21.4-21.4.19.jar",
+			"run/mods/1.21.4-balm-fabric-1.21.4-21.4.41.jar"
+	)
 }
 
 processResources {

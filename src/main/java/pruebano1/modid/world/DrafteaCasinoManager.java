@@ -166,11 +166,15 @@ public final class DrafteaCasinoManager {
             );
         }
 
-        if (!state.areNpcsSpawned()) {
-            int spawned = spawnCasinoNpcs(overworld, anchor, false);
+        if (!state.areNpcsSpawned() || state.getNpcLayoutVersion() < DrafteaCasinoWorldState.CURRENT_NPC_LAYOUT_VERSION) {
+            int spawned = spawnCasinoNpcs(overworld, anchor, state.areNpcsSpawned());
             if (spawned > 0) {
-                state.markNpcsSpawned();
+                state.markNpcsSpawned(DrafteaCasinoWorldState.CURRENT_NPC_LAYOUT_VERSION);
             }
+        }
+
+        if (!state.isWaystonePlaced() && pruebano1.modid.compat.WaystonesIntegration.ensureCasinoEntranceWaystone(overworld, anchor)) {
+            state.markWaystonePlaced();
         }
     }
 
@@ -417,8 +421,12 @@ public final class DrafteaCasinoManager {
 
         int spawned = 0;
 
-        // 1. TonyFase1 (Sudadera Verde): 1 Bartender fijo detrás de la barra Norte mirando al Sur
-        spawned += spawnBartender(overworld, anchor, 0.5, 1.0, -25.5, 0.0F) ? 1 : 0;
+        // 1. TonyFase1 (Sudadera Verde): Personal fijo detrás del mostrador del Lounge Bar Norte y Caja Central Oeste
+        BlockPos barCounterSpot = BlockPos.ofFloored(anchor.centerX() + 0.5, anchor.baseY() + 1.0, anchor.centerZ() - 22.5);
+        overworld.getChunk(barCounterSpot.getX() >> 4, barCounterSpot.getZ() >> 4);
+        double barDz = overworld.getBlockState(barCounterSpot).isSolidBlock(overworld, barCounterSpot) ? -24.5 : -22.5;
+        spawned += spawnBartender(overworld, anchor, 0.5, 1.0, barDz, 0.0F) ? 1 : 0;
+        spawned += spawnBartender(overworld, anchor, -23.5, 1.0, 17.5, 180.0F) ? 1 : 0;
 
         // 2. TonyFase3 (Sudadera Negra): 2 Guardias en la entrada principal bajo la marquesina
         spawned += spawnGuard(overworld, anchor, -2.5, 1.0, 25.5, 0.0F, TonyFase3Entity.POSE_CROSSED) ? 1 : 0;
@@ -430,15 +438,18 @@ public final class DrafteaCasinoManager {
         spawned += spawnGuard(overworld, anchor, -15.5, 1.0, -18.5, 0.0F, TonyFase3Entity.POSE_CROSSED) ? 1 : 0;
         spawned += spawnGuard(overworld, anchor, 0.5, 10.0, -17.5, 0.0F, TonyFase3Entity.POSE_HANDS_CLASPED) ? 1 : 0;
 
-        // 4. TonyFase2 (Sudadera Blanca): 7 Clientes (3 inicialmente frente a máquinas Draftea + 4 paseando)
+        // 4. TonyFase2 (Sudadera Blanca): 10 Clientes (5 inicialmente frente a máquinas Draftea + 5 paseando)
         spawned += spawnSlotClient(overworld, anchor, -10, 1, 5, -10, 1, 3, Direction.SOUTH) ? 1 : 0;
         spawned += spawnSlotClient(overworld, anchor, 13, 1, 2, 11, 1, 2, Direction.EAST) ? 1 : 0;
         spawned += spawnSlotClient(overworld, anchor, -28, 1, 4, -28, 1, 2, Direction.SOUTH) ? 1 : 0;
+        spawned += spawnSlotClient(overworld, anchor, 32, 1, 3, 34, 1, 3, Direction.WEST) ? 1 : 0;
+        spawned += spawnSlotClient(overworld, anchor, -22, 1, 5, -22, 1, 7, Direction.NORTH) ? 1 : 0;
 
         spawned += spawnRoamingClient(overworld, anchor, 4.5, 1.0, 12.5, 150.0F) ? 1 : 0;
         spawned += spawnRoamingClient(overworld, anchor, 0.5, 1.0, -2.5, 0.0F) ? 1 : 0;
         spawned += spawnRoamingClient(overworld, anchor, 19.5, 1.0, -6.5, 90.0F) ? 1 : 0;
         spawned += spawnRoamingClient(overworld, anchor, -27.5, 10.0, -1.5, 0.0F) ? 1 : 0;
+        spawned += spawnRoamingClient(overworld, anchor, 28.5, 10.0, 2.5, 90.0F) ? 1 : 0;
 
         return spawned;
     }

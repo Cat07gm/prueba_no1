@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": ["S", "D", "C"],
+  "key": { "S": "minecraft:jungle_sapling", "D": "minecraft:black_dye", "C": "minecraft:flower_pot" },
+  "result": { "id": "prueba_no1:casino_palm_pot", "count": 1 }
+}

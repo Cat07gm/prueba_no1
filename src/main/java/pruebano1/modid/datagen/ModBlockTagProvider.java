@@ -30,7 +30,18 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 .add(ModBlocks.CASINO_CHAIR)
                 .add(ModBlocks.DJ_TURNTABLE)
                 .add(ModBlocks.DJ_MIXER)
-                .add(ModBlocks.DJ_CONTROLLER);
+                .add(ModBlocks.DJ_CONTROLLER)
+                .add(ModBlocks.CASINO_COFFEE_TABLE)
+                .add(ModBlocks.CASINO_COCKTAIL_TABLE)
+                .add(ModBlocks.CASINO_BAR_STOOL)
+                .add(ModBlocks.NEON_SIGN_CARDS)
+                .add(ModBlocks.NEON_SIGN_CHIP)
+                .add(ModBlocks.NEON_SIGN_DICE)
+                .add(ModBlocks.NEON_SIGN_777);
+
+        // La Mesa Draftea Diaz es de madera: se rompe rápido con hacha
+        getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)
+                .add(ModBlocks.MESA_DRAFTEA_DIAZ);
 
         // Bloques que requieren al menos pico de hierro (o puedes usar NEEDS_DIAMOND_TOOL)
         getOrCreateTagBuilder(BlockTags.NEEDS_IRON_TOOL)

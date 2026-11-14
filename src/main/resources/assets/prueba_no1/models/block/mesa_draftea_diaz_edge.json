@@ -1,0 +1,80 @@
+{
+    "parent":  "minecraft:block/block",
+    "textures":  {
+                     "particle":  "prueba_no1:block/mesa_felt",
+                     "felt":  "prueba_no1:block/mesa_felt",
+                     "bets":  "prueba_no1:block/mesa_felt_bets",
+                     "cards":  "prueba_no1:block/mesa_felt_cards",
+                     "chips":  "prueba_no1:block/mesa_chips",
+                     "leather":  "prueba_no1:block/casino_chair_leather",
+                     "metal":  "prueba_no1:block/casino_chair_metal",
+                     "chrome":  "prueba_no1:block/casino_chair_chrome",
+                     "velvet":  "prueba_no1:block/casino_velvet"
+                 },
+    "elements":  [
+                     {
+                         "from":  [
+                                      0,
+                                      10,
+                                      4
+                                  ],
+                         "to":  [
+                                    16,
+                                    13,
+                                    16
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#leather"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#leather"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#leather"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#leather"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#felt"
+                                              },
+                                       "down":  {
+                                                    "texture":  "#metal"
+                                                }
+                                   }
+                     },
+                     {
+                         "from":  [
+                                      0,
+                                      10,
+                                      0
+                                  ],
+                         "to":  [
+                                    16,
+                                    15,
+                                    4
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#leather"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#chrome"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#leather"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#leather"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#leather"
+                                              },
+                                       "down":  {
+                                                    "texture":  "#metal"
+                                                }
+                                   }
+                     }
+                 ]
+}

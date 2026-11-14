@@ -28,7 +28,17 @@ public final class CasinoSongs {
             song("ebb_tide", "Ebb Tide"),
             song("glide_with_me", "Glide with me - David Luong"),
             song("hit_the_road_jack", "Hit The Road Jack - Ray Charles"),
-            song("voy_buscando", "Voy Buscando un Travesti - Cionibe")
+            song("voy_buscando", "Voy Buscando un Travesti - Cionibe"),
+            // Nuevas canciones: agregar siempre AL FINAL para no cambiar la canción guardada en los mundos
+            song("amor_prohibido", "Amor Prohibido - Nabogordo"),
+            song("amores_lejanos", "Amores Lejanos - Hombres G, Enanitos Verdes"),
+            song("gospel", "Gospel"),
+            song("lo_mejor_siempre_se_demora", "Lo Mejor Siempre Se Demora - Yeyo"),
+            song("m_extrana", "M Extraña - Uzielito Mix"),
+            song("pa_k", "PA K - Marc Seguí"),
+            song("pilates", "Pilates - Aria Bela"),
+            song("something_about_us", "Something About Us - Daft Punk"),
+            song("ultimate_battle", "Ultimate Battle - Laura Shigihara")
     );
 
     private CasinoSongs() {

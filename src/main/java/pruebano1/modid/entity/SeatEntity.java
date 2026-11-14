@@ -14,11 +14,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import pruebano1.modid.ModBlocks;
+import pruebano1.modid.block.CasinoSeat;
 import pruebano1.modid.block.CasinoChairBlock;
 
 /**
- * Entidad invisible de asiento para que los jugadores puedan sentarse en la Silla Negra de Casino.
+ * Entidad invisible de asiento para sentarse en los asientos del casino (silla negra, sofá, silla de bar).
  */
 public class SeatEntity extends Entity {
 
@@ -62,7 +62,7 @@ public class SeatEntity extends Entity {
         super.baseTick();
         if (!this.getWorld().isClient()) {
             BlockState state = this.getWorld().getBlockState(this.getBlockPos());
-            if (!state.isOf(ModBlocks.CASINO_CHAIR)) {
+            if (!(state.getBlock() instanceof CasinoSeat)) {
                 this.removeAllPassengers();
                 this.discard();
                 return;
@@ -80,8 +80,10 @@ public class SeatEntity extends Entity {
 
     @Override
     protected Vec3d getPassengerAttachmentPos(Entity passenger, EntityDimensions dimensions, float scaleFactor) {
-        // Superficie superior del cojín de cuero negro (9.5 px / 16 = 0.59375)
-        return new Vec3d(0.0, 0.59, 0.0);
+        // Cada asiento (silla, sofá, silla de bar alta) dice a qué altura está su cojín
+        BlockState state = this.getWorld().getBlockState(this.getBlockPos());
+        double height = state.getBlock() instanceof CasinoSeat seat ? seat.getSeatHeight() : 0.59;
+        return new Vec3d(0.0, height, 0.0);
     }
 
     @Override

@@ -15,7 +15,13 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.block.piston.PistonBehavior;
+import net.minecraft.util.shape.VoxelShapes;
+import pruebano1.modid.block.CasinoBarStoolBlock;
 import pruebano1.modid.block.CasinoChairBlock;
+import pruebano1.modid.block.CasinoDecorBlock;
+import pruebano1.modid.block.CasinoSofaBlock;
+import pruebano1.modid.block.MesaDrafteaDiazBlock;
+import pruebano1.modid.block.NeonSignBlock;
 import pruebano1.modid.block.DjComponentBlock;
 import pruebano1.modid.block.DjControllerBlock;
 import pruebano1.modid.block.DrafteaBlock;
@@ -206,8 +212,138 @@ public class ModBlocks {
             .pistonBehavior(PistonBehavior.BLOCK)
             .sounds(BlockSoundGroup.METAL));
 
+    // =====================================================================
+    // DECORACIÓN Y JUEGOS NUEVOS DEL CASINO DRAFTEA
+    // =====================================================================
+
+    private static RegistryKey<Block> blockKey(String name) {
+        return RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(Prueba_no1.MOD_ID, name));
+    }
+
+    private static RegistryKey<Item> itemKey(String name) {
+        return RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Prueba_no1.MOD_ID, name));
+    }
+
+    // MESA DRAFTEA DIAZ (mesa de apuestas de cartas 5x3: se apuestan lingotes y gemas). Solo creativo/comandos.
+    public static final RegistryKey<Block> MESA_DRAFTEA_DIAZ_KEY = blockKey("mesa_draftea_diaz");
+    public static final Block MESA_DRAFTEA_DIAZ = new MesaDrafteaDiazBlock(AbstractBlock.Settings.create()
+            .registryKey(MESA_DRAFTEA_DIAZ_KEY)
+            .mapColor(MapColor.PURPLE)
+            .strength(2.5f, 1200.0f) // Muy resistente a explosiones para que no se parta en pedazos
+            .nonOpaque()
+            .pistonBehavior(PistonBehavior.BLOCK)
+            .sounds(BlockSoundGroup.WOOD));
+
+    // SOFÁ MODULAR (se une con los de al lado: puntas, piezas centrales y esquinas)
+    public static final RegistryKey<Block> CASINO_SOFA_KEY = blockKey("casino_sofa");
+    public static final Block CASINO_SOFA = new CasinoSofaBlock(AbstractBlock.Settings.create()
+            .registryKey(CASINO_SOFA_KEY)
+            .mapColor(MapColor.BLACK)
+            .strength(1.0f, 3.0f)
+            .nonOpaque()
+            .pistonBehavior(PistonBehavior.DESTROY)
+            .sounds(BlockSoundGroup.WOOL));
+
+    // MESA DE CENTRO (baja, para las salas con sofás)
+    public static final RegistryKey<Block> CASINO_COFFEE_TABLE_KEY = blockKey("casino_coffee_table");
+    public static final Block CASINO_COFFEE_TABLE = new CasinoDecorBlock(
+            Block.createCuboidShape(0, 0, 0, 16, 8, 16),
+            AbstractBlock.Settings.create()
+                    .registryKey(CASINO_COFFEE_TABLE_KEY)
+                    .mapColor(MapColor.WHITE)
+                    .strength(1.5f, 4.0f)
+                    .nonOpaque()
+                    .pistonBehavior(PistonBehavior.DESTROY)
+                    .sounds(BlockSoundGroup.STONE));
+
+    // MESA ALTA DE COCTEL (pie cromado)
+    public static final RegistryKey<Block> CASINO_COCKTAIL_TABLE_KEY = blockKey("casino_cocktail_table");
+    public static final Block CASINO_COCKTAIL_TABLE = new CasinoDecorBlock(
+            VoxelShapes.union(
+                    Block.createCuboidShape(3, 0, 3, 13, 1, 13),
+                    Block.createCuboidShape(7, 1, 7, 9, 14, 9),
+                    Block.createCuboidShape(1, 14, 1, 15, 16, 15)),
+            AbstractBlock.Settings.create()
+                    .registryKey(CASINO_COCKTAIL_TABLE_KEY)
+                    .mapColor(MapColor.WHITE)
+                    .strength(1.5f, 4.0f)
+                    .nonOpaque()
+                    .pistonBehavior(PistonBehavior.DESTROY)
+                    .sounds(BlockSoundGroup.METAL));
+
+    // SILLA DE BAR ALTA
+    public static final RegistryKey<Block> CASINO_BAR_STOOL_KEY = blockKey("casino_bar_stool");
+    public static final Block CASINO_BAR_STOOL = new CasinoBarStoolBlock(AbstractBlock.Settings.create()
+            .registryKey(CASINO_BAR_STOOL_KEY)
+            .mapColor(MapColor.BLACK)
+            .strength(1.5f, 4.0f)
+            .nonOpaque()
+            .pistonBehavior(PistonBehavior.DESTROY)
+            .sounds(BlockSoundGroup.METAL));
+
+    // PLANTAS EN MACETA MODERNA
+    public static final RegistryKey<Block> CASINO_PALM_POT_KEY = blockKey("casino_palm_pot");
+    public static final Block CASINO_PALM_POT = createPlant(CASINO_PALM_POT_KEY);
+    public static final RegistryKey<Block> CASINO_MONSTERA_POT_KEY = blockKey("casino_monstera_pot");
+    public static final Block CASINO_MONSTERA_POT = createPlant(CASINO_MONSTERA_POT_KEY);
+
+    private static Block createPlant(RegistryKey<Block> key) {
+        return new CasinoDecorBlock(Block.createCuboidShape(3, 0, 3, 13, 16, 13), AbstractBlock.Settings.create()
+                .registryKey(key)
+                .mapColor(MapColor.BLACK)
+                .strength(0.8f, 2.0f)
+                .nonOpaque()
+                .pistonBehavior(PistonBehavior.DESTROY)
+                .sounds(BlockSoundGroup.DECORATED_POT));
+    }
+
+    // CUADROS / LETREROS NEÓN DE PARED
+    public static final RegistryKey<Block> NEON_SIGN_CARDS_KEY = blockKey("neon_sign_cards");
+    public static final Block NEON_SIGN_CARDS = createNeonSign(NEON_SIGN_CARDS_KEY);
+    public static final RegistryKey<Block> NEON_SIGN_CHIP_KEY = blockKey("neon_sign_chip");
+    public static final Block NEON_SIGN_CHIP = createNeonSign(NEON_SIGN_CHIP_KEY);
+    public static final RegistryKey<Block> NEON_SIGN_DICE_KEY = blockKey("neon_sign_dice");
+    public static final Block NEON_SIGN_DICE = createNeonSign(NEON_SIGN_DICE_KEY);
+    public static final RegistryKey<Block> NEON_SIGN_777_KEY = blockKey("neon_sign_777");
+    public static final Block NEON_SIGN_777 = createNeonSign(NEON_SIGN_777_KEY);
+
+    private static Block createNeonSign(RegistryKey<Block> key) {
+        return new NeonSignBlock(AbstractBlock.Settings.create()
+                .registryKey(key)
+                .mapColor(MapColor.PURPLE)
+                .strength(0.8f, 2.0f)
+                .nonOpaque()
+                .noCollision()
+                .luminance(state -> 10)
+                .pistonBehavior(PistonBehavior.DESTROY)
+                .sounds(BlockSoundGroup.GLASS));
+    }
+
+    /** Todos los bloques nuevos de decoración del casino, en el orden en que salen en el inventario creativo. */
+    public static final Block[] CASINO_DECOR = {
+            CASINO_SOFA, CASINO_COFFEE_TABLE, CASINO_COCKTAIL_TABLE, CASINO_BAR_STOOL,
+            CASINO_PALM_POT, CASINO_MONSTERA_POT,
+            NEON_SIGN_CARDS, NEON_SIGN_CHIP, NEON_SIGN_DICE, NEON_SIGN_777
+    };
+
+    private static void registerSimple(Block block, RegistryKey<Block> key) {
+        registerBlock(key, itemKey(key.getValue().getPath()), block);
+    }
+
     //REGISTERS
     public static void registerModBlocks() {
+        registerSimple(MESA_DRAFTEA_DIAZ, MESA_DRAFTEA_DIAZ_KEY);
+        registerSimple(CASINO_SOFA, CASINO_SOFA_KEY);
+        registerSimple(CASINO_COFFEE_TABLE, CASINO_COFFEE_TABLE_KEY);
+        registerSimple(CASINO_COCKTAIL_TABLE, CASINO_COCKTAIL_TABLE_KEY);
+        registerSimple(CASINO_BAR_STOOL, CASINO_BAR_STOOL_KEY);
+        registerSimple(CASINO_PALM_POT, CASINO_PALM_POT_KEY);
+        registerSimple(CASINO_MONSTERA_POT, CASINO_MONSTERA_POT_KEY);
+        registerSimple(NEON_SIGN_CARDS, NEON_SIGN_CARDS_KEY);
+        registerSimple(NEON_SIGN_CHIP, NEON_SIGN_CHIP_KEY);
+        registerSimple(NEON_SIGN_DICE, NEON_SIGN_DICE_KEY);
+        registerSimple(NEON_SIGN_777, NEON_SIGN_777_KEY);
+
         Prueba_no1.LOGGER.info("Registrando bloques para " + Prueba_no1.MOD_ID);
 
         registerBlock(SCARLET_ORE_KEY, SCARLET_ORE_ITEM_KEY, SCARLET_ORE);
@@ -238,6 +374,10 @@ public class ModBlocks {
             entries.add(DJ_TURNTABLE);
             entries.add(DJ_MIXER);
             entries.add(DJ_CONTROLLER);
+            entries.add(MESA_DRAFTEA_DIAZ);
+            for (Block decor : CASINO_DECOR) {
+                entries.add(decor);
+            }
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register(entries -> {

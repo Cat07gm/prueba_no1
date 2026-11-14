@@ -1,0 +1,19 @@
+{
+    "variants":  {
+                     "facing=north":  {
+                                          "model":  "prueba_no1:block/neon_sign_chip"
+                                      },
+                     "facing=east":  {
+                                         "model":  "prueba_no1:block/neon_sign_chip",
+                                         "y":  90
+                                     },
+                     "facing=south":  {
+                                          "model":  "prueba_no1:block/neon_sign_chip",
+                                          "y":  180
+                                      },
+                     "facing=west":  {
+                                         "model":  "prueba_no1:block/neon_sign_chip",
+                                         "y":  270
+                                     }
+                 }
+}

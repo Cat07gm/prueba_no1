@@ -1,0 +1,229 @@
+{
+    "variants":  {
+                     "facing=north,part=0":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_corner",
+                                                 "y":  270
+                                             },
+                     "facing=north,part=1":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                 "y":  180
+                                             },
+                     "facing=north,part=2":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_dealer",
+                                                 "y":  180
+                                             },
+                     "facing=north,part=3":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                 "y":  180
+                                             },
+                     "facing=north,part=4":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_corner",
+                                                 "y":  180
+                                             },
+                     "facing=north,part=5":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                 "y":  270
+                                             },
+                     "facing=north,part=6":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_center_bets"
+                                             },
+                     "facing=north,part=7":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_center_cards"
+                                             },
+                     "facing=north,part=8":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_center_bets"
+                                             },
+                     "facing=north,part=9":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                 "y":  90
+                                             },
+                     "facing=north,part=10":  {
+                                                  "model":  "prueba_no1:block/mesa_draftea_diaz_corner"
+                                              },
+                     "facing=north,part=11":  {
+                                                  "model":  "prueba_no1:block/mesa_draftea_diaz_edge"
+                                              },
+                     "facing=north,part=12":  {
+                                                  "model":  "prueba_no1:block/mesa_draftea_diaz_edge"
+                                              },
+                     "facing=north,part=13":  {
+                                                  "model":  "prueba_no1:block/mesa_draftea_diaz_edge"
+                                              },
+                     "facing=north,part=14":  {
+                                                  "model":  "prueba_no1:block/mesa_draftea_diaz_corner",
+                                                  "y":  90
+                                              },
+                     "facing=east,part=0":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_corner"
+                                            },
+                     "facing=east,part=1":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                "y":  270
+                                            },
+                     "facing=east,part=2":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_dealer",
+                                                "y":  270
+                                            },
+                     "facing=east,part=3":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                "y":  270
+                                            },
+                     "facing=east,part=4":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_corner",
+                                                "y":  270
+                                            },
+                     "facing=east,part=5":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_edge"
+                                            },
+                     "facing=east,part=6":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_center_bets",
+                                                "y":  90
+                                            },
+                     "facing=east,part=7":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_center_cards",
+                                                "y":  90
+                                            },
+                     "facing=east,part=8":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_center_bets",
+                                                "y":  90
+                                            },
+                     "facing=east,part=9":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                "y":  180
+                                            },
+                     "facing=east,part=10":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_corner",
+                                                 "y":  90
+                                             },
+                     "facing=east,part=11":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                 "y":  90
+                                             },
+                     "facing=east,part=12":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                 "y":  90
+                                             },
+                     "facing=east,part=13":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                 "y":  90
+                                             },
+                     "facing=east,part=14":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_corner",
+                                                 "y":  180
+                                             },
+                     "facing=south,part=0":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_corner",
+                                                 "y":  90
+                                             },
+                     "facing=south,part=1":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge"
+                                             },
+                     "facing=south,part=2":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_dealer"
+                                             },
+                     "facing=south,part=3":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge"
+                                             },
+                     "facing=south,part=4":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_corner"
+                                             },
+                     "facing=south,part=5":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                 "y":  90
+                                             },
+                     "facing=south,part=6":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_center_bets",
+                                                 "y":  180
+                                             },
+                     "facing=south,part=7":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_center_cards",
+                                                 "y":  180
+                                             },
+                     "facing=south,part=8":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_center_bets",
+                                                 "y":  180
+                                             },
+                     "facing=south,part=9":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                 "y":  270
+                                             },
+                     "facing=south,part=10":  {
+                                                  "model":  "prueba_no1:block/mesa_draftea_diaz_corner",
+                                                  "y":  180
+                                              },
+                     "facing=south,part=11":  {
+                                                  "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                  "y":  180
+                                              },
+                     "facing=south,part=12":  {
+                                                  "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                  "y":  180
+                                              },
+                     "facing=south,part=13":  {
+                                                  "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                  "y":  180
+                                              },
+                     "facing=south,part=14":  {
+                                                  "model":  "prueba_no1:block/mesa_draftea_diaz_corner",
+                                                  "y":  270
+                                              },
+                     "facing=west,part=0":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_corner",
+                                                "y":  180
+                                            },
+                     "facing=west,part=1":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                "y":  90
+                                            },
+                     "facing=west,part=2":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_dealer",
+                                                "y":  90
+                                            },
+                     "facing=west,part=3":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                "y":  90
+                                            },
+                     "facing=west,part=4":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_corner",
+                                                "y":  90
+                                            },
+                     "facing=west,part=5":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                "y":  180
+                                            },
+                     "facing=west,part=6":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_center_bets",
+                                                "y":  270
+                                            },
+                     "facing=west,part=7":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_center_cards",
+                                                "y":  270
+                                            },
+                     "facing=west,part=8":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_center_bets",
+                                                "y":  270
+                                            },
+                     "facing=west,part=9":  {
+                                                "model":  "prueba_no1:block/mesa_draftea_diaz_edge"
+                                            },
+                     "facing=west,part=10":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_corner",
+                                                 "y":  270
+                                             },
+                     "facing=west,part=11":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                 "y":  270
+                                             },
+                     "facing=west,part=12":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                 "y":  270
+                                             },
+                     "facing=west,part=13":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_edge",
+                                                 "y":  270
+                                             },
+                     "facing=west,part=14":  {
+                                                 "model":  "prueba_no1:block/mesa_draftea_diaz_corner"
+                                             }
+                 }
+}

@@ -1,0 +1,94 @@
+{
+    "variants":  {
+                     "facing=north,shape=single":  {
+                                                       "model":  "prueba_no1:block/casino_sofa_single"
+                                                   },
+                     "facing=north,shape=left":  {
+                                                     "model":  "prueba_no1:block/casino_sofa_left"
+                                                 },
+                     "facing=north,shape=right":  {
+                                                      "model":  "prueba_no1:block/casino_sofa_right"
+                                                  },
+                     "facing=north,shape=middle":  {
+                                                       "model":  "prueba_no1:block/casino_sofa_middle"
+                                                   },
+                     "facing=north,shape=corner_left":  {
+                                                            "model":  "prueba_no1:block/casino_sofa_corner_left"
+                                                        },
+                     "facing=north,shape=corner_right":  {
+                                                             "model":  "prueba_no1:block/casino_sofa_corner_right"
+                                                         },
+                     "facing=east,shape=single":  {
+                                                      "model":  "prueba_no1:block/casino_sofa_single",
+                                                      "y":  90
+                                                  },
+                     "facing=east,shape=left":  {
+                                                    "model":  "prueba_no1:block/casino_sofa_left",
+                                                    "y":  90
+                                                },
+                     "facing=east,shape=right":  {
+                                                     "model":  "prueba_no1:block/casino_sofa_right",
+                                                     "y":  90
+                                                 },
+                     "facing=east,shape=middle":  {
+                                                      "model":  "prueba_no1:block/casino_sofa_middle",
+                                                      "y":  90
+                                                  },
+                     "facing=east,shape=corner_left":  {
+                                                           "model":  "prueba_no1:block/casino_sofa_corner_left",
+                                                           "y":  90
+                                                       },
+                     "facing=east,shape=corner_right":  {
+                                                            "model":  "prueba_no1:block/casino_sofa_corner_right",
+                                                            "y":  90
+                                                        },
+                     "facing=south,shape=single":  {
+                                                       "model":  "prueba_no1:block/casino_sofa_single",
+                                                       "y":  180
+                                                   },
+                     "facing=south,shape=left":  {
+                                                     "model":  "prueba_no1:block/casino_sofa_left",
+                                                     "y":  180
+                                                 },
+                     "facing=south,shape=right":  {
+                                                      "model":  "prueba_no1:block/casino_sofa_right",
+                                                      "y":  180
+                                                  },
+                     "facing=south,shape=middle":  {
+                                                       "model":  "prueba_no1:block/casino_sofa_middle",
+                                                       "y":  180
+                                                   },
+                     "facing=south,shape=corner_left":  {
+                                                            "model":  "prueba_no1:block/casino_sofa_corner_left",
+                                                            "y":  180
+                                                        },
+                     "facing=south,shape=corner_right":  {
+                                                             "model":  "prueba_no1:block/casino_sofa_corner_right",
+                                                             "y":  180
+                                                         },
+                     "facing=west,shape=single":  {
+                                                      "model":  "prueba_no1:block/casino_sofa_single",
+                                                      "y":  270
+                                                  },
+                     "facing=west,shape=left":  {
+                                                    "model":  "prueba_no1:block/casino_sofa_left",
+                                                    "y":  270
+                                                },
+                     "facing=west,shape=right":  {
+                                                     "model":  "prueba_no1:block/casino_sofa_right",
+                                                     "y":  270
+                                                 },
+                     "facing=west,shape=middle":  {
+                                                      "model":  "prueba_no1:block/casino_sofa_middle",
+                                                      "y":  270
+                                                  },
+                     "facing=west,shape=corner_left":  {
+                                                           "model":  "prueba_no1:block/casino_sofa_corner_left",
+                                                           "y":  270
+                                                       },
+                     "facing=west,shape=corner_right":  {
+                                                            "model":  "prueba_no1:block/casino_sofa_corner_right",
+                                                            "y":  270
+                                                        }
+                 }
+}

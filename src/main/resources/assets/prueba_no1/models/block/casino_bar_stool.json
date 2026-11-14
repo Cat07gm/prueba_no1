@@ -1,0 +1,238 @@
+{
+    "parent":  "minecraft:block/block",
+    "textures":  {
+                     "particle":  "prueba_no1:block/casino_chair_leather",
+                     "leather":  "prueba_no1:block/casino_chair_leather",
+                     "metal":  "prueba_no1:block/casino_chair_metal",
+                     "chrome":  "prueba_no1:block/casino_chair_chrome",
+                     "velvet":  "prueba_no1:block/casino_velvet",
+                     "marble":  "prueba_no1:block/casino_marble"
+                 },
+    "elements":  [
+                     {
+                         "from":  [
+                                      4,
+                                      0,
+                                      4
+                                  ],
+                         "to":  [
+                                    12,
+                                    1,
+                                    12
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#metal"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#metal"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#metal"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#metal"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#metal"
+                                              },
+                                       "down":  {
+                                                    "texture":  "#metal",
+                                                    "cullface":  "down"
+                                                }
+                                   }
+                     },
+                     {
+                         "from":  [
+                                      7,
+                                      1,
+                                      7
+                                  ],
+                         "to":  [
+                                    9,
+                                    13,
+                                    9
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#chrome"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#chrome"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#chrome"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#chrome"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#chrome"
+                                              },
+                                       "down":  {
+                                                    "texture":  "#chrome"
+                                                }
+                                   }
+                     },
+                     {
+                         "from":  [
+                                      4,
+                                      6,
+                                      7
+                                  ],
+                         "to":  [
+                                    12,
+                                    7,
+                                    9
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#chrome"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#chrome"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#chrome"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#chrome"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#chrome"
+                                              },
+                                       "down":  {
+                                                    "texture":  "#chrome"
+                                                }
+                                   }
+                     },
+                     {
+                         "from":  [
+                                      7,
+                                      6,
+                                      4
+                                  ],
+                         "to":  [
+                                    9,
+                                    7,
+                                    12
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#chrome"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#chrome"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#chrome"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#chrome"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#chrome"
+                                              },
+                                       "down":  {
+                                                    "texture":  "#chrome"
+                                                }
+                                   }
+                     },
+                     {
+                         "from":  [
+                                      3,
+                                      13,
+                                      3
+                                  ],
+                         "to":  [
+                                    13,
+                                    14,
+                                    13
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#leather"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#leather"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#leather"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#leather"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#leather"
+                                              },
+                                       "down":  {
+                                                    "texture":  "#leather"
+                                                }
+                                   }
+                     },
+                     {
+                         "from":  [
+                                      3,
+                                      14,
+                                      3
+                                  ],
+                         "to":  [
+                                    13,
+                                    16,
+                                    13
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#velvet"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#velvet"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#velvet"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#velvet"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#velvet"
+                                              },
+                                       "down":  {
+                                                    "texture":  "#velvet"
+                                                }
+                                   }
+                     },
+                     {
+                         "from":  [
+                                      3,
+                                      16,
+                                      12
+                                  ],
+                         "to":  [
+                                    13,
+                                    19,
+                                    13
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#velvet"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#leather"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#leather"
+                                                },
+                                       "west":  {
+                                                    "texture":  "#leather"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#leather"
+                                              },
+                                       "down":  {
+                                                    "texture":  "#leather"
+                                                }
+                                   }
+                     }
+                 ]
+}

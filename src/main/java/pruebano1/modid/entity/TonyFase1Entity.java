@@ -8,7 +8,19 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.village.Merchant;
+import net.minecraft.village.TradeOffer;
+import net.minecraft.village.TradeOfferList;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.PlayState;
@@ -18,7 +30,7 @@ import software.bernie.geckolib.animation.RawAnimation;
  * TonyFase1 (Sudadera Verde): Bartender fijo del Lounge Bar en el casino "Draftea Tony Diaz".
  * No puede moverse de su puesto y alterna animaciones de coctelería (batir bebidas, limpiar vasos y pose de barra).
  */
-public class TonyFase1Entity extends TonyCasinoNpcEntity {
+public class TonyFase1Entity extends TonyCasinoNpcEntity implements Merchant {
 
     public static final int ACTION_SHAKE_DRINKS = 0;
     public static final int ACTION_WIPE_GLASS = 1;
@@ -33,6 +45,12 @@ public class TonyFase1Entity extends TonyCasinoNpcEntity {
     private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenLoop("idle");
 
     private int cycleTicks = 0;
+
+    // Tienda del bar (como un aldeano): quién está comprando y el menú
+    @Nullable
+    private PlayerEntity customer;
+    @Nullable
+    private TradeOfferList offers;
 
     public TonyFase1Entity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
@@ -118,5 +136,98 @@ public class TonyFase1Entity extends TonyCasinoNpcEntity {
             }
             return PlayState.CONTINUE;
         }));
+    }
+
+    // ------------------------------------------------------------------
+    // Tienda del Lounge Bar: comida y bebidas a cambio de Tony Coins
+    // ------------------------------------------------------------------
+
+    @Override
+    protected ActionResult interactMob(PlayerEntity player, Hand hand) {
+        if (!this.isAlive() || (player.isSneaking() && player.isCreative())) {
+            return super.interactMob(player, hand);
+        }
+        if (this.getWorld().isClient()) {
+            return ActionResult.SUCCESS;
+        }
+        if (this.customer != null && this.customer != player) {
+            player.sendMessage(Text.literal("Tony está atendiendo a otro cliente").formatted(Formatting.RED), true);
+            return ActionResult.SUCCESS;
+        }
+        this.setCustomer(player);
+        this.sendOffers(player, Text.literal("Lounge Bar - Tony").formatted(Formatting.DARK_PURPLE), 0);
+        return ActionResult.SUCCESS;
+    }
+
+    @Override
+    public void setCustomer(@Nullable PlayerEntity customer) {
+        this.customer = customer;
+    }
+
+    @Override
+    public @Nullable PlayerEntity getCustomer() {
+        return this.customer;
+    }
+
+    @Override
+    public TradeOfferList getOffers() {
+        if (this.offers == null) {
+            this.offers = TonyBarTrades.create();
+        }
+        return this.offers;
+    }
+
+    @Override
+    public void setOffersFromServer(TradeOfferList offers) {
+        this.offers = offers;
+    }
+
+    @Override
+    public void trade(TradeOffer offer) {
+        offer.use();
+        this.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.2F);
+    }
+
+    @Override
+    public void onSellingItem(ItemStack stack) {
+    }
+
+    @Override
+    public int getExperience() {
+        return 0;
+    }
+
+    @Override
+    public void setExperienceFromServer(int experience) {
+    }
+
+    @Override
+    public boolean isLeveledMerchant() {
+        return false; // Sin barra de nivel: es un bar, no un aldeano
+    }
+
+    @Override
+    public SoundEvent getYesSound() {
+        return SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP;
+    }
+
+    @Override
+    public boolean isClient() {
+        return this.getWorld().isClient();
+    }
+
+    @Override
+    public boolean canInteract(PlayerEntity player) {
+        return this.customer == player && this.isAlive() && player.squaredDistanceTo(this) <= 8.0D * 8.0D;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        // Si el cliente se fue lejos, murió o se desconectó, Tony queda libre (la tienda se cierra sola con canInteract)
+        if (this.customer != null && !this.getWorld().isClient()
+                && (!this.customer.isAlive() || this.customer.isRemoved() || this.customer.squaredDistanceTo(this) > 8.0D * 8.0D)) {
+            this.customer = null;
+        }
     }
 }

@@ -121,5 +121,77 @@
         "stream": true
       }
     ]
+  },
+  "casino_music_amor_prohibido": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/amor_prohibido",
+        "stream": true
+      }
+    ]
+  },
+  "casino_music_amores_lejanos": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/amores_lejanos",
+        "stream": true
+      }
+    ]
+  },
+  "casino_music_gospel": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/gospel",
+        "stream": true
+      }
+    ]
+  },
+  "casino_music_lo_mejor_siempre_se_demora": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/lo_mejor_siempre_se_demora",
+        "stream": true
+      }
+    ]
+  },
+  "casino_music_m_extrana": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/m_extrana",
+        "stream": true
+      }
+    ]
+  },
+  "casino_music_pa_k": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/pa_k",
+        "stream": true
+      }
+    ]
+  },
+  "casino_music_pilates": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/pilates",
+        "stream": true
+      }
+    ]
+  },
+  "casino_music_something_about_us": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/something_about_us",
+        "stream": true
+      }
+    ]
+  },
+  "casino_music_ultimate_battle": {
+    "sounds": [
+      {
+        "name": "prueba_no1:casino/ultimate_battle",
+        "stream": true
+      }
+    ]
   }
 }

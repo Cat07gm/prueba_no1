@@ -24,6 +24,8 @@ public class DrafteaCasinoWorldState extends PersistentState {
     public static final int PROTECTED_MIN_REL_Y = -8;
     public static final int PROTECTED_MAX_REL_Y = 44;
 
+    public static final int CURRENT_NPC_LAYOUT_VERSION = 3;
+
     public static final Type<DrafteaCasinoWorldState> TYPE = new Type<>(
             DrafteaCasinoWorldState::new,
             DrafteaCasinoWorldState::fromNbt,
@@ -33,6 +35,8 @@ public class DrafteaCasinoWorldState extends PersistentState {
     private boolean initialized;
     private boolean placed;
     private boolean npcsSpawned;
+    private int npcLayoutVersion;
+    private boolean waystonePlaced;
     private int startChunkX;
     private int startChunkZ;
     private int baseY;
@@ -49,6 +53,8 @@ public class DrafteaCasinoWorldState extends PersistentState {
         state.initialized = nbt.getBoolean("Initialized");
         state.placed = nbt.getBoolean("Placed");
         state.npcsSpawned = nbt.getBoolean("NpcsSpawned");
+        state.npcLayoutVersion = nbt.getInt("NpcLayoutVersion");
+        state.waystonePlaced = nbt.getBoolean("WaystonePlaced");
         state.startChunkX = nbt.getInt("StartChunkX");
         state.startChunkZ = nbt.getInt("StartChunkZ");
         state.baseY = nbt.getInt("BaseY");
@@ -60,6 +66,8 @@ public class DrafteaCasinoWorldState extends PersistentState {
         nbt.putBoolean("Initialized", this.initialized);
         nbt.putBoolean("Placed", this.placed);
         nbt.putBoolean("NpcsSpawned", this.npcsSpawned);
+        nbt.putInt("NpcLayoutVersion", this.npcLayoutVersion);
+        nbt.putBoolean("WaystonePlaced", this.waystonePlaced);
         nbt.putInt("StartChunkX", this.startChunkX);
         nbt.putInt("StartChunkZ", this.startChunkZ);
         nbt.putInt("BaseY", this.baseY);
@@ -78,8 +86,26 @@ public class DrafteaCasinoWorldState extends PersistentState {
         return npcsSpawned;
     }
 
+    public int getNpcLayoutVersion() {
+        return npcLayoutVersion;
+    }
+
     public void markNpcsSpawned() {
+        markNpcsSpawned(CURRENT_NPC_LAYOUT_VERSION);
+    }
+
+    public void markNpcsSpawned(int layoutVersion) {
         this.npcsSpawned = true;
+        this.npcLayoutVersion = layoutVersion;
+        this.markDirty();
+    }
+
+    public boolean isWaystonePlaced() {
+        return waystonePlaced;
+    }
+
+    public void markWaystonePlaced() {
+        this.waystonePlaced = true;
         this.markDirty();
     }
 

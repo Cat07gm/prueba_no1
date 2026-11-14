@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": ["B  ", "BPP", "N N"],
+  "key": { "B": "minecraft:black_wool", "P": "minecraft:purple_wool", "N": "minecraft:iron_nugget" },
+  "result": { "id": "prueba_no1:casino_sofa", "count": 2 }
+}

@@ -32,6 +32,12 @@ public class DjControllerScreen extends Screen {
 
     private final BlockPos controllerPos;
     private final List<ButtonWidget> songButtons = new ArrayList<>();
+    /** Índice en CasinoSongs.SONGS de cada botón de la página actual. */
+    private final List<Integer> songIndexes = new ArrayList<>();
+    /** Página actual de canciones (-1 = elegir al abrir). */
+    private int page = -1;
+    private Text pageLabel;
+    private int pageLabelY;
     private VolumeSlider volumeSlider;
     private int panelTop;
     private int panelHeight;
@@ -47,21 +53,63 @@ public class DjControllerScreen extends Screen {
     @Override
     protected void init() {
         songButtons.clear();
+        songIndexes.clear();
         int songs = CasinoSongs.SONGS.size();
-        // Título + canciones + detener + volumen + botones de volumen + márgenes
-        panelHeight = 34 + songs * ROW_HEIGHT + 8 + ROW_HEIGHT + 12 + ROW_HEIGHT * 2 + 8;
+
+        // Cuántas canciones caben por página según el alto de la ventana (entre 3 y 8)
+        int fixedHeight = 34 + 8 + ROW_HEIGHT + 12 + ROW_HEIGHT * 2 + 8;
+        int perPage = MathHelper.clamp((this.height - 16 - fixedHeight - ROW_HEIGHT) / ROW_HEIGHT, 3, 8);
+        if (songs <= perPage + 1) {
+            perPage = songs; // Si caben todas (o sobra solo una), sin páginas
+        }
+        int pages = Math.max(1, (songs + perPage - 1) / perPage);
+        if (page < 0) {
+            // Al abrir: ir a la página de la canción que está sonando
+            int playing = CasinoMusicClient.getSongIndex();
+            page = CasinoSongs.isValid(playing) ? playing / perPage : 0;
+        }
+        page = MathHelper.clamp(page, 0, pages - 1);
+        int first = page * perPage;
+        int shown = Math.min(perPage, songs - first);
+        boolean paged = pages > 1;
+
+        // Título + canciones (+ fila de páginas) + detener + volumen + botones de volumen + márgenes
+        panelHeight = fixedHeight + perPage * ROW_HEIGHT + (paged ? ROW_HEIGHT : 0);
         panelTop = Math.max(8, (this.height - panelHeight) / 2);
         int x = (this.width - BUTTON_WIDTH) / 2;
         int y = panelTop + 34;
 
-        // 1. Una fila por canción
-        for (int i = 0; i < songs; i++) {
-            final int index = i;
+        // 1. Una fila por canción de esta página
+        for (int i = 0; i < shown; i++) {
+            final int index = first + i;
             ButtonWidget button = ButtonWidget.builder(Text.empty(), b -> send(CasinoMusicControlPayload.ACTION_PLAY, index, 0))
                     .dimensions(x, y, BUTTON_WIDTH, 20)
                     .build();
             songButtons.add(addDrawableChild(button));
+            songIndexes.add(index);
             y += ROW_HEIGHT;
+        }
+        y += (perPage - shown) * ROW_HEIGHT; // Mantener el panel del mismo tamaño en la última página
+
+        // 1b. Cambiar de página
+        if (paged) {
+            final int lastPage = pages - 1;
+            int arrowWidth = 40;
+            ButtonWidget prev = addDrawableChild(ButtonWidget.builder(Text.literal("◀"), b -> {
+                page--;
+                clearAndInit();
+            }).dimensions(x, y, arrowWidth, 20).build());
+            ButtonWidget next = addDrawableChild(ButtonWidget.builder(Text.literal("▶"), b -> {
+                page++;
+                clearAndInit();
+            }).dimensions(x + BUTTON_WIDTH - arrowWidth, y, arrowWidth, 20).build());
+            prev.active = page > 0;
+            next.active = page < lastPage;
+            pageLabel = Text.literal("Página " + (page + 1) + " / " + pages).formatted(Formatting.GRAY);
+            pageLabelY = y + 6;
+            y += ROW_HEIGHT;
+        } else {
+            pageLabel = null;
         }
 
         // 2. Detener
@@ -104,8 +152,9 @@ public class DjControllerScreen extends Screen {
     private void refreshSongLabels() {
         int playing = CasinoMusicClient.getSongIndex();
         for (int i = 0; i < songButtons.size(); i++) {
-            String title = CasinoSongs.SONGS.get(i).title();
-            boolean isPlaying = i == playing;
+            int songIndex = songIndexes.get(i);
+            String title = CasinoSongs.SONGS.get(songIndex).title();
+            boolean isPlaying = songIndex == playing;
             String prefix = isPlaying ? "▶ " : "♪ ";
             String trimmed = this.textRenderer.trimToWidth(prefix + title, BUTTON_WIDTH - 12);
             Text label = isPlaying
@@ -156,6 +205,9 @@ public class DjControllerScreen extends Screen {
         context.drawCenteredTextWithShadow(this.textRenderer,
                 Text.literal("♫ ").append(this.title).append(" ♫").formatted(Formatting.WHITE, Formatting.BOLD),
                 this.width / 2, panelTop + 9, 0xFFFFFF);
+        if (pageLabel != null) {
+            context.drawCenteredTextWithShadow(this.textRenderer, pageLabel, this.width / 2, pageLabelY, 0xAAAAAA);
+        }
 
         Text status;
         if (!CasinoMusicClient.isLocalPlayerInsideCasino()) {

@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": ["QQQ", "BPB"],
+  "key": { "Q": "minecraft:quartz_slab", "B": "minecraft:black_concrete", "P": "minecraft:purple_dye" },
+  "result": { "id": "prueba_no1:casino_coffee_table", "count": 2 }
+}

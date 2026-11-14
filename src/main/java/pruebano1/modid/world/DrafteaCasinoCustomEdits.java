@@ -133,6 +133,12 @@ public final class DrafteaCasinoCustomEdits {
         return SAVED_CHUNKS.size();
     }
 
+    /** La construcción termina en el borde blanco de la plaza; nada guardado más allá se aplica. */
+    private static boolean isInsideBuildFootprint(int dx, int dz) {
+        return dx >= DrafteaCasinoPiece.PLAZA_MIN_X && dx <= DrafteaCasinoPiece.PLAZA_MAX_X
+                && dz >= DrafteaCasinoPiece.PLAZA_MIN_Z && dz <= DrafteaCasinoPiece.PLAZA_MAX_Z;
+    }
+
     public static void applyCustomChunkIfPresent(
             StructureWorldAccess world,
             BlockBox chunkBox,
@@ -172,9 +178,12 @@ public final class DrafteaCasinoCustomEdits {
             int wx = baseX + lx;
             for (int lz = 0; lz < 16; lz++) {
                 int wz = baseZ + lz;
+                // Fuera de la plaza el archivo solo contiene terreno del mundo donde se guardó:
+                // pegarlo en otro mundo provoca cortes, así que se ignora.
+                boolean insideBuild = isInsideBuildFootprint(wx - centerX, wz - centerZ);
                 for (int relY = MIN_REL_Y; relY <= MAX_REL_Y; relY++) {
                     int palIndex = data.blockIndices()[idx++];
-                    if (palIndex >= 0 && palIndex < decodedPalette.size()) {
+                    if (insideBuild && palIndex >= 0 && palIndex < decodedPalette.size()) {
                         BlockState state = decodedPalette.get(palIndex);
                         pos.set(wx, baseY + relY, wz);
                         world.setBlockState(pos, state, Block.NOTIFY_LISTENERS);
@@ -186,6 +195,9 @@ public final class DrafteaCasinoCustomEdits {
         if (data.blockEntities() != null) {
             for (SavedBlockEntity sbe : data.blockEntities()) {
                 BlockPos targetPos = new BlockPos(baseX + sbe.relX(), baseY + sbe.relY(), baseZ + sbe.relZ());
+                if (!isInsideBuildFootprint(targetPos.getX() - centerX, targetPos.getZ() - centerZ)) {
+                    continue;
+                }
                 BlockEntity be = world.getBlockEntity(targetPos);
                 if (be != null) {
                     try {

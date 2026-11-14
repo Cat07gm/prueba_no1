@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [ { "type": "minecraft:item", "name": "prueba_no1:mesa_draftea_diaz" } ],
+      "conditions": [
+        { "condition": "minecraft:survives_explosion" },
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "prueba_no1:mesa_draftea_diaz",
+          "properties": { "part": "7" }
+        }
+      ]
+    }
+  ]
+}

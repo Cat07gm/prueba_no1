@@ -65,6 +65,10 @@ public class ModItemGroups {
                 entries.add(ModBlocks.DJ_TURNTABLE);
                 entries.add(ModBlocks.DJ_MIXER);
                 entries.add(ModBlocks.DJ_CONTROLLER);
+                entries.add(ModBlocks.MESA_DRAFTEA_DIAZ);
+                for (net.minecraft.block.Block decor : ModBlocks.CASINO_DECOR) {
+                    entries.add(decor);
+                }
                 entries.add(ModItem.TONY_COIN);
 
                 // 8. Huevos Generadores (Jefes y Familia de Niños)

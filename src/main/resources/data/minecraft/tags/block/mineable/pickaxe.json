@@ -9,6 +9,13 @@
     "prueba_no1:casino_chair",
     "prueba_no1:dj_turntable",
     "prueba_no1:dj_mixer",
-    "prueba_no1:dj_controller"
+    "prueba_no1:dj_controller",
+    "prueba_no1:casino_coffee_table",
+    "prueba_no1:casino_cocktail_table",
+    "prueba_no1:casino_bar_stool",
+    "prueba_no1:neon_sign_cards",
+    "prueba_no1:neon_sign_chip",
+    "prueba_no1:neon_sign_dice",
+    "prueba_no1:neon_sign_777"
   ]
 }

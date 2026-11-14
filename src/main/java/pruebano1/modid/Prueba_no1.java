@@ -82,6 +82,7 @@ public class Prueba_no1 implements ModInitializer {
 		// Cargar cambios guardados del casino único y registrar su protección, zona segura y comandos
 		pruebano1.modid.world.DrafteaCasinoCustomEdits.ensureLoaded();
 		pruebano1.modid.world.DrafteaCasinoProtection.registerServer();
+		pruebano1.modid.compat.WaystonesIntegration.registerIfLoaded();
 
 		// Inmunidad total para los jugadores en la zona segura del casino o en cinemáticas de Jefri Penstein
 		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {

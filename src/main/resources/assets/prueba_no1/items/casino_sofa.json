@@ -1,0 +1,6 @@
+{
+    "model":  {
+                  "type":  "minecraft:model",
+                  "model":  "prueba_no1:block/casino_sofa_single"
+              }
+}

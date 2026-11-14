@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": ["GXG", "BBB"],
+  "key": { "G": "minecraft:glowstone_dust", "X": "minecraft:gold_nugget", "B": "minecraft:black_stained_glass_pane" },
+  "result": { "id": "prueba_no1:neon_sign_chip", "count": 2 }
+}
