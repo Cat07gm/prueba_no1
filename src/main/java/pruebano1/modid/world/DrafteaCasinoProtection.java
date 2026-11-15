@@ -136,6 +136,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class DrafteaCasinoProtection {
 
     private static final Set<UUID> PLAYERS_IN_CASINO = ConcurrentHashMap.newKeySet();
+    private static final Set<UUID> PLAYERS_IN_LOBBY = ConcurrentHashMap.newKeySet();
     private static int zoneCheckTimer = 0;
 
     private DrafteaCasinoProtection() {
@@ -203,6 +204,88 @@ public final class DrafteaCasinoProtection {
         ServerTickEvents.END_SERVER_TICK.register(DrafteaCasinoProtection::tickSafeZone);
 
         registerCommands();
+        registerLobby();
+    }
+
+    /** Torre del Lobby principal: ciclo de vida, aparición en la cima y comandos "/lobby ...". */
+    private static void registerLobby() {
+        ServerWorldEvents.LOAD.register((server, world) -> LobbyTowerManager.onOverworldLoaded(world));
+        ServerLifecycleEvents.SERVER_STARTED.register(LobbyTowerManager::onServerStarted);
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            PLAYERS_IN_LOBBY.clear();
+            LobbyTowerManager.clearServerCaches(server);
+        });
+
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            ServerPlayerEntity player = handler.getPlayer();
+            ServerPlayNetworking.send(player, LobbyTowerManager.getBoundsPayloadForServer(server));
+            server.execute(() -> LobbyTowerManager.onPlayerJoin(player));
+        });
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) ->
+                PLAYERS_IN_LOBBY.remove(handler.getPlayer().getUuid())
+        );
+        net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents.AFTER_RESPAWN.register(
+                (oldPlayer, newPlayer, alive) -> LobbyTowerManager.onPlayerRespawn(newPlayer, alive)
+        );
+
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
+                dispatcher.register(CommandManager.literal("lobby")
+                        .requires(source -> source.hasPermissionLevel(2))
+                        .then(CommandManager.literal("guardar")
+                                .executes(context -> LobbyTowerCustomEdits.saveFromPlayer(context.getSource().getPlayerOrThrow()))
+                        )
+                        .then(CommandManager.literal("limpiar")
+                                .executes(context -> {
+                                    LobbyTowerCustomEdits.clearAllSavedEdits();
+                                    context.getSource().sendFeedback(
+                                            () -> Text.literal("🧹 Ediciones guardadas de la torre del Lobby borradas.")
+                                                    .formatted(Formatting.YELLOW),
+                                            false
+                                    );
+                                    return 1;
+                                })
+                        )
+                        .then(CommandManager.literal("ir")
+                                .executes(context -> {
+                                    if (!LobbyTowerManager.teleportToTop(context.getSource().getPlayerOrThrow())) {
+                                        context.getSource().sendError(Text.literal("Este mundo no tiene torre del Lobby. Usa /lobby generar."));
+                                        return 0;
+                                    }
+                                    return 1;
+                                })
+                        )
+                        .then(CommandManager.literal("info")
+                                .executes(context -> {
+                                    LobbyTowerManager.LobbyAnchor anchor = LobbyTowerManager.getAnchor(context.getSource().getServer());
+                                    if (anchor == null) {
+                                        context.getSource().sendError(Text.literal("Este mundo no tiene torre del Lobby. Usa /lobby generar."));
+                                        return 0;
+                                    }
+                                    context.getSource().sendFeedback(
+                                            () -> Text.literal("🗼 Torre del Lobby en (" + anchor.centerX() + ", " + anchor.baseY() + ", " + anchor.centerZ() + ").")
+                                                    .formatted(Formatting.AQUA),
+                                            false
+                                    );
+                                    return 1;
+                                })
+                        )
+                        .then(CommandManager.literal("generar")
+                                .executes(context -> {
+                                    ServerWorld overworld = context.getSource().getServer().getOverworld();
+                                    if (!LobbyTowerManager.forceGenerate(overworld)) {
+                                        context.getSource().sendError(Text.literal("La torre del Lobby ya existe en este mundo."));
+                                        return 0;
+                                    }
+                                    context.getSource().sendFeedback(
+                                            () -> Text.literal("🗼 Torre del Lobby generada en el punto de aparición del mundo.")
+                                                    .formatted(Formatting.AQUA),
+                                            true
+                                    );
+                                    return 1;
+                                })
+                        )
+                )
+        );
     }
 
     public static boolean shouldCancelBlockAttack(World world, PlayerEntity player, BlockPos pos) {
@@ -232,6 +315,12 @@ public final class DrafteaCasinoProtection {
         // bloqueando el menú de edición (Shift + click derecho) en supervivencia.
         if (pruebano1.modid.compat.WaystonesIntegration.isWaystoneBlock(block)) {
             return player.shouldCancelInteraction();
+        }
+
+        // En la torre del Lobby sí se pueden usar los muebles (puertas, mesas de trabajo, etc.).
+        boolean inLobby = LobbyTowerManager.isProtected(world, pos);
+        if (inLobby && isLobbyFurniture(block) && !player.shouldCancelInteraction()) {
+            return false;
         }
 
         // Permitir únicamente juegos, sillas/sofás/bancos y el controlador DJ propios del casino.
@@ -277,6 +366,11 @@ public final class DrafteaCasinoProtection {
                 || entity instanceof LeashKnotEntity
                 || entity instanceof TonyCasinoNpcEntity
                 || entity instanceof VehicleEntity;
+        // En el Lobby tampoco se puede golpear a aldeanos ni NPC (sí a monstruos que se cuelen)
+        if (!(entity instanceof net.minecraft.entity.mob.Monster)
+                && LobbyTowerManager.isProtected(world, entity.getBlockPos())) {
+            return true;
+        }
         return isProtectedEntity && DrafteaCasinoManager.isProtectedBlock(world, entity.getBlockPos());
     }
 
@@ -293,6 +387,14 @@ public final class DrafteaCasinoProtection {
         if (entity instanceof TonyFase1Entity) {
             return isEntityGriefItem(player.getStackInHand(hand));
         }
+        // En la torre del Lobby se puede hablar/comerciar con aldeanos y NPC, pero no tocar la decoración.
+        if (LobbyTowerManager.isProtected(world, entity.getBlockPos())) {
+            boolean decoration = entity instanceof ArmorStandEntity
+                    || entity instanceof ItemFrameEntity
+                    || entity instanceof PaintingEntity
+                    || entity instanceof LeashKnotEntity;
+            return decoration || isEntityGriefItem(player.getStackInHand(hand));
+        }
         return true;
     }
 
@@ -307,6 +409,22 @@ public final class DrafteaCasinoProtection {
                 || item instanceof BucketItem
                 || item instanceof ShearsItem
                 || item instanceof DyeItem;
+    }
+
+    private static boolean isLobbyFurniture(Block block) {
+        return block instanceof DoorBlock
+                || block instanceof FenceGateBlock
+                || block instanceof ButtonBlock
+                || block instanceof BellBlock
+                || block instanceof CraftingTableBlock
+                || block instanceof EnderChestBlock
+                || block instanceof EnchantingTableBlock
+                || block instanceof StonecutterBlock
+                || block instanceof LoomBlock
+                || block instanceof CartographyTableBlock
+                || block instanceof SmithingTableBlock
+                || block instanceof GrindstoneBlock
+                || block instanceof CasinoSeat;
     }
 
     private static boolean isCasinoInteractiveBlock(Block block) {
@@ -405,7 +523,8 @@ public final class DrafteaCasinoProtection {
         if (source.isOf(DamageTypes.OUT_OF_WORLD) || source.isOf(DamageTypes.GENERIC_KILL)) {
             return false;
         }
-        return DrafteaCasinoManager.isInSafeZone(serverWorld, player.getBlockPos());
+        return DrafteaCasinoManager.isInSafeZone(serverWorld, player.getBlockPos())
+                || LobbyTowerManager.isProtected(serverWorld, player.getBlockPos());
     }
 
     private static void tickSafeZone(MinecraftServer server) {
@@ -441,6 +560,23 @@ public final class DrafteaCasinoProtection {
                 ));
             } else {
                 PLAYERS_IN_CASINO.remove(player.getUuid());
+            }
+
+            if (LobbyTowerManager.isProtected(world, player.getBlockPos())) {
+                if (PLAYERS_IN_LOBBY.add(player.getUuid())) {
+                    player.networkHandler.sendPacket(new TitleFadeS2CPacket(10, 45, 15));
+                    player.networkHandler.sendPacket(new TitleS2CPacket(
+                            Text.literal("LOBBY").formatted(Formatting.AQUA, Formatting.BOLD)
+                    ));
+                    player.networkHandler.sendPacket(new SubtitleS2CPacket(
+                            Text.literal("Zona segura").formatted(Formatting.WHITE)
+                    ));
+                }
+                if (player.isOnFire()) {
+                    player.extinguish();
+                }
+            } else {
+                PLAYERS_IN_LOBBY.remove(player.getUuid());
             }
         }
     }

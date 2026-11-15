@@ -265,6 +265,18 @@ public class ModItem {
                     .rarity(Rarity.RARE)
     );
 
+    //ACORDEON DE JOSÉ TORRES (Drop de Jefri penstein al ser derrotado; sólo ítem, sirve para invocar a José Torres en el Cassete de Podcast)
+    public static final RegistryKey<Item> JOSE_TORRES_ACCORDION_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "jose_torres_accordion")
+    );
+    public static final Item JOSE_TORRES_ACCORDION = new Item(
+            new Item.Settings()
+                    .registryKey(JOSE_TORRES_ACCORDION_KEY)
+                    .maxCount(1)
+                    .rarity(Rarity.EPIC)
+    );
+
     //TONY COIN (Moneda para jugar en la máquina Draftea)
     public static final RegistryKey<Item> TONY_COIN_KEY = RegistryKey.of(
             RegistryKeys.ITEM,
@@ -357,6 +369,16 @@ public class ModItem {
             new Item.Settings().registryKey(JEFRI_PENSTEIN_SPAWN_EGG_KEY)
     );
 
+    //HUEVO GENERADOR DE JOSÉ TORRES (Boss José Torres / Fase 2 Jhoseph towers)
+    public static final RegistryKey<Item> JOSE_TORRES_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "jose_torres_spawn_egg")
+    );
+    public static final Item JOSE_TORRES_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.JOSE_TORRES,
+            new Item.Settings().registryKey(JOSE_TORRES_SPAWN_EGG_KEY)
+    );
+
     // HUEVO GENERADOR DE TONY FASE 1 (Bartender fijo de sudadera verde del Casino Draftea Tony Diaz)
     public static final RegistryKey<Item> TONY_FASE1_SPAWN_EGG_KEY = RegistryKey.of(
             RegistryKeys.ITEM,
@@ -396,6 +418,18 @@ public class ModItem {
             new Item.Settings().registryKey(TOALLA_KOTEX_KEY)
     );
 
+    //BOLA DE HIELO (Proyectil de José Torres / Jhoseph towers en "La Bola de Hielo Ráfaga" y arrojadizo por el jugador)
+    public static final RegistryKey<Item> ICE_BALL_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "ice_ball")
+    );
+    public static final Item ICE_BALL = new IceBallItem(
+            new Item.Settings()
+                    .registryKey(ICE_BALL_KEY)
+                    .maxCount(16)
+                    .rarity(Rarity.UNCOMMON)
+    );
+
     //Método ayudante de registro
     private static Item registerItem(RegistryKey<Item> key, Item item) {
         return Registry.register(Registries.ITEM, key, item);
@@ -432,6 +466,7 @@ public class ModItem {
 
         //Registrar Orden de Arresto y Huevos Generadores
         registerItem(ARREST_WARRANT_KEY, ARREST_WARRANT);
+        registerItem(JOSE_TORRES_ACCORDION_KEY, JOSE_TORRES_ACCORDION);
         registerItem(TONY_COIN_KEY, TONY_COIN);
         registerItem(PI_DIDI_SPAWN_EGG_KEY, PI_DIDI_SPAWN_EGG);
         registerItem(YOSTIN_BIBER_SPAWN_EGG_KEY, YOSTIN_BIBER_SPAWN_EGG);
@@ -441,15 +476,18 @@ public class ModItem {
         registerItem(BANANA_KEY, BANANA);
         registerItem(VALENTINA_PRIETA_SPAWN_EGG_KEY, VALENTINA_PRIETA_SPAWN_EGG);
         registerItem(JEFRI_PENSTEIN_SPAWN_EGG_KEY, JEFRI_PENSTEIN_SPAWN_EGG);
+        registerItem(JOSE_TORRES_SPAWN_EGG_KEY, JOSE_TORRES_SPAWN_EGG);
         registerItem(TONY_FASE1_SPAWN_EGG_KEY, TONY_FASE1_SPAWN_EGG);
         registerItem(TONY_FASE2_SPAWN_EGG_KEY, TONY_FASE2_SPAWN_EGG);
         registerItem(TONY_FASE3_SPAWN_EGG_KEY, TONY_FASE3_SPAWN_EGG);
         registerItem(TOALLA_KOTEX_KEY, TOALLA_KOTEX);
+        registerItem(ICE_BALL_KEY, ICE_BALL);
 
         //Pestaña Ingredientes
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> {
             entries.add(SCARLET_INGOT);
             entries.add(ARREST_WARRANT);
+            entries.add(JOSE_TORRES_ACCORDION);
             entries.add(TONY_COIN);
             entries.add(MARIJUANA);
         });
@@ -462,6 +500,7 @@ public class ModItem {
         //Pestaña Huevos Generadores (Spawn Eggs)
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(entries -> {
             entries.add(JEFRI_PENSTEIN_SPAWN_EGG);
+            entries.add(JOSE_TORRES_SPAWN_EGG);
             entries.add(PI_DIDI_SPAWN_EGG);
             entries.add(YOSTIN_BIBER_SPAWN_EGG);
             entries.add(VITOR_JUGO_SPAWN_EGG);
@@ -484,6 +523,7 @@ public class ModItem {
             entries.add(ISRATOTEM);
             entries.add(LONTOTEM);
             entries.add(TOALLA_KOTEX);
+            entries.add(ICE_BALL);
         });
 
         //Pestaña Herramientas

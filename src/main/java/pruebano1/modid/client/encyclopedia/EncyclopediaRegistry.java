@@ -522,6 +522,30 @@ public final class EncyclopediaRegistry {
                 .keywords("mailbox buzon jefri altar invocar jefe")
                 .build());
 
+        list.add(EncyclopediaEntry.builder("podcast_cassette", "Cassete de Podcast")
+                .type("Altar de Invocación")
+                .category(EncyclopediaCategory.BLOCKS, EncyclopediaCategory.MISC)
+                .rarity(EncyclopediaRarity.EPIC)
+                .icon(ModBlocks.PODCAST_CASSETTE)
+                .description("Cassete indestructible en supervivencia ubicado en el centro del Escenario del Podcast. Haz clic derecho sobre él con el Acordeon de José Torres para invocar al boss final José Torres con su cinemática musical de entrada.")
+                .stats(
+                        new StatInfo("Resistencia", "Indestructible"),
+                        new StatInfo("Ubicación", "Escenario del Podcast", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Llave", "Acordeon de José Torres", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new StatInfo("Invoca a", "José Torres", EncyclopediaEntry.RED_STAT_COLOR)
+                )
+                .effects(
+                        new EffectInfo("Invocar Boss Final", "Haz clic derecho con el Acordeon de José Torres en la mano.", EncyclopediaEntry.GOLD_STAT_COLOR)
+                )
+                .obtaining(ObtainingMethod.info(
+                        "Dónde encontrarlo",
+                        SlotRef.link(ModItem.JOSE_TORRES_ACCORDION, "escenario_podcast"),
+                        "Se genera sobre el pedestal central del Escenario del Podcast en el Overworld."
+                ))
+                .related("entity_jose_torres", "Ver Boss José Torres 3D")
+                .keywords("cassete podcast bloque altar invocar jose torres acordeon escenario")
+                .build());
+
         list.add(EncyclopediaEntry.builder("draftea", "Máquina Draftea")
                 .type("Máquina de Premios")
                 .category(EncyclopediaCategory.BLOCKS, EncyclopediaCategory.MISC)
@@ -651,6 +675,44 @@ public final class EncyclopediaRegistry {
                 ))
                 .related("jefri_mailbox", "Ver Buzón de Jefri")
                 .keywords("jefri penstein boss jefe 3d devil modo diablo")
+                .build());
+
+        list.add(EncyclopediaEntry.builder("entity_jose_torres", "José Torres / Jhoseph towers")
+                .type("Jefe Final · Entidad 3D (2 Fases)")
+                .category(EncyclopediaCategory.ENTITIES)
+                .rarity(EncyclopediaRarity.EPIC)
+                .icon(ModItem.JOSE_TORRES_ACCORDION)
+                .entityPreview(new EntityPreviewConfig(
+                        () -> ModEntities.JOSE_TORRES,
+                        50.0F, 13.0F, 1.05F, 22.0F, 8.0F, true
+                ))
+                .description("El jefe final invocado en el Cassete de Podcast del Escenario del Podcast con el Acordeon de José Torres. Entra con una cinemática de 5 segundos tocando su acordeón y nunca deja de tocarlo (no ataca cuerpo a cuerpo). Posee 4 ataques especiales, empuje defensivo en su Fase 2 (Jhoseph towers) y una cinemática final de muerte con explosión de hielo.")
+                .statsSupplier(() -> buildEntityStats(ModEntities.JOSE_TORRES, List.of(
+                        new StatInfo("Fase 1", "José Torres (Traje Negro/Dorado)", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new StatInfo("Fase 2 (50% HP)", "Jhoseph towers (Blanco + Empuje)", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Bola de Hielo Ráfaga", "5.5 - 6.5 ❤ + Congelación", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Una Bola de Hielo", "14 - 16 ❤ + Explosión", EncyclopediaEntry.RED_STAT_COLOR),
+                        new StatInfo("Dialecto / Zombies", "9-11 ❤ / 3-6 Zombies (1m CD)", EncyclopediaEntry.GREEN_STAT_COLOR)
+                )))
+                .effects(
+                        new EffectInfo("1. Zombies (CD 1 min)", "Invoca de 3 a 6 zombies con partículas de virus encapsulado. En Fase 2 tienen Fuerza I y pueden aparecer equipados.", EncyclopediaEntry.GREEN_STAT_COLOR),
+                        new EffectInfo("2. Dialecto (CD 1 min)", "Flota muy alto elevando a los jugadores con él, los empuja provocando mucho daño y desciende lentamente.", EncyclopediaEntry.RED_STAT_COLOR),
+                        new EffectInfo("3. La Bola de Hielo Ráfaga", "Dispara ráfagas de Bolas de Hielo más fuertes que la Toalla Kotex que aplican Lentitud y Congelación.", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new EffectInfo("4. Una Bola de Hielo", "Se eleva mientras suena su audio especial cargando una gigantesca bola de hielo y la lanza al jugador más cercano causando daño masivo y empuje en área.", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new EffectInfo("Fase 2: Jhoseph towers (Empuje)", "Al 50% de vida viste de blanco y empuja violentamente a quienes se acerquen causando gran daño (7.5 ❤).", EncyclopediaEntry.PURPLE_STAT_COLOR)
+                )
+                .drops(
+                        DropInfo.link(ModItem.ICE_BALL, "Bola de Hielo", "x16–24 (100%)", "ice_ball"),
+                        DropInfo.link(ModItem.LONTOTEM, "Lontotem", "x1 (100%)", "lontotem"),
+                        DropInfo.link(ModItem.SCARLET_INGOT, "Lingote de Escarlata", "x6–10 (100%)", "scarlet_ingot")
+                )
+                .obtaining(ObtainingMethod.info(
+                        "Invocación",
+                        SlotRef.link(ModBlocks.PODCAST_CASSETTE, "podcast_cassette"),
+                        "Haz clic derecho en el bloque Cassete de Podcast del Escenario del Podcast sosteniendo el Acordeon de José Torres."
+                ))
+                .related("escenario_podcast", "Ver Escenario del Podcast")
+                .keywords("jose torres jhoseph towers boss jefe final acordeon zombies dialecto bola hielo 3d")
                 .build());
 
         list.add(EncyclopediaEntry.builder("entity_pi_didi", "Pi Didi")
@@ -885,6 +947,29 @@ public final class EncyclopediaRegistry {
                 .keywords("orden arresto warrant invocar jefri")
                 .build());
 
+        list.add(EncyclopediaEntry.builder("jose_torres_accordion", "Acordeon de José Torres")
+                .type("Instrumento / Llave de Jefe")
+                .category(EncyclopediaCategory.MISC)
+                .rarity(EncyclopediaRarity.EPIC)
+                .icon(ModItem.JOSE_TORRES_ACCORDION)
+                .description("Acordeón tradicional norteño con diseño ligero en 3D que suelta Jefri penstein al ser derrotado. Es únicamente un ítem (no colocable) y sirve para invocar a José Torres haciendo clic derecho sobre el bloque Cassete de Podcast.")
+                .stats(
+                        new StatInfo("Obtenido de", "Jefri penstein", EncyclopediaEntry.RED_STAT_COLOR),
+                        new StatInfo("Uso", "Clic en Cassete de Podcast", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new StatInfo("Invoca a", "José Torres", EncyclopediaEntry.CYAN_STAT_COLOR)
+                )
+                .effects(
+                        new EffectInfo("Invocar a José Torres", "Haz clic derecho en un Cassete de Podcast para iniciar la cinemática de 5 segundos y el combate.", EncyclopediaEntry.GOLD_STAT_COLOR)
+                )
+                .obtaining(ObtainingMethod.info(
+                        "Recompensa de Jefe",
+                        SlotRef.link(ModBlocks.JEFRI_MAILBOX, "entity_jefri_penstein"),
+                        "Lo suelta Jefri penstein al ser derrotado."
+                ))
+                .related("podcast_cassette", "Ver Cassete de Podcast")
+                .keywords("acordeon jose torres instrumento llave invocar")
+                .build());
+
         list.add(EncyclopediaEntry.builder("toalla_kotex", "Toalla Kotex")
                 .type("Proyectil / Munición")
                 .category(EncyclopediaCategory.MISC, EncyclopediaCategory.TOOLS)
@@ -904,6 +989,29 @@ public final class EncyclopediaRegistry {
                         "Botín especial vinculado a las batallas en Isla Penstein."
                 ))
                 .keywords("toalla kotex proyectil flecha arrojadizo")
+                .build());
+
+        list.add(EncyclopediaEntry.builder("ice_ball", "Bola de Hielo")
+                .type("Proyectil Glacial")
+                .category(EncyclopediaCategory.MISC, EncyclopediaCategory.TOOLS)
+                .rarity(EncyclopediaRarity.RARE)
+                .icon(ModItem.ICE_BALL)
+                .description("Esfera de hielo cristalino utilizada por José Torres en su ataque 'La Bola de Hielo Ráfaga'. Se lanza como una bola de nieve con sonido de hielo al impactar, causando más daño que la Toalla Kotex y aplicando Lentitud y Congelación.")
+                .stats(
+                        new StatInfo("Daño al golpear", "5.5 corazones (11 HP)", EncyclopediaEntry.RED_STAT_COLOR),
+                        new StatInfo("Efecto", "Lentitud II + Congelación", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Sonido", "Impacto de Hielo", EncyclopediaEntry.GREEN_STAT_COLOR)
+                )
+                .effects(
+                        new EffectInfo("Impacto Glacial", "Congela y ralentiza al objetivo al impactar con partículas de nieve y hielo.", EncyclopediaEntry.CYAN_STAT_COLOR)
+                )
+                .obtaining(ObtainingMethod.info(
+                        "Recompensa de Jefe",
+                        SlotRef.link(ModItem.JOSE_TORRES_ACCORDION, "entity_jose_torres"),
+                        "La suelta José Torres / Jhoseph towers al ser derrotado."
+                ))
+                .related("entity_jose_torres", "Ver Boss José Torres 3D")
+                .keywords("bola de hielo ice ball proyectil nieve congelacion jose torres")
                 .build());
 
         list.add(EncyclopediaEntry.builder("marijuana", "Marihuana")
@@ -1103,6 +1211,58 @@ public final class EncyclopediaRegistry {
                 )
                 .related("draftea", "Ver Máquina Draftea")
                 .keywords("casino draftea tony diaz estructura spawn seguro invulnerable tragamonedas")
+                .build());
+
+        list.add(EncyclopediaEntry.builder("escenario_podcast", "Escenario del Podcast")
+                .type("Estructura / Arena del Jefe Final")
+                .category(EncyclopediaCategory.STRUCTURES)
+                .rarity(EncyclopediaRarity.EPIC)
+                .icon(ModBlocks.PODCAST_CASSETTE)
+                .description("Arena circular de piedra negra, cuarzo y hielo compacto que se genera en el Overworld cerca del spawn (~140–200 bloques). Cuenta con un escenario de podcast con bocinas laterales al Norte y el pedestal central con el bloque indestructible Cassete de Podcast para invocar a José Torres.")
+                .stats(
+                        new StatInfo("Ubicación", "~150 bloques del Spawn", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Centro", "Cassete de Podcast", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new StatInfo("Jefe Final", "José Torres / Jhoseph towers", EncyclopediaEntry.RED_STAT_COLOR)
+                )
+                .structureContents(
+                        StructureFeatureInfo.link(
+                                "Pedestal Central con el Cassete de Podcast",
+                                "En el centro exacto de la explanada reposa el bloque indestructible Cassete de Podcast sobre oro cincelado.",
+                                ModBlocks.PODCAST_CASSETTE,
+                                "podcast_cassette"
+                        ),
+                        StructureFeatureInfo.link(
+                                "Arena de Combate de José Torres",
+                                "Amplia explanada despejada de 38 bloques de diámetro diseñada para esquivar las Bolas de Hielo, los Zombies y el ataque de Dialecto.",
+                                ModItem.JOSE_TORRES_ACCORDION,
+                                "entity_jose_torres"
+                        )
+                )
+                .structureSteps(
+                        StructureStepInfo.link(
+                                1,
+                                "Consigue el Acordeon de José Torres",
+                                "Derrota primero a Jefri penstein en la Isla Penstein para obtener el Acordeon de José Torres.",
+                                ModItem.JOSE_TORRES_ACCORDION,
+                                "jose_torres_accordion"
+                        ),
+                        StructureStepInfo.link(
+                                2,
+                                "Encuentra el Escenario del Podcast",
+                                "Explora alrededor del punto de aparición del Overworld (o usa /escenariopodcast tp si eres administrador) hasta ver el título 'Escenario del Podcast'.",
+                                ModBlocks.PODCAST_CASSETTE,
+                                "podcast_cassette"
+                        ),
+                        StructureStepInfo.link(
+                                3,
+                                "Invoca y vence a José Torres / Jhoseph towers",
+                                "Haz clic derecho con el Acordeón sobre el Cassete de Podcast y sobrevive a sus dos fases y sus 4 ataques especiales.",
+                                ModItem.ICE_BALL,
+                                "entity_jose_torres"
+                        )
+                )
+                .related("entity_jose_torres", "Ver Boss José Torres 3D")
+                .keywords("escenario podcast estructura altar cassete jose torres jhoseph towers")
                 .build());
     }
 

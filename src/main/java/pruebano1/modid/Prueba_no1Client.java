@@ -23,11 +23,16 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import pruebano1.modid.client.BananaProjectileRenderer;
 import pruebano1.modid.client.DrafteaBlockEntityRenderer;
+import pruebano1.modid.client.EncapsulatedVirusParticle;
 import pruebano1.modid.client.encyclopedia.EncyclopediaScreen;
 import pruebano1.modid.client.FerOvillaRenderer;
 import pruebano1.modid.client.HelloKittyParticle;
+import pruebano1.modid.client.IceBallProjectileRenderer;
 import pruebano1.modid.client.JefriBossMusicInstance;
 import pruebano1.modid.client.JefriPensteinRenderer;
+import pruebano1.modid.client.JoseTorresBossMusicInstance;
+import pruebano1.modid.client.JoseTorresRenderer;
+import pruebano1.modid.client.JoseTorresVoiceSoundInstance;
 import pruebano1.modid.client.KotexProjectileRenderer;
 import pruebano1.modid.client.PiDidiBossMusicInstance;
 import pruebano1.modid.client.PiDidiRenderer;
@@ -40,6 +45,7 @@ import pruebano1.modid.client.VitorJugoRenderer;
 import pruebano1.modid.client.WeedLeafParticle;
 import pruebano1.modid.client.YostinBiberRenderer;
 import pruebano1.modid.entity.JefriPensteinEntity;
+import pruebano1.modid.entity.JoseTorresEntity;
 import pruebano1.modid.entity.ModEntities;
 import pruebano1.modid.entity.PiDidiEntity;
 import pruebano1.modid.network.PlayerDeathKoPayload;
@@ -50,7 +56,12 @@ public class Prueba_no1Client implements ClientModInitializer {
 
     private static PiDidiBossMusicInstance activeBossMusic = null;
     private static JefriBossMusicInstance activeJefriMusic = null;
+    private static JoseTorresBossMusicInstance activeJoseTorresMusic = null;
+    private static JoseTorresVoiceSoundInstance activeJoseTorresVoice = null;
+    private static int lastJoseEntityId = -1;
+    private static int lastJoseVoiceSeq = 0;
     private static int activeTiktokCinematicTick = 0;
+    private static int activeJoseTorresCinematicTick = 0;
     private static boolean activeDeathCageCinematic = false;
     private static boolean wasInJefriCinematic = false;
     private static boolean savedHudHidden = false;
@@ -78,7 +89,10 @@ public class Prueba_no1Client implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.BANANA_PROJECTILE, BananaProjectileRenderer::new);
         EntityRendererRegistry.register(ModEntities.VALENTINA_PRIETA, ValentinaPrietaRenderer::new);
         EntityRendererRegistry.register(ModEntities.JEFRI_PENSTEIN, JefriPensteinRenderer::new);
+        EntityRendererRegistry.register(ModEntities.JOSE_TORRES, JoseTorresRenderer::new);
         EntityRendererRegistry.register(ModEntities.KOTEX_PROJECTILE, KotexProjectileRenderer::new);
+        EntityRendererRegistry.register(ModEntities.ICE_BALL_PROJECTILE, IceBallProjectileRenderer::new);
+        EntityRendererRegistry.register(ModEntities.GIANT_ICE_BALL_PROJECTILE, IceBallProjectileRenderer::createGiant);
         EntityRendererRegistry.register(ModEntities.SEAT, net.minecraft.client.render.entity.EmptyEntityRenderer::new);
         EntityRendererRegistry.register(ModEntities.TONY_FASE1, TonyFase1Renderer::new);
         EntityRendererRegistry.register(ModEntities.TONY_FASE2, TonyFase2Renderer::new);
@@ -91,6 +105,7 @@ public class Prueba_no1Client implements ClientModInitializer {
 
         ParticleFactoryRegistry.getInstance().register(ModParticles.HELLO_KITTY, HelloKittyParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(ModParticles.WEED_LEAF, WeedLeafParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(ModParticles.ENCAPSULATED_VIRUS, EncapsulatedVirusParticle.Factory::new);
 
         // Recibir aviso cuando cualquier jugador muere para activar el sonido y el GIF/efecto K.O. en pantalla
         ClientPlayNetworking.registerGlobalReceiver(PlayerDeathKoPayload.ID, (payload, context) -> {
@@ -101,6 +116,14 @@ public class Prueba_no1Client implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(pruebano1.modid.network.CasinoBoundsPayload.ID, (payload, context) -> {
             context.client().execute(() -> pruebano1.modid.world.DrafteaCasinoManager.setClientBounds(payload));
         });
+
+        // Lo mismo para la torre del Lobby principal
+        ClientPlayNetworking.registerGlobalReceiver(pruebano1.modid.network.LobbyBoundsPayload.ID, (payload, context) -> {
+            context.client().execute(() -> pruebano1.modid.world.LobbyTowerManager.setClientBounds(payload));
+        });
+        net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register((handler, client) ->
+                pruebano1.modid.world.LobbyTowerManager.clearClientBounds()
+        );
 
         // Música del casino: recibir lo que eligió el DJ, abrir su interfaz y reproducir solo dentro del casino
         ClientPlayNetworking.registerGlobalReceiver(pruebano1.modid.network.CasinoMusicStatePayload.ID, (payload, context) ->
@@ -136,7 +159,7 @@ public class Prueba_no1Client implements ClientModInitializer {
             if (PlayerDeathKoOverlay.isActive()) {
                 PlayerDeathKoOverlay.render(drawContext, tickCounter.getTickDelta(false));
             }
-            if (activeTiktokCinematicTick > 0 || activeDeathCageCinematic) {
+            if (activeTiktokCinematicTick > 0 || activeDeathCageCinematic || activeJoseTorresCinematicTick > 0) {
                 int w = drawContext.getScaledWindowWidth();
                 int h = drawContext.getScaledWindowHeight();
                 int barHeight = Math.max(16, h / 10);
@@ -166,12 +189,14 @@ public class Prueba_no1Client implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             PlayerDeathKoOverlay.tick();
             activeTiktokCinematicTick = 0;
+            activeJoseTorresCinematicTick = 0;
             activeDeathCageCinematic = false;
 
             if (client.world == null || client.player == null || !client.player.isAlive()) {
                 restorePlayerViewAfterCinematic(client);
                 activeBossMusic = null;
                 activeJefriMusic = null;
+                activeJoseTorresMusic = null;
                 return;
             }
 
@@ -180,6 +205,92 @@ public class Prueba_no1Client implements ClientModInitializer {
                     if (client.currentScreen == null) {
                         client.setScreen(new EncyclopediaScreen());
                     }
+                }
+            }
+
+            Box joseSearchBox = client.player.getBoundingBox().expand(64.0D);
+            List<JoseTorresEntity> nearbyJoseTorres = client.world.getEntitiesByClass(
+                    JoseTorresEntity.class,
+                    joseSearchBox,
+                    JoseTorresEntity::isAlive
+            );
+
+            if (!nearbyJoseTorres.isEmpty()) {
+                JoseTorresEntity jose = nearbyJoseTorres.get(0);
+
+                // Detectar y reproducir audios de ataques especiales ("Zombies", "Dialecto" y "Una Bola de Hielo") sin atenuación por distancia
+                if (jose.getId() != lastJoseEntityId) {
+                    lastJoseEntityId = jose.getId();
+                    lastJoseVoiceSeq = jose.getSpecialVoiceSeq();
+                } else if (jose.getSpecialVoiceSeq() != lastJoseVoiceSeq) {
+                    lastJoseVoiceSeq = jose.getSpecialVoiceSeq();
+                    int specialType = jose.getActiveSpecialType();
+                    if (specialType == JoseTorresEntity.SPECIAL_ZOMBIES
+                            || specialType == JoseTorresEntity.SPECIAL_DIALECTO
+                            || specialType == JoseTorresEntity.SPECIAL_GIANT_ICE_BALL) {
+                        if (activeJoseTorresVoice != null) {
+                            client.getSoundManager().stop(activeJoseTorresVoice);
+                        }
+                        net.minecraft.sound.SoundEvent voiceEvent = switch (specialType) {
+                            case JoseTorresEntity.SPECIAL_ZOMBIES -> ModSounds.JOSE_TORRES_ZOMBIES;
+                            case JoseTorresEntity.SPECIAL_DIALECTO -> ModSounds.JOSE_TORRES_DIALECTO;
+                            default -> ModSounds.JOSE_TORRES_BOLA_HIELO;
+                        };
+                        activeJoseTorresVoice = new JoseTorresVoiceSoundInstance(jose, voiceEvent);
+                        client.getSoundManager().play(activeJoseTorresVoice);
+                    }
+                }
+
+                // 1. Música de Fase 1 (José Torres) o Fase 2 (Jhoseph towers, recortada desde el segundo 9)
+                if (jose.shouldPlayPhase1Music()) {
+                    if (activeJoseTorresMusic == null
+                            || activeJoseTorresMusic.isPhase2Track()
+                            || activeJoseTorresMusic.isDone()
+                            || !client.getSoundManager().isPlaying(activeJoseTorresMusic)) {
+                        if (activeJoseTorresMusic != null) {
+                            client.getSoundManager().stop(activeJoseTorresMusic);
+                        }
+                        activeJoseTorresMusic = new JoseTorresBossMusicInstance(jose, false);
+                        client.getSoundManager().play(activeJoseTorresMusic);
+                    }
+                } else if (jose.shouldPlayPhase2Music()) {
+                    if (activeJoseTorresMusic == null
+                            || !activeJoseTorresMusic.isPhase2Track()
+                            || activeJoseTorresMusic.isDone()
+                            || !client.getSoundManager().isPlaying(activeJoseTorresMusic)) {
+                        if (activeJoseTorresMusic != null) {
+                            client.getSoundManager().stop(activeJoseTorresMusic);
+                        }
+                        activeJoseTorresMusic = new JoseTorresBossMusicInstance(jose, true);
+                        client.getSoundManager().play(activeJoseTorresMusic);
+                    }
+                } else if (activeJoseTorresMusic != null) {
+                    client.getSoundManager().stop(activeJoseTorresMusic);
+                    activeJoseTorresMusic = null;
+                }
+
+                // 2. Cinemática de entrada (5 s tocando acordeón) o cinemática final de muerte (5 s)
+                if (jose.isInSpawnCinematic()) {
+                    enforceCinematicView(client);
+                    activeJoseTorresCinematicTick = jose.getSpawnCinematicTicks();
+                    focusCameraOnEntity(client, jose, 1.35D);
+                } else if (jose.isDyingCinematic()) {
+                    enforceCinematicView(client);
+                    activeJoseTorresCinematicTick = 1;
+                    focusCameraOnEntity(client, jose, 1.35D);
+                } else {
+                    restorePlayerViewAfterCinematic(client);
+                }
+                return;
+            } else {
+                lastJoseEntityId = -1;
+                if (activeJoseTorresVoice != null) {
+                    client.getSoundManager().stop(activeJoseTorresVoice);
+                    activeJoseTorresVoice = null;
+                }
+                if (activeJoseTorresMusic != null) {
+                    client.getSoundManager().stop(activeJoseTorresMusic);
+                    activeJoseTorresMusic = null;
                 }
             }
 
@@ -290,11 +401,15 @@ public class Prueba_no1Client implements ClientModInitializer {
      * mientras cae al suelo, queda encerrado tras los barrotes de hierro vanilla y finalmente despawnea.
      */
     private static void focusCameraOnBoss(MinecraftClient client, JefriPensteinEntity jefri) {
+        focusCameraOnEntity(client, jefri, 1.0D);
+    }
+
+    private static void focusCameraOnEntity(MinecraftClient client, net.minecraft.entity.Entity target, double heightOffset) {
         if (client.player == null) {
             return;
         }
         Vec3d eyePos = client.player.getEyePos();
-        Vec3d targetPos = jefri.getPos().add(0.0D, 1.0D, 0.0D);
+        Vec3d targetPos = target.getPos().add(0.0D, heightOffset, 0.0D);
         Vec3d diff = targetPos.subtract(eyePos);
         double horizDist = Math.sqrt(diff.x * diff.x + diff.z * diff.z);
 

@@ -26,6 +26,7 @@ import pruebano1.modid.block.DjComponentBlock;
 import pruebano1.modid.block.DjControllerBlock;
 import pruebano1.modid.block.DrafteaBlock;
 import pruebano1.modid.block.JefriMailboxBlock;
+import pruebano1.modid.block.PodcastCassetteBlock;
 
 public class ModBlocks {
 
@@ -80,6 +81,24 @@ public class ModBlocks {
             .dropsNothing()
             .nonOpaque()
             .sounds(BlockSoundGroup.LANTERN));
+
+    // CASSETE DE PODCAST (Bloque indestructible en supervivencia para invocar a José Torres con el Acordeon de José Torres)
+    public static final RegistryKey<Block> PODCAST_CASSETTE_KEY = RegistryKey.of(
+            RegistryKeys.BLOCK,
+            Identifier.of(Prueba_no1.MOD_ID, "podcast_cassette")
+    );
+    public static final RegistryKey<Item> PODCAST_CASSETTE_ITEM_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "podcast_cassette")
+    );
+
+    public static final Block PODCAST_CASSETTE = new PodcastCassetteBlock(AbstractBlock.Settings.create()
+            .registryKey(PODCAST_CASSETTE_KEY)
+            .strength(-1.0f, 3600000.0f) // Indestructible en supervivencia
+            .dropsNothing()
+            .nonOpaque()
+            .pistonBehavior(PistonBehavior.BLOCK)
+            .sounds(BlockSoundGroup.METAL));
 
     // DRAFTEA (Máquina tragamonedas de 2 bloques de alto que funciona con Tony Coins)
     public static final RegistryKey<Block> DRAFTEA_KEY = RegistryKey.of(
@@ -350,6 +369,7 @@ public class ModBlocks {
         registerBlock(DEEPSLATE_SCARLET_ORE_KEY, DEEPSLATE_SCARLET_ORE_ITEM_KEY, DEEPSLATE_SCARLET_ORE);
         registerBlock(SCARLET_BLOCK_KEY, SCARLET_BLOCK_ITEM_KEY, SCARLET_BLOCK);
         registerBlock(JEFRI_MAILBOX_KEY, JEFRI_MAILBOX_ITEM_KEY, JEFRI_MAILBOX);
+        registerBlock(PODCAST_CASSETTE_KEY, PODCAST_CASSETTE_ITEM_KEY, PODCAST_CASSETTE);
         registerBlock(DRAFTEA_KEY, DRAFTEA_ITEM_KEY, DRAFTEA);
         registerBlock(CASINO_LIGHT_KEY, CASINO_LIGHT_ITEM_KEY, CASINO_LIGHT);
         registerBlock(DRAFTEA_LIGHT_KEY, DRAFTEA_LIGHT_ITEM_KEY, DRAFTEA_LIGHT);
@@ -367,6 +387,7 @@ public class ModBlocks {
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> {
             entries.add(JEFRI_MAILBOX);
+            entries.add(PODCAST_CASSETTE);
             entries.add(DRAFTEA);
             entries.add(CASINO_LIGHT);
             entries.add(DRAFTEA_LIGHT);

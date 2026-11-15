@@ -373,6 +373,10 @@ public final class DrafteaCasinoManager {
         if (world == null || pos == null || world.getRegistryKey() != World.OVERWORLD) {
             return false;
         }
+        // La torre del Lobby principal comparte toda la protección de bloques del casino
+        if (LobbyTowerManager.isProtected(world, pos)) {
+            return true;
+        }
         if (world.isClient()) {
             BlockBox box = clientProtectedBox;
             return box != null && box.contains(pos);

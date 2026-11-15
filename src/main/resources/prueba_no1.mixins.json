@@ -10,7 +10,11 @@
 		"CasinoFireMixin"
 	],
 	"client": [
-		"ScartyElytraRendererMixin"
+		"ScartyElytraRendererMixin",
+		"SplashOverlayMixin",
+		"RotatingCubeMapRendererMixin",
+		"LogoDrawerMixin",
+		"ScreenBackgroundMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

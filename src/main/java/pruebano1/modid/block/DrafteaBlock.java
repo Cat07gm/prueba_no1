@@ -14,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -41,7 +42,7 @@ import pruebano1.modid.ModSounds;
 
 /**
  * Máquina tragamonedas "Draftea" (2 bloques de alto).
- * Clic derecho con una Tony Coin: consume la moneda, gira la ruleta ~2 segundos
+ * Clic derecho con una Tony Coin: consume la moneda, gira la ruleta 4 segundos
  * y suelta un premio aleatorio de {@link DrafteaRewards} por el frente.
  */
 public class DrafteaBlock extends HorizontalFacingBlock implements BlockEntityProvider {
@@ -189,7 +190,7 @@ public class DrafteaBlock extends HorizontalFacingBlock implements BlockEntityPr
             DrafteaBlockEntity screen = getScreen(world, lowerPos);
             if (screen != null) {
                 Random random = world.getRandom();
-                screen.setPendingReward(DrafteaRewards.pickIndex(random));
+                screen.setPendingReward(DrafteaRewards.roll(random));
                 for (int i = 0; i < DrafteaBlockEntity.REELS; i++) {
                     screen.setReel(i, DrafteaRewards.randomDisplayItem(random, screen.getReel(i)));
                 }
@@ -225,13 +226,14 @@ public class DrafteaBlock extends HorizontalFacingBlock implements BlockEntityPr
         // Premio decidido al meter la moneda (si falta o la tabla cambió, se elige otro)
         DrafteaBlockEntity screen = getScreen(world, pos);
         int rewardIndex = screen != null ? screen.getPendingReward() : -1;
-        if (rewardIndex < 0 || rewardIndex >= DrafteaRewards.REWARDS.size()) {
-            rewardIndex = DrafteaRewards.pickIndex(random);
+        if (!DrafteaRewards.isValidResult(rewardIndex)) {
+            rewardIndex = DrafteaRewards.roll(random);
             if (screen != null) {
                 screen.setPendingReward(rewardIndex);
             }
         }
-        DrafteaRewards.Reward reward = DrafteaRewards.REWARDS.get(rewardIndex);
+        boolean lose = rewardIndex == DrafteaRewards.LOSE;
+        DrafteaRewards.Reward reward = lose ? null : DrafteaRewards.REWARDS.get(rewardIndex);
         boolean finished = step >= SPIN_DELAYS.length;
 
         // Actualizar la pantalla: cada rodillo sigue cambiando hasta su paso de parada
@@ -241,7 +243,12 @@ public class DrafteaBlock extends HorizontalFacingBlock implements BlockEntityPr
                     if (step == REEL_STOP_STEPS[i] && !finished) {
                         world.playSound(null, pos, SoundEvents.BLOCK_IRON_TRAPDOOR_CLOSE, SoundCategory.BLOCKS, 0.4F, 1.6F);
                     }
-                    screen.setReel(i, reward.item());
+                    if (!lose) {
+                        screen.setReel(i, reward.item());
+                    } else if (step == REEL_STOP_STEPS[i]) {
+                        // Perder: cada rodillo se detiene en un ítem distinto a los anteriores (sin combinación)
+                        screen.setReel(i, differentFromStopped(screen, i, random));
+                    }
                 } else {
                     screen.setReel(i, DrafteaRewards.randomDisplayItem(random, screen.getReel(i)));
                 }
@@ -258,9 +265,25 @@ public class DrafteaBlock extends HorizontalFacingBlock implements BlockEntityPr
             return;
         }
 
-        // Fin del giro: soltar premio
         world.setBlockState(pos, state.with(SPIN, 0), Block.NOTIFY_ALL);
         Direction front = state.get(FACING);
+
+        if (lose) {
+            // La casa gana: no suelta nada
+            world.playSound(null, pos, SoundEvents.BLOCK_NOTE_BLOCK_BASS.value(), SoundCategory.BLOCKS, 1.0F, 0.6F);
+            world.spawnParticles(ParticleTypes.SMOKE,
+                    pos.getX() + 0.5D + front.getOffsetX() * 0.6D,
+                    pos.getY() + 1.4D,
+                    pos.getZ() + 0.5D + front.getOffsetZ() * 0.6D,
+                    15, 0.3D, 0.3D, 0.3D, 0.01D);
+            PlayerEntity player = world.getClosestPlayer(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 8.0D, false);
+            if (player != null) {
+                player.sendMessage(Text.literal("La casa gana: no salió nada").formatted(Formatting.GRAY), true);
+            }
+            return;
+        }
+
+        // Fin del giro: soltar premio
         Block.dropStack(world, pos, front, reward.toStack());
 
         world.playSound(null, pos, ModSounds.DRAFTEA_WIN, SoundCategory.BLOCKS, 1.0F, 1.0F);
@@ -278,6 +301,26 @@ public class DrafteaBlock extends HorizontalFacingBlock implements BlockEntityPr
     @Override
     public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new DrafteaBlockEntity(pos, state);
+    }
+
+    /** Ítem de la tabla distinto a los de los rodillos ya detenidos (0..reel-1). */
+    private static net.minecraft.item.Item differentFromStopped(DrafteaBlockEntity screen, int reel, Random random) {
+        java.util.List<net.minecraft.item.Item> options = new java.util.ArrayList<>();
+        for (DrafteaRewards.Reward r : DrafteaRewards.REWARDS) {
+            boolean used = false;
+            for (int j = 0; j < reel; j++) {
+                if (screen.getReel(j) == r.item()) {
+                    used = true;
+                }
+            }
+            if (!used && !options.contains(r.item())) {
+                options.add(r.item());
+            }
+        }
+        if (options.isEmpty()) {
+            return DrafteaRewards.randomDisplayItem(random, screen.getReel(reel));
+        }
+        return options.get(random.nextInt(options.size()));
     }
 
     /** La pantalla vive en la mitad superior; recibe la posición de la mitad inferior. */

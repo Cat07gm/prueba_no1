@@ -90,5 +90,13 @@
   "block.prueba_no1.neon_sign_dice": "Letrero Neón de Dados",
   "item.prueba_no1.neon_sign_dice": "Letrero Neón de Dados",
   "block.prueba_no1.neon_sign_777": "Letrero Neón 777",
-  "item.prueba_no1.neon_sign_777": "Letrero Neón 777"
+  "item.prueba_no1.neon_sign_777": "Letrero Neón 777",
+  "item.prueba_no1.jose_torres_accordion": "Acordeon de José Torres",
+  "block.prueba_no1.podcast_cassette": "Cassete de Podcast",
+  "item.prueba_no1.podcast_cassette": "Cassete de Podcast",
+  "item.prueba_no1.jose_torres_spawn_egg": "Generar José Torres",
+  "entity.prueba_no1.jose_torres": "José Torres",
+  "entity.prueba_no1.jhoseph_towers": "Jhoseph towers",
+  "item.prueba_no1.ice_ball": "Bola de Hielo",
+  "entity.prueba_no1.ice_ball_projectile": "Bola de Hielo"
 }

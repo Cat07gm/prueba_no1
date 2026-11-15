@@ -56,6 +56,41 @@ public class ModSounds {
             SoundEvent.of(JEFRI_DEATH_FART_ID)
     );
 
+    public static final Identifier JOSE_TORRES_BOSS_MUSIC_ID = Identifier.of(Prueba_no1.MOD_ID, "jose_torres_boss_music");
+    public static final SoundEvent JOSE_TORRES_BOSS_MUSIC = Registry.register(
+            Registries.SOUND_EVENT,
+            JOSE_TORRES_BOSS_MUSIC_ID,
+            SoundEvent.of(JOSE_TORRES_BOSS_MUSIC_ID)
+    );
+
+    public static final Identifier JHOSEPH_TOWERS_BOSS_MUSIC_ID = Identifier.of(Prueba_no1.MOD_ID, "jhoseph_towers_boss_music");
+    public static final SoundEvent JHOSEPH_TOWERS_BOSS_MUSIC = Registry.register(
+            Registries.SOUND_EVENT,
+            JHOSEPH_TOWERS_BOSS_MUSIC_ID,
+            SoundEvent.of(JHOSEPH_TOWERS_BOSS_MUSIC_ID)
+    );
+
+    public static final Identifier JOSE_TORRES_ZOMBIES_ID = Identifier.of(Prueba_no1.MOD_ID, "jose_torres_zombies");
+    public static final SoundEvent JOSE_TORRES_ZOMBIES = Registry.register(
+            Registries.SOUND_EVENT,
+            JOSE_TORRES_ZOMBIES_ID,
+            SoundEvent.of(JOSE_TORRES_ZOMBIES_ID)
+    );
+
+    public static final Identifier JOSE_TORRES_DIALECTO_ID = Identifier.of(Prueba_no1.MOD_ID, "jose_torres_dialecto");
+    public static final SoundEvent JOSE_TORRES_DIALECTO = Registry.register(
+            Registries.SOUND_EVENT,
+            JOSE_TORRES_DIALECTO_ID,
+            SoundEvent.of(JOSE_TORRES_DIALECTO_ID)
+    );
+
+    public static final Identifier JOSE_TORRES_BOLA_HIELO_ID = Identifier.of(Prueba_no1.MOD_ID, "jose_torres_bola_hielo");
+    public static final SoundEvent JOSE_TORRES_BOLA_HIELO = Registry.register(
+            Registries.SOUND_EVENT,
+            JOSE_TORRES_BOLA_HIELO_ID,
+            SoundEvent.of(JOSE_TORRES_BOLA_HIELO_ID)
+    );
+
     // SONIDOS DE LA DRAFTEA (en sounds.json apuntan a sonidos de vanilla; se pueden cambiar por .ogg propios)
     public static final Identifier DRAFTEA_COIN_ID = Identifier.of(Prueba_no1.MOD_ID, "draftea_coin");
     public static final SoundEvent DRAFTEA_COIN = Registry.register(

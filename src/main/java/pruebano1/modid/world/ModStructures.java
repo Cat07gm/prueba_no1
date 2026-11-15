@@ -54,7 +54,29 @@ public class ModStructures {
             Identifier.of(Prueba_no1.MOD_ID, "draftea_casino_feature_placed")
     );
 
+    public static final Feature<DefaultFeatureConfig> LOBBY_TOWER_FEATURE = Registry.register(
+            Registries.FEATURE,
+            Identifier.of(Prueba_no1.MOD_ID, "lobby_tower_feature"),
+            new LobbyTowerFeature(DefaultFeatureConfig.CODEC)
+    );
+
+    public static final RegistryKey<PlacedFeature> LOBBY_TOWER_PLACED_KEY = RegistryKey.of(
+            RegistryKeys.PLACED_FEATURE,
+            Identifier.of(Prueba_no1.MOD_ID, "lobby_tower_feature_placed")
+    );
+
+    public static final Feature<DefaultFeatureConfig> PODCAST_STAGE_FEATURE = Registry.register(
+            Registries.FEATURE,
+            Identifier.of(Prueba_no1.MOD_ID, "podcast_stage_feature"),
+            new PodcastStageFeature(DefaultFeatureConfig.CODEC)
+    );
+
+    public static final RegistryKey<PlacedFeature> PODCAST_STAGE_PLACED_KEY = RegistryKey.of(
+            RegistryKeys.PLACED_FEATURE,
+            Identifier.of(Prueba_no1.MOD_ID, "podcast_stage_feature_placed")
+    );
+
     public static void registerModStructures() {
-        Prueba_no1.LOGGER.info("Registrando Isla Penstein y Casino único 'Draftea Tony Diaz' para " + Prueba_no1.MOD_ID);
+        Prueba_no1.LOGGER.info("Registrando Isla Penstein, Casino 'Draftea Tony Diaz' y Escenario del Podcast para " + Prueba_no1.MOD_ID);
     }
 }

@@ -20,6 +20,12 @@ public class ModParticles {
             FabricParticleTypes.simple(true)
     );
 
+    public static final SimpleParticleType ENCAPSULATED_VIRUS = Registry.register(
+            Registries.PARTICLE_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "encapsulated_virus"),
+            FabricParticleTypes.simple(true)
+    );
+
     public static void registerModParticles() {
         Prueba_no1.LOGGER.info("Registrando partículas personalizadas para " + Prueba_no1.MOD_ID);
     }

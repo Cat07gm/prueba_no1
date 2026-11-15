@@ -122,6 +122,20 @@ public class ModEntities {
                     .build(JEFRI_PENSTEIN_KEY)
     );
 
+    public static final RegistryKey<EntityType<?>> JOSE_TORRES_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "jose_torres")
+    );
+
+    public static final EntityType<JoseTorresEntity> JOSE_TORRES = Registry.register(
+            Registries.ENTITY_TYPE,
+            JOSE_TORRES_KEY,
+            EntityType.Builder.create(JoseTorresEntity::new, SpawnGroup.MONSTER)
+                    .dimensions(0.8F, 2.2F)
+                    .maxTrackingRange(64)
+                    .build(JOSE_TORRES_KEY)
+    );
+
     public static final RegistryKey<EntityType<?>> KOTEX_PROJECTILE_KEY = RegistryKey.of(
             RegistryKeys.ENTITY_TYPE,
             Identifier.of(Prueba_no1.MOD_ID, "kotex_projectile")
@@ -135,6 +149,36 @@ public class ModEntities {
                     .maxTrackingRange(64)
                     .trackingTickInterval(10)
                     .build(KOTEX_PROJECTILE_KEY)
+    );
+
+    public static final RegistryKey<EntityType<?>> ICE_BALL_PROJECTILE_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "ice_ball_projectile")
+    );
+
+    public static final EntityType<IceBallProjectileEntity> ICE_BALL_PROJECTILE = Registry.register(
+            Registries.ENTITY_TYPE,
+            ICE_BALL_PROJECTILE_KEY,
+            EntityType.Builder.<IceBallProjectileEntity>create(IceBallProjectileEntity::new, SpawnGroup.MISC)
+                    .dimensions(0.35F, 0.35F)
+                    .maxTrackingRange(64)
+                    .trackingTickInterval(10)
+                    .build(ICE_BALL_PROJECTILE_KEY)
+    );
+
+    public static final RegistryKey<EntityType<?>> GIANT_ICE_BALL_PROJECTILE_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "giant_ice_ball_projectile")
+    );
+
+    public static final EntityType<IceBallProjectileEntity> GIANT_ICE_BALL_PROJECTILE = Registry.register(
+            Registries.ENTITY_TYPE,
+            GIANT_ICE_BALL_PROJECTILE_KEY,
+            EntityType.Builder.<IceBallProjectileEntity>create(IceBallProjectileEntity::new, SpawnGroup.MISC)
+                    .dimensions(1.15F, 1.15F)
+                    .maxTrackingRange(64)
+                    .trackingTickInterval(10)
+                    .build(GIANT_ICE_BALL_PROJECTILE_KEY)
     );
 
     public static final RegistryKey<EntityType<?>> SEAT_KEY = RegistryKey.of(
@@ -202,6 +246,7 @@ public class ModEntities {
         FabricDefaultAttributeRegistry.register(FER_OVILLA, FerOvillaEntity.createFerOvillaAttributes());
         FabricDefaultAttributeRegistry.register(VALENTINA_PRIETA, ValentinaPrietaEntity.createValentinaPrietaAttributes());
         FabricDefaultAttributeRegistry.register(JEFRI_PENSTEIN, JefriPensteinEntity.createJefriPensteinAttributes());
+        FabricDefaultAttributeRegistry.register(JOSE_TORRES, JoseTorresEntity.createJoseTorresAttributes());
         FabricDefaultAttributeRegistry.register(TONY_FASE1, TonyFase1Entity.createTonyFase1Attributes());
         FabricDefaultAttributeRegistry.register(TONY_FASE2, TonyFase2Entity.createTonyFase2Attributes());
         FabricDefaultAttributeRegistry.register(TONY_FASE3, TonyFase3Entity.createTonyFase3Attributes());

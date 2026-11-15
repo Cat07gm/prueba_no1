@@ -193,5 +193,45 @@
         "stream": true
       }
     ]
+  },
+  "jose_torres_boss_music": {
+    "sounds": [
+      {
+        "name": "prueba_no1:jose_torres_boss_music",
+        "stream": true
+      }
+    ]
+  },
+  "jhoseph_towers_boss_music": {
+    "sounds": [
+      {
+        "name": "prueba_no1:jhoseph_towers_boss_music",
+        "stream": true
+      }
+    ]
+  },
+  "jose_torres_zombies": {
+    "sounds": [
+      {
+        "name": "prueba_no1:jose_torres_zombies",
+        "stream": false
+      }
+    ]
+  },
+  "jose_torres_dialecto": {
+    "sounds": [
+      {
+        "name": "prueba_no1:jose_torres_dialecto",
+        "stream": false
+      }
+    ]
+  },
+  "jose_torres_bola_hielo": {
+    "sounds": [
+      {
+        "name": "prueba_no1:jose_torres_bola_hielo",
+        "stream": false
+      }
+    ]
   }
 }

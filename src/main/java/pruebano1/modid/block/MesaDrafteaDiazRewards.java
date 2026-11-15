@@ -18,10 +18,10 @@ import pruebano1.modid.ModItem;
 import java.util.List;
 
 /**
- * APUESTAS Y PREMIOS DE LA MESA DRAFTEA DIAZ.
+ * MESA DRAFTEA DIAZ
  *
- * Para apostar se hace clic en la mesa con un lingote o gema en la mano.
- * Cada mineral pide una cantidad fija y pertenece a un nivel (tier): mientras más raro,
+ * Para apostar se hace clic en la mesa con una cantidad de lingotes en la mano.
+ * Cada mineral pide una cantidad fija y pertenece a un nivel(tier) mientras más raro,
  * menos probabilidad de perder y más probabilidad de premios altos.
  *
  * - Cambiar cuánto cuesta apostar un mineral: segundo número de BETS.
@@ -35,29 +35,29 @@ public final class MesaDrafteaDiazRewards {
     public record Bet(Item item, int count, int tier) {
     }
 
-    /** Premio: objeto, cantidad y peso (más peso = sale más dentro de su categoría). */
+    /**Premio (más peso = sale más dentro de su categoría)*/
     public record Reward(Item item, int count, int weight) {
     }
 
     public static final List<Bet> BETS = List.of(
-            // Nivel 0: comunes (60% de perder)
+            // Nivel 0(60% de perder)
             new Bet(Items.COAL, 16, 0),
             new Bet(Items.COPPER_INGOT, 16, 0),
             new Bet(Items.REDSTONE, 16, 0),
             new Bet(Items.LAPIS_LAZULI, 16, 0),
             new Bet(Items.QUARTZ, 12, 0),
-            // Nivel 1: metales preciosos (45% de perder)
+            // Nivel 1(45% de perder)
             new Bet(Items.IRON_INGOT, 8, 1),
             new Bet(Items.GOLD_INGOT, 6, 1),
-            // Nivel 2: gemas (30% de perder)
+            // Nivel 2(30% de perder)
             new Bet(Items.EMERALD, 3, 2),
             new Bet(Items.DIAMOND, 2, 2),
             new Bet(ModItem.SCARLET_INGOT, 2, 2),
-            // Nivel 3: legendario (15% de perder)
+            // Nivel 3(15% de perder)
             new Bet(Items.NETHERITE_INGOT, 1, 3)
     );
 
-    /** Probabilidad (%) de que la casa gane y no salga nada, por nivel de la apuesta. */
+    /** Probabilidad de que la casa gane y no salga nada, por nivel de la apuesta*/
     public static final int[] LOSE_CHANCE = {60, 45, 30, 15};
 
     /**
@@ -78,7 +78,7 @@ public final class MesaDrafteaDiazRewards {
             new Reward(Items.SPECTRAL_ARROW, 16, 1)
     );
 
-    /** El libro encantado lleva un encantamiento aleatorio (sin maldiciones). */
+    /** el libro encantado lleva un encantamiento aleatorio (sin maldiciones)*/
     public static final List<Reward> MEDIUM = List.of(
             new Reward(Items.GOLDEN_APPLE, 2, 1),
             new Reward(Items.ENCHANTED_BOOK, 1, 1),

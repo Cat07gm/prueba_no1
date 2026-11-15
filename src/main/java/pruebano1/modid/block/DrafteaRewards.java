@@ -10,9 +10,9 @@ import java.util.List;
 /**
  * TABLA DE PREMIOS DE LA MÁQUINA "DRAFTEA".
  *
- * Cada premio tiene: (item, cantidad, peso).
- * El "peso" es la probabilidad relativa: la probabilidad real de cada premio es
- *      peso / (suma de todos los pesos)
+ * Cada premio tiene item, cantidad, peso
+ * El peso es la probabilidad relativa: la probabilidad real de cada premio es
+ * peso / (suma de todos los pesos)
  * Como los pesos de abajo suman 100, cada peso equivale directamente a su porcentaje.
  *
  * Para cambiar probabilidades solo modifica el último número de cada línea.
@@ -37,10 +37,28 @@ public final class DrafteaRewards {
             new Reward(Items.GOLDEN_APPLE,         1,         5)
     );
 
+    /** Probabilidad (%) de que la casa gane y la máquina no suelte nada. */
+    public static final int LOSE_CHANCE = 25;
+    /** Resultado especial: la casa gana (los rodillos se detienen en 3 ítems distintos). */
+    public static final int LOSE = -2;
+
     private DrafteaRewards() {
     }
 
-    /** Elige un premio al azar respetando los pesos y devuelve su posición en REWARDS. */
+    /** Resultado de una tirada: {@link #LOSE} (25%) o el índice de un premio de la tabla. */
+    public static int roll(Random random) {
+        if (random.nextInt(100) < LOSE_CHANCE) {
+            return LOSE;
+        }
+        return pickIndex(random);
+    }
+
+    /** ¿Es un resultado válido (perder o un premio existente)? */
+    public static boolean isValidResult(int result) {
+        return result == LOSE || (result >= 0 && result < REWARDS.size());
+    }
+
+    /**premio al azar*/
     public static int pickIndex(Random random) {
         int total = 0;
         for (Reward reward : REWARDS) {

@@ -836,8 +836,9 @@ public class JefriPensteinEntity extends HostileEntity implements GeoEntity {
                     this.getX(), this.getY() + 1.0D, this.getZ(),
                     35, 0.6D, 0.8D, 0.6D, 0.05D
             );
-            // Soltar entre 16 y 24 Toallas Kotex como recompensa al derrotar a Jefri
+            // Soltar entre 16 y 24 Toallas Kotex y el Acordeon de José Torres como recompensa al derrotar a Jefri
             this.dropStack(world, new ItemStack(ModItem.TOALLA_KOTEX, 16 + this.random.nextInt(9)));
+            this.dropStack(world, new ItemStack(ModItem.JOSE_TORRES_ACCORDION, 1));
 
             // Reproducir el sonido de pedo justo en el instante en que despawnea
             world.playSound(

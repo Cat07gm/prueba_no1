@@ -30,6 +30,7 @@ import pruebano1.modid.client.encyclopedia.EncyclopediaEntry.StatInfo;
 import pruebano1.modid.client.encyclopedia.EncyclopediaEntry.StructureFeatureInfo;
 import pruebano1.modid.client.encyclopedia.EncyclopediaEntry.StructureStepInfo;
 import pruebano1.modid.entity.JefriPensteinEntity;
+import pruebano1.modid.entity.JoseTorresEntity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -928,6 +929,8 @@ public class EncyclopediaScreen extends Screen {
 
         if (entity instanceof JefriPensteinEntity jefri) {
             jefri.setClientPreviewDevilMode(devilMode);
+        } else if (entity instanceof JoseTorresEntity jose) {
+            jose.setClientPreviewPhase2(devilMode);
         }
 
         float pitchRad = (float) Math.toRadians(pitchDeg);

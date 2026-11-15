@@ -207,7 +207,7 @@ public final class DrafteaCasinoPiece {
      * Quita todo lo que sobresalga por encima de capY en la columna y, si se recortó suelo,
      * deja la nueva superficie con pasto/tierra para que no quede piedra o tierra expuesta.
      */
-    private static void gradeTerrainAroundPlaza(
+    static void gradeTerrainAroundPlaza(
             StructureWorldAccess world,
             BlockPos.Mutable pos,
             int wx,

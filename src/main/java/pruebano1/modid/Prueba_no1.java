@@ -4,7 +4,9 @@ import net.fabricmc.api.ModInitializer;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EntityType;
@@ -21,15 +23,18 @@ import net.minecraft.structure.StructureStart;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pruebano1.modid.entity.JefriPensteinEntity;
+import pruebano1.modid.entity.JoseTorresEntity;
 import pruebano1.modid.entity.ModEntities;
 import pruebano1.modid.network.PlayerDeathKoPayload;
 import pruebano1.modid.world.IslaPensteinCustomEdits;
 import pruebano1.modid.world.IslaPensteinStructure;
 import pruebano1.modid.world.ModStructures;
+import pruebano1.modid.world.PodcastStageManager;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +45,7 @@ public class Prueba_no1 implements ModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	private static final Set<UUID> PLAYERS_IN_ISLA_PENSTEIN = new HashSet<>();
+	private static final Set<UUID> PLAYERS_IN_PODCAST_STAGE = new HashSet<>();
 	private static int islandTitleCheckTimer = 0;
 
 	@Override
@@ -62,6 +68,11 @@ public class Prueba_no1 implements ModInitializer {
 				pruebano1.modid.network.CasinoBoundsPayload.CODEC
 		);
 
+		PayloadTypeRegistry.playS2C().register(
+				pruebano1.modid.network.LobbyBoundsPayload.ID,
+				pruebano1.modid.network.LobbyBoundsPayload.CODEC
+		);
+
 		// Música del casino (DJ Controller): canciones, órdenes del DJ y estado para los clientes
 		pruebano1.modid.casino.CasinoSongs.registerCasinoSongs();
 		PayloadTypeRegistry.playC2S().register(
@@ -80,22 +91,36 @@ public class Prueba_no1 implements ModInitializer {
 		);
 
 		// Cargar cambios guardados del casino único y registrar su protección, zona segura y comandos
+		pruebano1.modid.world.LobbyTowerCustomEdits.ensureLoaded();
 		pruebano1.modid.world.DrafteaCasinoCustomEdits.ensureLoaded();
 		pruebano1.modid.world.DrafteaCasinoProtection.registerServer();
 		pruebano1.modid.compat.WaystonesIntegration.registerIfLoaded();
 
-		// Inmunidad total para los jugadores en la zona segura del casino o en cinemáticas de Jefri Penstein
+		// Ciclo de vida del Escenario del Podcast (Altar de José Torres con el Cassete de Podcast)
+		ServerWorldEvents.LOAD.register((server, world) -> PodcastStageManager.onOverworldLoaded(world));
+		ServerLifecycleEvents.SERVER_STARTED.register(PodcastStageManager::ensurePlacedOnServerStart);
+		ServerLifecycleEvents.SERVER_STOPPED.register(PodcastStageManager::clearServerCaches);
+
+		// Inmunidad total para los jugadores en la zona segura del casino o en cinemáticas de Jefri Penstein / José Torres
 		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
 			if (entity instanceof ServerPlayerEntity player && player.getWorld() instanceof ServerWorld serverWorld) {
 				if (pruebano1.modid.world.DrafteaCasinoProtection.isImmuneInSafeZone(player, serverWorld, source)) {
 					return false;
 				}
-				boolean cinematicActive = !serverWorld.getEntitiesByClass(
+				boolean jefriCinematic = !serverWorld.getEntitiesByClass(
 						JefriPensteinEntity.class,
 						new Box(player.getBlockPos()).expand(80.0D),
 						JefriPensteinEntity::isInAnyCinematic
 				).isEmpty();
-				if (cinematicActive) {
+				if (jefriCinematic) {
+					return false;
+				}
+				boolean joseCinematic = !serverWorld.getEntitiesByClass(
+						JoseTorresEntity.class,
+						new Box(player.getBlockPos()).expand(80.0D),
+						JoseTorresEntity::isInAnyCinematic
+				).isEmpty();
+				if (joseCinematic) {
 					return false;
 				}
 			}
@@ -154,11 +179,49 @@ public class Prueba_no1 implements ModInitializer {
 				} else {
 					PLAYERS_IN_ISLA_PENSTEIN.remove(playerId);
 				}
+
+				boolean insidePodcastStage = PodcastStageManager.isPosInPodcastStage(world, player.getBlockPos());
+				if (insidePodcastStage) {
+					if (PLAYERS_IN_PODCAST_STAGE.add(playerId)) {
+						player.networkHandler.sendPacket(new TitleFadeS2CPacket(15, 70, 20));
+						player.networkHandler.sendPacket(
+								new TitleS2CPacket(Text.literal("Escenario del Podcast").formatted(Formatting.AQUA, Formatting.BOLD))
+						);
+						player.networkHandler.sendPacket(
+								new SubtitleS2CPacket(Text.literal("Altar de José Torres — Usa el Acordeón en el Cassete").formatted(Formatting.GOLD, Formatting.ITALIC))
+						);
+					}
+				} else {
+					PLAYERS_IN_PODCAST_STAGE.remove(playerId);
+				}
 			}
 		});
 
-		// Comando "/islapenstein guardar" para guardar cualquier modificación hecha por ti dentro de la isla
+		// Comando "/islapenstein guardar" y "/escenariopodcast tp"
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			dispatcher.register(
+					CommandManager.literal("escenariopodcast")
+							.requires(source -> source.hasPermissionLevel(2))
+							.then(CommandManager.literal("tp")
+									.executes(ctx -> {
+										ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+										ServerWorld overworld = ctx.getSource().getServer().getOverworld();
+										PodcastStageManager.ensurePlacedOnServerStart(ctx.getSource().getServer());
+										PodcastStageManager.StageAnchor anchor = PodcastStageManager.getAnchor(ctx.getSource().getServer());
+										if (anchor == null || overworld == null) {
+											return 0;
+										}
+										BlockPos tp = anchor.entranceTpPos();
+										player.teleport(overworld, tp.getX() + 0.5D, tp.getY(), tp.getZ() + 0.5D, Set.of(), 180.0F, 0.0F, true);
+										player.sendMessage(
+												Text.literal("🎙️ Teletransportado al Escenario del Podcast en (" + anchor.centerX() + ", " + anchor.baseY() + ", " + anchor.centerZ() + ").")
+														.formatted(Formatting.AQUA, Formatting.BOLD),
+												false
+										);
+										return 1;
+									})
+							)
+			);
 			dispatcher.register(
 					CommandManager.literal("islapenstein")
 							.requires(source -> source.hasPermissionLevel(2))
