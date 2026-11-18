@@ -1,5 +1,6 @@
 package pruebano1.modid.entity;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -23,10 +24,13 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import pruebano1.modid.ModBlocks;
 import pruebano1.modid.ModItem;
+import pruebano1.modid.world.DrafteaCasinoManager;
 
 import java.util.List;
 
@@ -257,6 +261,9 @@ public class IceBallProjectileEntity extends ThrownItemEntity implements FlyingI
                 50, 2.2D, 1.2D, 2.2D, 0.05D
         );
 
+        // Convertir el terreno alrededor del impacto en hielo y nieve en un radio de 5x5
+        freezeGroundAroundImpact(serverWorld, BlockPos.ofFloored(center.x, center.y, center.z));
+
         double radius = 7.5D;
         Box area = new Box(
                 center.x - radius, center.y - 4.0D, center.z - radius,
@@ -300,5 +307,93 @@ public class IceBallProjectileEntity extends ThrownItemEntity implements FlyingI
                 serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(serverPlayer));
             }
         }
+    }
+
+    /**
+     * Convierte todo alrededor del punto de impacto de "Una Bola de Hielo" en hielo (Hielo Compacto,
+     * Hielo normal, Bloques de Nieve) y capas de nieve en un radio de 5 por 5, respetando bloques
+     * indestructibles como el Cassete de Podcast, Buzón de Jefri, Bedrock o zonas protegidas del Casino/Lobby.
+     */
+    private void freezeGroundAroundImpact(ServerWorld world, BlockPos centerPos) {
+        int r = 5;
+        BlockPos.Mutable mpos = new BlockPos.Mutable();
+
+        for (int dx = -r; dx <= r; dx++) {
+            for (int dz = -r; dz <= r; dz++) {
+                double distSq = dx * dx + dz * dz;
+                if (distSq > (r + 0.35D) * (r + 0.35D)) {
+                    continue;
+                }
+
+                // Buscar el bloque de superficie más cercano a la altura del impacto (dy entre +3 y -3)
+                for (int dy = 3; dy >= -3; dy--) {
+                    mpos.set(centerPos.getX() + dx, centerPos.getY() + dy, centerPos.getZ() + dz);
+                    if (!canReplaceWithIceOrSnow(world, mpos)) {
+                        continue;
+                    }
+
+                    BlockState state = world.getBlockState(mpos);
+                    if (state.isOf(Blocks.WATER)) {
+                        world.setBlockState(mpos, Blocks.ICE.getDefaultState());
+                        break;
+                    }
+
+                    BlockPos abovePos = mpos.up();
+                    BlockState aboveState = world.getBlockState(abovePos);
+                    boolean exposedSurface = aboveState.isAir()
+                            || aboveState.isReplaceable()
+                            || aboveState.isOf(Blocks.SNOW)
+                            || aboveState.isOf(Blocks.FIRE);
+
+                    if (exposedSurface && !state.isAir() && !state.isReplaceable() && !state.isOf(Blocks.SNOW)) {
+                        BlockState frozenBlock;
+                        if (distSq <= 4.5D) {
+                            // Núcleo del impacto: hielo compacto y hielo puro
+                            frozenBlock = (this.random.nextFloat() < 0.65F)
+                                    ? Blocks.PACKED_ICE.getDefaultState()
+                                    : Blocks.ICE.getDefaultState();
+                        } else {
+                            // Borde del radio de 5x5: mezcla de hielo, hielo compacto y bloque de nieve
+                            float roll = this.random.nextFloat();
+                            if (roll < 0.45F) {
+                                frozenBlock = Blocks.ICE.getDefaultState();
+                            } else if (roll < 0.75F) {
+                                frozenBlock = Blocks.SNOW_BLOCK.getDefaultState();
+                            } else {
+                                frozenBlock = Blocks.PACKED_ICE.getDefaultState();
+                            }
+                        }
+
+                        world.setBlockState(mpos, frozenBlock);
+
+                        // Colocar capa de nieve encima si el bloque superior está libre o es reemplazable
+                        if (canReplaceWithIceOrSnow(world, abovePos)
+                                && (aboveState.isAir() || aboveState.isReplaceable() || aboveState.isOf(Blocks.FIRE))
+                                && this.random.nextFloat() < 0.75F) {
+                            BlockState snowLayer = Blocks.SNOW.getDefaultState();
+                            if (snowLayer.canPlaceAt(world, abovePos)) {
+                                world.setBlockState(abovePos, snowLayer);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private static boolean canReplaceWithIceOrSnow(ServerWorld world, BlockPos pos) {
+        if (DrafteaCasinoManager.isProtectedBlock(world, pos)) {
+            return false;
+        }
+        BlockState state = world.getBlockState(pos);
+        if (state.isOf(ModBlocks.PODCAST_CASSETTE) || state.isOf(ModBlocks.JEFRI_MAILBOX)) {
+            return false;
+        }
+        if (world.getBlockEntity(pos) != null) {
+            return false;
+        }
+        // No reemplazar bloques indestructibles (bedrock, barreras, portales, etc.)
+        return state.getHardness(world, pos) >= 0.0F;
     }
 }

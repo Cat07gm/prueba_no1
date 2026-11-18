@@ -26,6 +26,12 @@ public class ModParticles {
             FabricParticleTypes.simple(true)
     );
 
+    public static final SimpleParticleType CHARLIE_WEAPON = Registry.register(
+            Registries.PARTICLE_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "charlie_weapon"),
+            FabricParticleTypes.simple(true)
+    );
+
     public static void registerModParticles() {
         Prueba_no1.LOGGER.info("Registrando partículas personalizadas para " + Prueba_no1.MOD_ID);
     }

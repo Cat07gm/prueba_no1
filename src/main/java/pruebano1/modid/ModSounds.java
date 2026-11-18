@@ -113,6 +113,20 @@ public class ModSounds {
             SoundEvent.of(DRAFTEA_WIN_ID)
     );
 
+    public static final Identifier CHARLIE_KIRK_BOSS_MUSIC_ID = Identifier.of(Prueba_no1.MOD_ID, "charlie_kirk_boss_music");
+    public static final SoundEvent CHARLIE_KIRK_BOSS_MUSIC = Registry.register(
+            Registries.SOUND_EVENT,
+            CHARLIE_KIRK_BOSS_MUSIC_ID,
+            SoundEvent.of(CHARLIE_KIRK_BOSS_MUSIC_ID)
+    );
+
+    public static final Identifier CHARLIE_KIRK_BOSS_MUSIC_LOOP_ID = Identifier.of(Prueba_no1.MOD_ID, "charlie_kirk_boss_music_loop");
+    public static final SoundEvent CHARLIE_KIRK_BOSS_MUSIC_LOOP = Registry.register(
+            Registries.SOUND_EVENT,
+            CHARLIE_KIRK_BOSS_MUSIC_LOOP_ID,
+            SoundEvent.of(CHARLIE_KIRK_BOSS_MUSIC_LOOP_ID)
+    );
+
     public static void registerModSounds() {
         Prueba_no1.LOGGER.info("Registrando sonidos personalizados para " + Prueba_no1.MOD_ID);
     }

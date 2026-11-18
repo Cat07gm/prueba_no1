@@ -90,9 +90,9 @@ public class JoseTorresEntity extends HostileEntity implements GeoEntity {
 
     public static final int ZOMBIE_ATTACK_COOLDOWN_TICKS = 20 * 60;      // 1 minuto (1200 ticks)
     public static final int DIALECTO_ATTACK_COOLDOWN_TICKS = 20 * 60;    // 1 minuto (1200 ticks)
-    public static final int GIANT_ICE_BALL_COOLDOWN_TICKS = 20 * 45;     // 45 segundos (900 ticks)
-    public static final int ICE_BARRAGE_COOLDOWN_PHASE1_TICKS = 20 * 9;  // 9 segundos (180 ticks)
-    public static final int ICE_BARRAGE_COOLDOWN_PHASE2_TICKS = 20 * 7;  // 7 segundos (140 ticks)
+    public static final int GIANT_ICE_BALL_COOLDOWN_TICKS = 20 * 55;     // 55 segundos (1100 ticks)
+    public static final int ICE_BARRAGE_COOLDOWN_PHASE1_TICKS = 20 * 14; // 14 segundos (280 ticks)
+    public static final int ICE_BARRAGE_COOLDOWN_PHASE2_TICKS = 20 * 11; // 11 segundos (220 ticks)
 
     public static final int SPECIAL_NONE = 0;
     public static final int SPECIAL_ZOMBIES = 1;
@@ -247,7 +247,7 @@ public class JoseTorresEntity extends HostileEntity implements GeoEntity {
 
     public static DefaultAttributeContainer.Builder createJoseTorresAttributes() {
         return HostileEntity.createHostileAttributes()
-                .add(EntityAttributes.MAX_HEALTH, 650.0D) // Un poco más fuerte que Jefri Penstein (500 HP)
+                .add(EntityAttributes.MAX_HEALTH, 700.0D) // 700 HP (350 corazones; +50 puntos adicionales)
                 .add(EntityAttributes.MOVEMENT_SPEED, 0.29D)
                 .add(EntityAttributes.ATTACK_DAMAGE, 0.0D) // No ataca cuerpo a cuerpo
                 .add(EntityAttributes.ARMOR, 12.0D)       // Un poco más blindado que Jefri Penstein (10)
@@ -416,8 +416,8 @@ public class JoseTorresEntity extends HostileEntity implements GeoEntity {
      * Jefri Penstein, causando mucho daño (15.0F = 7.5 corazones, un poco menos que el ataque de Dialecto).
      */
     private void triggerPhase2ProximityPushWave(ServerWorld world) {
-        this.phase2PushCooldown = 160; // 8 segundos de recarga para permitir ventanas de ataque cuerpo a cuerpo
-        this.globalAttackGapTicks = Math.max(this.globalAttackGapTicks, 35);
+        this.phase2PushCooldown = 220; // 11 segundos de recarga para dar más margen de ataque cuerpo a cuerpo
+        this.globalAttackGapTicks = Math.max(this.globalAttackGapTicks, 65);
         this.triggerAnim("actionController", "phase2_push");
 
         world.playSound(
@@ -496,11 +496,11 @@ public class JoseTorresEntity extends HostileEntity implements GeoEntity {
 
         if (ticks >= SPAWN_CINEMATIC_DURATION_TICKS) {
             this.dataTracker.set(SPAWN_CINEMATIC_TICKS, 0);
-            this.globalAttackGapTicks = 30;
-            this.iceBarrageCooldown = 40;
-            this.zombieAttackCooldown = 110;
-            this.giantIceBallCooldown = 240;
-            this.dialectoAttackCooldown = 480;
+            this.globalAttackGapTicks = 50;
+            this.iceBarrageCooldown = 60;
+            this.zombieAttackCooldown = 140;
+            this.giantIceBallCooldown = 300;
+            this.dialectoAttackCooldown = 560;
             releaseCinematicFrozenMobs(world);
         } else {
             this.dataTracker.set(SPAWN_CINEMATIC_TICKS, ticks + 1);
@@ -539,11 +539,9 @@ public class JoseTorresEntity extends HostileEntity implements GeoEntity {
         for (ServerPlayerEntity player : players) {
             player.networkHandler.sendPacket(new TitleFadeS2CPacket(10, 50, 15));
             player.networkHandler.sendPacket(new TitleS2CPacket(
-                    Text.literal("Jhoseph towers").formatted(Formatting.WHITE, Formatting.BOLD)
+                    Text.literal("Modo Jhosep Towers").formatted(Formatting.WHITE, Formatting.BOLD)
             ));
-            player.networkHandler.sendPacket(new SubtitleS2CPacket(
-                    Text.literal("¡Llegó la pizza!").formatted(Formatting.AQUA)
-            ));
+            player.networkHandler.sendPacket(new SubtitleS2CPacket(Text.empty()));
         }
     }
 
@@ -655,7 +653,7 @@ public class JoseTorresEntity extends HostileEntity implements GeoEntity {
             }
 
             if (this.activeSpecialTicks >= 76) {
-                finishSpecialAttack(70); // 3.5s de margen antes del siguiente ataque
+                finishSpecialAttack(130); // 6.5s de respiro después de invocar zombies
             }
         } else if (specialType == SPECIAL_DIALECTO) {
             // ATAQUE ESPECIAL 2: ATAQUE DE DIALECTO (220 ticks = 11.0s)
@@ -696,7 +694,7 @@ public class JoseTorresEntity extends HostileEntity implements GeoEntity {
         }
 
         if (this.activeSpecialTicks >= 40) {
-            finishSpecialAttack(60); // 3 segundos libres para que el jugador ataque
+            finishSpecialAttack(110); // 5.5 segundos libres después de la ráfaga para que el jugador ataque
         }
     }
 
@@ -756,24 +754,25 @@ public class JoseTorresEntity extends HostileEntity implements GeoEntity {
             double vy = Math.clamp((desiredY - this.getY()) * 0.22D, -0.35D, 0.42D);
             this.setVelocity(0.0D, vy, 0.0D);
 
-            // Efectos especiales crecientes en la Gran Bola de Hielo sobre su cabeza
-            double orbY = this.getY() + 2.8D;
-            double spread = 0.25D + (this.activeSpecialTicks / 225.0D) * 0.85D;
+            // Efectos especiales crecientes en la Gran Bola de Hielo (~3x3 bloques al final) sobre su cabeza
+            double chargeRatio = Math.min(1.0D, this.activeSpecialTicks / 225.0D);
+            double orbY = this.getY() + 2.6D + (chargeRatio * 1.9D);
+            double spread = 0.15D + (chargeRatio * 1.65D);
             if (this.activeSpecialTicks % 2 == 0) {
                 world.spawnParticles(
                         ParticleTypes.SNOWFLAKE,
                         this.getX(), orbY, this.getZ(),
-                        6, spread, spread, spread, 0.04D
+                        8, spread, spread, spread, 0.05D
                 );
                 world.spawnParticles(
                         BLUE_ICE_PARTICLE,
                         this.getX(), orbY, this.getZ(),
-                        4, spread * 0.8D, spread * 0.8D, spread * 0.8D, 0.06D
+                        6, spread * 0.85D, spread * 0.85D, spread * 0.85D, 0.07D
                 );
                 world.spawnParticles(
                         DIALECTO_CYAN_DUST,
                         this.getX(), orbY, this.getZ(),
-                        4, spread * 0.9D, spread * 0.9D, spread * 0.9D, 0.02D
+                        6, spread * 0.9D, spread * 0.9D, spread * 0.9D, 0.02D
                 );
             }
             if (this.activeSpecialTicks % 16 == 0) {
@@ -784,7 +783,7 @@ public class JoseTorresEntity extends HostileEntity implements GeoEntity {
                 );
             }
         } else if (this.activeSpecialTicks == 226) {
-            // ¡Termina el audio y lanza la Gran Bola de Hielo completamente cargada hacia el jugador más cercano!
+            // ¡Termina el audio y lanza la Gran Bola de Hielo (~3x3 bloques) hacia el jugador más cercano!
             this.setVelocity(0.0D, 0.0D, 0.0D);
             if (aimTarget != null) {
                 launchFullyChargedGiantIceBall(world, aimTarget);
@@ -798,14 +797,14 @@ public class JoseTorresEntity extends HostileEntity implements GeoEntity {
 
             if (this.activeSpecialTicks >= 236) {
                 this.setPosition(this.getX(), this.anchorGroundY, this.getZ());
-                finishSpecialAttack(85); // ~4.25 segundos de ventana para que el jugador se recupere y ataque
+                finishSpecialAttack(150); // 7.5 segundos de ventana después de "Una Bola de Hielo"
             }
         }
     }
 
     private void launchFullyChargedGiantIceBall(ServerWorld world, LivingEntity target) {
         double startX = this.getX();
-        double startY = this.getY() + 2.6D;
+        double startY = this.getY() + 3.8D;
         double startZ = this.getZ();
 
         world.playSound(
@@ -972,7 +971,7 @@ public class JoseTorresEntity extends HostileEntity implements GeoEntity {
             if (this.activeSpecialTicks >= 220) {
                 this.setPosition(this.getX(), this.anchorGroundY, this.getZ());
                 this.setVelocity(0.0D, 0.0D, 0.0D);
-                finishSpecialAttack(80); // 4 segundos libres tras aterrizar
+                finishSpecialAttack(140); // 7.0 segundos libres tras aterrizar del ataque de Dialecto
             }
         }
     }
@@ -1241,10 +1240,10 @@ public class JoseTorresEntity extends HostileEntity implements GeoEntity {
             for (ServerPlayerEntity player : nearbyPlayers) {
                 player.networkHandler.sendPacket(new TitleFadeS2CPacket(10, 70, 20));
                 player.networkHandler.sendPacket(new TitleS2CPacket(
-                        Text.literal("¡JHOSEPH TOWERS DERROTADO!").formatted(Formatting.AQUA, Formatting.BOLD)
+                        Text.literal("YiYi Ez").formatted(Formatting.AQUA, Formatting.BOLD)
                 ));
                 player.networkHandler.sendPacket(new SubtitleS2CPacket(
-                        Text.literal("¡El Sol sí era una Bola de Hielo!").formatted(Formatting.WHITE, Formatting.ITALIC)
+                        Text.literal("El Sol sí era una Bola de Hielo").formatted(Formatting.WHITE, Formatting.ITALIC)
                 ));
             }
 

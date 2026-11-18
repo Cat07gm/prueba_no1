@@ -265,6 +265,18 @@ public class ModItem {
                     .rarity(Rarity.RARE)
     );
 
+    //PERMISO PARA PORTAR ARMAS (Sello azul para invocar a Charlie Kirk en el Buzón de la Casa Blanca)
+    public static final RegistryKey<Item> GUN_PERMIT_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "gun_permit")
+    );
+    public static final Item GUN_PERMIT = new Item(
+            new Item.Settings()
+                    .registryKey(GUN_PERMIT_KEY)
+                    .maxCount(1)
+                    .rarity(Rarity.RARE)
+    );
+
     //ACORDEON DE JOSÉ TORRES (Drop de Jefri penstein al ser derrotado; sólo ítem, sirve para invocar a José Torres en el Cassete de Podcast)
     public static final RegistryKey<Item> JOSE_TORRES_ACCORDION_KEY = RegistryKey.of(
             RegistryKeys.ITEM,
@@ -409,6 +421,16 @@ public class ModItem {
             new Item.Settings().registryKey(TONY_FASE3_SPAWN_EGG_KEY)
     );
 
+    // HUEVO GENERADOR DE CHARLIE KIRK (Jefe de la Dungeon La Casa Blanca)
+    public static final RegistryKey<Item> CHARLIE_KIRK_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "charlie_kirk_spawn_egg")
+    );
+    public static final Item CHARLIE_KIRK_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.CHARLIE_KIRK,
+            new Item.Settings().registryKey(CHARLIE_KIRK_SPAWN_EGG_KEY)
+    );
+
     //TOALLA KOTEX (Proyectil tipo flecha de Jefri penstein y usable con Arco/Ballesta o lanzándola con la mano)
     public static final RegistryKey<Item> TOALLA_KOTEX_KEY = RegistryKey.of(
             RegistryKeys.ITEM,
@@ -466,6 +488,7 @@ public class ModItem {
 
         //Registrar Orden de Arresto y Huevos Generadores
         registerItem(ARREST_WARRANT_KEY, ARREST_WARRANT);
+        registerItem(GUN_PERMIT_KEY, GUN_PERMIT);
         registerItem(JOSE_TORRES_ACCORDION_KEY, JOSE_TORRES_ACCORDION);
         registerItem(TONY_COIN_KEY, TONY_COIN);
         registerItem(PI_DIDI_SPAWN_EGG_KEY, PI_DIDI_SPAWN_EGG);
@@ -480,6 +503,7 @@ public class ModItem {
         registerItem(TONY_FASE1_SPAWN_EGG_KEY, TONY_FASE1_SPAWN_EGG);
         registerItem(TONY_FASE2_SPAWN_EGG_KEY, TONY_FASE2_SPAWN_EGG);
         registerItem(TONY_FASE3_SPAWN_EGG_KEY, TONY_FASE3_SPAWN_EGG);
+        registerItem(CHARLIE_KIRK_SPAWN_EGG_KEY, CHARLIE_KIRK_SPAWN_EGG);
         registerItem(TOALLA_KOTEX_KEY, TOALLA_KOTEX);
         registerItem(ICE_BALL_KEY, ICE_BALL);
 
@@ -487,6 +511,7 @@ public class ModItem {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> {
             entries.add(SCARLET_INGOT);
             entries.add(ARREST_WARRANT);
+            entries.add(GUN_PERMIT);
             entries.add(JOSE_TORRES_ACCORDION);
             entries.add(TONY_COIN);
             entries.add(MARIJUANA);
@@ -501,6 +526,7 @@ public class ModItem {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(entries -> {
             entries.add(JEFRI_PENSTEIN_SPAWN_EGG);
             entries.add(JOSE_TORRES_SPAWN_EGG);
+            entries.add(CHARLIE_KIRK_SPAWN_EGG);
             entries.add(PI_DIDI_SPAWN_EGG);
             entries.add(YOSTIN_BIBER_SPAWN_EGG);
             entries.add(VITOR_JUGO_SPAWN_EGG);

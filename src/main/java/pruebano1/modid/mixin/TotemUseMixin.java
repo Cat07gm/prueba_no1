@@ -90,16 +90,16 @@ public abstract class TotemUseMixin extends Entity {
             String description;
             Formatting color;
             if (totemStack.isOf(ModItem.NAZITOTEM)) {
-                description = "¡" + playerName + " valió ñionga y consumió " + totemName + " bro...!";
+                description = playerName + " valió ñionga y consumió " + totemName + " bro...";
                 color = Formatting.RED;
             } else if (totemStack.isOf(ModItem.ISRATOTEM)) {
-                description = "¡" + playerName + " valió cola y consumió " + totemName + " hermano...!";
+                description = playerName + " valió cola y consumió " + totemName + " hermano...";
                 color = Formatting.AQUA;
             } else if (totemStack.isOf(ModItem.LONTOTEM)) {
-                description = "¡" + playerName + " valió cagad* y consumió " + totemName + " realmente...!";
+                description = playerName + " valió cagad* y consumió " + totemName + " realmente...";
                 color = Formatting.LIGHT_PURPLE;
             } else {
-                description = "¡" + playerName + " casí muere y consumió " + totemName + " uwu!";
+                description = playerName + " casí muere y consumió " + totemName + " uwu";
                 color = Formatting.GOLD;
             }
 

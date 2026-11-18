@@ -737,7 +737,7 @@ public final class DrafteaCasinoPiece {
 
         // Letrero oficial luminoso sobre las puertas
         placeWallSign(world, chunkBox, centerX, baseY, centerZ, 0, 5, BLDG_MAX_Z + 1, Direction.SOUTH,
-                DyeColor.WHITE, "§d★ DRAFTEA ★", "§f§lTONY DIAZ", "§aZona Segura", "§e¡Bienvenidos!");
+                DyeColor.WHITE, "§d★ DRAFTEA ★", "§f§lTONY DIAZ", "§aZona Segura", "§eBienvenidos");
     }
 
     /**
@@ -1004,7 +1004,7 @@ public final class DrafteaCasinoPiece {
         setRel(world, chunkBox, centerX, baseY, centerZ, -33, 1, 20, Blocks.POTTED_AZALEA_BUSH.getDefaultState());
 
         placeWallSign(world, chunkBox, centerX, baseY, centerZ, -26, 4, 15, Direction.NORTH,
-                DyeColor.YELLOW, "§6§lCAJA CENTRAL", "§dFichas Draftea", "§fTony Coin = Premio", "§a¡Mucha Suerte!");
+                DyeColor.YELLOW, "§6§lCAJA CENTRAL", "§dFichas Draftea", "§fTony Coin = Premio", "§aMucha Suerte");
     }
 
     private static void buildLobbyLoungeAndShowcases(

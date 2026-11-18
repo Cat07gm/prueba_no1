@@ -65,18 +65,63 @@ public class ModStructures {
             Identifier.of(Prueba_no1.MOD_ID, "lobby_tower_feature_placed")
     );
 
-    public static final Feature<DefaultFeatureConfig> PODCAST_STAGE_FEATURE = Registry.register(
-            Registries.FEATURE,
-            Identifier.of(Prueba_no1.MOD_ID, "podcast_stage_feature"),
-            new PodcastStageFeature(DefaultFeatureConfig.CODEC)
+    public static final RegistryKey<Structure> CASA_JOSE_TORRES_KEY = RegistryKey.of(
+            RegistryKeys.STRUCTURE,
+            Identifier.of(Prueba_no1.MOD_ID, "casa_jose_torres")
     );
 
-    public static final RegistryKey<PlacedFeature> PODCAST_STAGE_PLACED_KEY = RegistryKey.of(
+    public static final StructurePieceType CASA_JOSE_TORRES_PIECE = Registry.register(
+            Registries.STRUCTURE_PIECE,
+            Identifier.of(Prueba_no1.MOD_ID, "casa_jose_torres_piece"),
+            CasaJoseTorresPiece::new
+    );
+
+    public static final StructureType<CasaJoseTorresStructure> CASA_JOSE_TORRES_TYPE = Registry.register(
+            Registries.STRUCTURE_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "casa_jose_torres"),
+            () -> CasaJoseTorresStructure.CODEC
+    );
+
+    public static final Feature<DefaultFeatureConfig> CASA_JOSE_TORRES_FEATURE = Registry.register(
+            Registries.FEATURE,
+            Identifier.of(Prueba_no1.MOD_ID, "casa_jose_torres_feature"),
+            new CasaJoseTorresFeature(DefaultFeatureConfig.CODEC)
+    );
+
+    public static final RegistryKey<PlacedFeature> CASA_JOSE_TORRES_PLACED_KEY = RegistryKey.of(
             RegistryKeys.PLACED_FEATURE,
-            Identifier.of(Prueba_no1.MOD_ID, "podcast_stage_feature_placed")
+            Identifier.of(Prueba_no1.MOD_ID, "casa_jose_torres_feature_placed")
+    );
+
+    public static final RegistryKey<Structure> CASA_BLANCA_KEY = RegistryKey.of(
+            RegistryKeys.STRUCTURE,
+            Identifier.of(Prueba_no1.MOD_ID, "casa_blanca")
+    );
+
+    public static final StructurePieceType CASA_BLANCA_PIECE = Registry.register(
+            Registries.STRUCTURE_PIECE,
+            Identifier.of(Prueba_no1.MOD_ID, "casa_blanca_piece"),
+            CasaBlancaPiece::new
+    );
+
+    public static final StructureType<CasaBlancaStructure> CASA_BLANCA_TYPE = Registry.register(
+            Registries.STRUCTURE_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "casa_blanca"),
+            () -> CasaBlancaStructure.CODEC
+    );
+
+    public static final Feature<DefaultFeatureConfig> CASA_BLANCA_FEATURE = Registry.register(
+            Registries.FEATURE,
+            Identifier.of(Prueba_no1.MOD_ID, "casa_blanca_feature"),
+            new CasaBlancaFeature(DefaultFeatureConfig.CODEC)
+    );
+
+    public static final RegistryKey<PlacedFeature> CASA_BLANCA_PLACED_KEY = RegistryKey.of(
+            RegistryKeys.PLACED_FEATURE,
+            Identifier.of(Prueba_no1.MOD_ID, "casa_blanca_feature_placed")
     );
 
     public static void registerModStructures() {
-        Prueba_no1.LOGGER.info("Registrando Isla Penstein, Casino 'Draftea Tony Diaz' y Escenario del Podcast para " + Prueba_no1.MOD_ID);
+        Prueba_no1.LOGGER.info("Registrando Isla Penstein, Casino 'Draftea Tony Diaz', La Casa de José Torres y La Casa Blanca para " + Prueba_no1.MOD_ID);
     }
 }

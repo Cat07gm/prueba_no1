@@ -62,11 +62,18 @@ public class ModWorldGeneration {
                 ModStructures.LOBBY_TOWER_PLACED_KEY
         );
 
-        // Escenario del Podcast (Altar de José Torres con el Cassete de Podcast en el centro)
+        // Segunda Gran Dungeon única en biomas de nieve: "La Casa de José Torres" (420x420 bloques)
         BiomeModifications.addFeature(
                 BiomeSelectors.foundInOverworld(),
                 GenerationStep.Feature.SURFACE_STRUCTURES,
-                ModStructures.PODCAST_STAGE_PLACED_KEY
+                ModStructures.CASA_JOSE_TORRES_PLACED_KEY
+        );
+
+        // Tercera Gran Dungeon única: "La Casa Blanca" (448x448 bloques)
+        BiomeModifications.addFeature(
+                BiomeSelectors.foundInOverworld(),
+                GenerationStep.Feature.SURFACE_STRUCTURES,
+                ModStructures.CASA_BLANCA_PLACED_KEY
         );
 
         // Permitir que los 4 niños spawneen en toda el área de 520x520 de la Isla Penstein

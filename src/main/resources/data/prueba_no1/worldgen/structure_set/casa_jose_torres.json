@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "prueba_no1:casa_jose_torres",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 320,
+    "separation": 120,
+    "salt": 847291635
+  }
+}

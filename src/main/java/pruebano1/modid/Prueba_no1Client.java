@@ -22,6 +22,10 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import pruebano1.modid.client.BananaProjectileRenderer;
+import pruebano1.modid.client.CharlieKirkBossMusicInstance;
+import pruebano1.modid.client.CharlieKirkCinematicController;
+import pruebano1.modid.client.CharlieKirkRenderer;
+import pruebano1.modid.client.CharlieWeaponParticle;
 import pruebano1.modid.client.DrafteaBlockEntityRenderer;
 import pruebano1.modid.client.EncapsulatedVirusParticle;
 import pruebano1.modid.client.encyclopedia.EncyclopediaScreen;
@@ -44,6 +48,7 @@ import pruebano1.modid.client.ValentinaPrietaRenderer;
 import pruebano1.modid.client.VitorJugoRenderer;
 import pruebano1.modid.client.WeedLeafParticle;
 import pruebano1.modid.client.YostinBiberRenderer;
+import pruebano1.modid.entity.CharlieKirkEntity;
 import pruebano1.modid.entity.JefriPensteinEntity;
 import pruebano1.modid.entity.JoseTorresEntity;
 import pruebano1.modid.entity.ModEntities;
@@ -58,10 +63,14 @@ public class Prueba_no1Client implements ClientModInitializer {
     private static JefriBossMusicInstance activeJefriMusic = null;
     private static JoseTorresBossMusicInstance activeJoseTorresMusic = null;
     private static JoseTorresVoiceSoundInstance activeJoseTorresVoice = null;
+    private static CharlieKirkBossMusicInstance activeCharlieKirkMusic = null;
+    private static int lastCharlieMusicEntityId = -1;
+    private static boolean charlieIntroFinished = false;
     private static int lastJoseEntityId = -1;
     private static int lastJoseVoiceSeq = 0;
     private static int activeTiktokCinematicTick = 0;
     private static int activeJoseTorresCinematicTick = 0;
+    private static int activeCharlieKirkCinematicTick = 0;
     private static boolean activeDeathCageCinematic = false;
     private static boolean wasInJefriCinematic = false;
     private static boolean savedHudHidden = false;
@@ -97,6 +106,7 @@ public class Prueba_no1Client implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.TONY_FASE1, TonyFase1Renderer::new);
         EntityRendererRegistry.register(ModEntities.TONY_FASE2, TonyFase2Renderer::new);
         EntityRendererRegistry.register(ModEntities.TONY_FASE3, TonyFase3Renderer::new);
+        EntityRendererRegistry.register(ModEntities.CHARLIE_KIRK, CharlieKirkRenderer::new);
 
         // Pantalla de la Draftea: dibuja los ítems de los rodillos
         BlockEntityRendererFactories.register(ModBlockEntities.DRAFTEA, DrafteaBlockEntityRenderer::new);
@@ -106,6 +116,7 @@ public class Prueba_no1Client implements ClientModInitializer {
         ParticleFactoryRegistry.getInstance().register(ModParticles.HELLO_KITTY, HelloKittyParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(ModParticles.WEED_LEAF, WeedLeafParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(ModParticles.ENCAPSULATED_VIRUS, EncapsulatedVirusParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(ModParticles.CHARLIE_WEAPON, CharlieWeaponParticle.Factory::new);
 
         // Recibir aviso cuando cualquier jugador muere para activar el sonido y el GIF/efecto K.O. en pantalla
         ClientPlayNetworking.registerGlobalReceiver(PlayerDeathKoPayload.ID, (payload, context) -> {
@@ -139,6 +150,9 @@ public class Prueba_no1Client implements ClientModInitializer {
         net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register((handler, client) ->
                 pruebano1.modid.world.DrafteaCasinoManager.clearClientBounds()
         );
+        net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register((handler, client) ->
+                client.execute(() -> CharlieKirkCinematicController.reset(client))
+        );
 
         net.fabricmc.fabric.api.event.player.AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
             if (world.isClient() && pruebano1.modid.world.DrafteaCasinoProtection.shouldCancelBlockAttack(world, player, pos)) {
@@ -156,10 +170,11 @@ public class Prueba_no1Client implements ClientModInitializer {
 
         // Dibujar el efecto K.O. y los destellos/barras de cinemática estilo Edit de TikTok de Jefri penstein
         HudRenderCallback.EVENT.register((drawContext, tickCounter) -> {
+            float tickDelta = tickCounter.getTickDelta(false);
             if (PlayerDeathKoOverlay.isActive()) {
-                PlayerDeathKoOverlay.render(drawContext, tickCounter.getTickDelta(false));
+                PlayerDeathKoOverlay.render(drawContext, tickDelta);
             }
-            if (activeTiktokCinematicTick > 0 || activeDeathCageCinematic || activeJoseTorresCinematicTick > 0) {
+            if (activeTiktokCinematicTick > 0 || activeDeathCageCinematic || activeJoseTorresCinematicTick > 0 || activeCharlieKirkCinematicTick > 0) {
                 int w = drawContext.getScaledWindowWidth();
                 int h = drawContext.getScaledWindowHeight();
                 int barHeight = Math.max(16, h / 10);
@@ -171,6 +186,13 @@ public class Prueba_no1Client implements ClientModInitializer {
                 if (activeTiktokCinematicTick == 70 || (activeTiktokCinematicTick > 70 && activeTiktokCinematicTick % 9 == 0)) {
                     drawContext.fill(0, 0, w, h, 0x35FFFFFF);
                 }
+            }
+            float charlieBlackoutAlpha = CharlieKirkCinematicController.getBlackoutAlpha(tickDelta);
+            if (charlieBlackoutAlpha > 0.001F) {
+                int w = drawContext.getScaledWindowWidth();
+                int h = drawContext.getScaledWindowHeight();
+                int alpha = MathHelper.clamp((int) (charlieBlackoutAlpha * 255.0F), 0, 255);
+                drawContext.fill(0, 0, w, h, alpha << 24);
             }
         });
 
@@ -190,13 +212,18 @@ public class Prueba_no1Client implements ClientModInitializer {
             PlayerDeathKoOverlay.tick();
             activeTiktokCinematicTick = 0;
             activeJoseTorresCinematicTick = 0;
+            activeCharlieKirkCinematicTick = 0;
             activeDeathCageCinematic = false;
 
             if (client.world == null || client.player == null || !client.player.isAlive()) {
+                CharlieKirkCinematicController.reset(client);
                 restorePlayerViewAfterCinematic(client);
                 activeBossMusic = null;
                 activeJefriMusic = null;
                 activeJoseTorresMusic = null;
+                activeCharlieKirkMusic = null;
+                lastCharlieMusicEntityId = -1;
+                charlieIntroFinished = false;
                 return;
             }
 
@@ -205,6 +232,82 @@ public class Prueba_no1Client implements ClientModInitializer {
                     if (client.currentScreen == null) {
                         client.setScreen(new EncyclopediaScreen());
                     }
+                }
+            }
+
+            Box charlieSearchBox = client.player.getBoundingBox().expand(280.0D);
+            List<CharlieKirkEntity> nearbyCharlies = client.world.getEntitiesByClass(
+                    CharlieKirkEntity.class,
+                    charlieSearchBox,
+                    CharlieKirkEntity::isAlive
+            );
+
+            if (!nearbyCharlies.isEmpty()) {
+                CharlieKirkEntity charlie = nearbyCharlies.get(0);
+                if (charlie.getId() != lastCharlieMusicEntityId) {
+                    lastCharlieMusicEntityId = charlie.getId();
+                    charlieIntroFinished = false;
+                    if (activeCharlieKirkMusic != null) {
+                        client.getSoundManager().stop(activeCharlieKirkMusic);
+                        activeCharlieKirkMusic = null;
+                    }
+                }
+
+                if (charlie.shouldPlayBossMusic()) {
+                    boolean musicStoppedOrDone = activeCharlieKirkMusic == null
+                            || activeCharlieKirkMusic.isDone()
+                            || (activeCharlieKirkMusic.getTicksPlayed() >= 5 && !client.getSoundManager().isPlaying(activeCharlieKirkMusic));
+                    if (musicStoppedOrDone) {
+                        if (activeCharlieKirkMusic != null
+                                && !activeCharlieKirkMusic.isLoopTrack()
+                                && (activeCharlieKirkMusic.isDone() || activeCharlieKirkMusic.hasStartedPlaying() || activeCharlieKirkMusic.getTicksPlayed() >= 4490)) {
+                            charlieIntroFinished = true;
+                        }
+                        if (activeCharlieKirkMusic != null) {
+                            client.getSoundManager().stop(activeCharlieKirkMusic);
+                        }
+                        activeCharlieKirkMusic = new CharlieKirkBossMusicInstance(charlie, charlieIntroFinished);
+                        client.getSoundManager().play(activeCharlieKirkMusic);
+                    }
+                } else if (activeCharlieKirkMusic != null) {
+                    client.getSoundManager().stop(activeCharlieKirkMusic);
+                    activeCharlieKirkMusic = null;
+                    charlieIntroFinished = false;
+                }
+
+                if (charlie.isInSpawnCinematic()) {
+                    enforceCinematicView(client);
+                    activeCharlieKirkCinematicTick = charlie.getSpawnCinematicTicks();
+                    CharlieKirkCinematicController.update(client, charlie);
+                    client.player.setVelocity(Vec3d.ZERO);
+                    if (client.options != null) {
+                        client.options.forwardKey.setPressed(false);
+                        client.options.backKey.setPressed(false);
+                        client.options.leftKey.setPressed(false);
+                        client.options.rightKey.setPressed(false);
+                        client.options.jumpKey.setPressed(false);
+                        client.options.sprintKey.setPressed(false);
+                    }
+                    if (activeCharlieKirkCinematicTick >= CharlieKirkEntity.TELEPORT_PLAYERS_TICK) {
+                        focusCameraOnEntity(client, charlie, 1.35D);
+                    }
+                } else if (charlie.isDyingCinematic()) {
+                    CharlieKirkCinematicController.reset(client);
+                    enforceCinematicView(client);
+                    activeCharlieKirkCinematicTick = 1;
+                    focusCameraOnEntity(client, charlie, 1.35D);
+                } else {
+                    CharlieKirkCinematicController.reset(client);
+                    restorePlayerViewAfterCinematic(client);
+                }
+                return;
+            } else {
+                CharlieKirkCinematicController.reset(client);
+                lastCharlieMusicEntityId = -1;
+                charlieIntroFinished = false;
+                if (activeCharlieKirkMusic != null) {
+                    client.getSoundManager().stop(activeCharlieKirkMusic);
+                    activeCharlieKirkMusic = null;
                 }
             }
 

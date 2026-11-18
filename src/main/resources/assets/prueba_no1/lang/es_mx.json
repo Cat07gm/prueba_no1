@@ -49,7 +49,7 @@
   "subtitles.prueba_no1.draftea_spin": "La Draftea gira",
   "subtitles.prueba_no1.draftea_win": "La Draftea paga",
   "category.prueba_no1.lon_terry": "Lon Terry",
-  "key.prueba_no1.encyclopedia": "Abrir Enciclopedia del Mod",
+  "key.prueba_no1.encyclopedia": "Abrir Enciclopedia",
   "block.prueba_no1.casino_light": "Luz de Casino",
   "item.prueba_no1.casino_light": "Luz de Casino",
   "block.prueba_no1.draftea_light": "Luz Draftea",
@@ -98,5 +98,13 @@
   "entity.prueba_no1.jose_torres": "José Torres",
   "entity.prueba_no1.jhoseph_towers": "Jhoseph towers",
   "item.prueba_no1.ice_ball": "Bola de Hielo",
-  "entity.prueba_no1.ice_ball_projectile": "Bola de Hielo"
+  "entity.prueba_no1.ice_ball_projectile": "Bola de Hielo",
+  "item.prueba_no1.gun_permit": "Permiso para portar armas",
+  "block.prueba_no1.white_house_mailbox": "Buzón de la Casa Blanca",
+  "item.prueba_no1.white_house_mailbox": "Buzón de la Casa Blanca",
+  "item.prueba_no1.charlie_kirk_spawn_egg": "Generar Charlie Kirk",
+  "entity.prueba_no1.charlie_kirk": "Charlie Kirk",
+  "modmenu.prueba_no1.instagram": "Instagram",
+  "modmenu.prueba_no1.canal_lon_terry": "Canal Lon Terry (WhatsApp)",
+  "modmenu.prueba_no1.canal_milofans": "Canal Milofans (WhatsApp)"
 }

@@ -14,7 +14,7 @@ public class IceBallProjectileRenderer extends FlyingItemEntityRenderer<IceBallP
     }
 
     public static IceBallProjectileRenderer createGiant(EntityRendererFactory.Context context) {
-        return new IceBallProjectileRenderer(context, 3.6F, true);
+        return new IceBallProjectileRenderer(context, 6.0F, true);
     }
 
     private IceBallProjectileRenderer(EntityRendererFactory.Context context, float scale, boolean lit) {

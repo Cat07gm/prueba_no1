@@ -14,7 +14,8 @@
 		"SplashOverlayMixin",
 		"RotatingCubeMapRendererMixin",
 		"LogoDrawerMixin",
-		"ScreenBackgroundMixin"
+		"ScreenBackgroundMixin",
+		"CharlieCinematicCameraMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

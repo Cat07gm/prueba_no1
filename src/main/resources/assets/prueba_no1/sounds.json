@@ -233,5 +233,21 @@
         "stream": false
       }
     ]
+  },
+  "charlie_kirk_boss_music": {
+    "sounds": [
+      {
+        "name": "prueba_no1:charlie_kirk_boss_music",
+        "stream": true
+      }
+    ]
+  },
+  "charlie_kirk_boss_music_loop": {
+    "sounds": [
+      {
+        "name": "prueba_no1:charlie_kirk_boss_music_loop",
+        "stream": true
+      }
+    ]
   }
 }

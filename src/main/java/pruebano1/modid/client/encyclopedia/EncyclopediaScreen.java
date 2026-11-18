@@ -1,6 +1,7 @@
 package pruebano1.modid.client.encyclopedia;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ConfirmLinkScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -126,6 +127,16 @@ public class EncyclopediaScreen extends Screen {
     private List<Text> pendingTooltipLines = null;
 
     private final List<HitTarget> detailTargets = new ArrayList<>();
+    private final List<HitTarget> socialTargets = new ArrayList<>();
+
+    private record SocialLink(String label, String url, int accentColor) {
+    }
+
+    private static final List<SocialLink> SOCIAL_LINKS = List.of(
+            new SocialLink("Instagram", "https://www.instagram.com/milokgms?srtk=MXNlOHRmMjlqNWltaA==", 0xFFE1306C),
+            new SocialLink("Canal Lon Terry", "https://whatsapp.com/channel/0029Vaz9S5VIiRowWW7Zwy2b", 0xFF25D366),
+            new SocialLink("Canal Milofans", "https://whatsapp.com/channel/0029Vb7yf8e8fewuDpPhlO1b", 0xFF25D366)
+    );
 
     private record HitTarget(
             int x, int y, int w, int h,
@@ -382,7 +393,7 @@ public class EncyclopediaScreen extends Screen {
         int brandW = this.textRenderer.getWidth(brandText);
         String topSub = selectedCategory == EncyclopediaCategory.STRUCTURES
                 ? "· Apartado de Estructuras"
-                : "· Enciclopedia del Mod";
+                : "· Enciclopedia";
         context.drawText(this.textRenderer, topSub, brandX + brandW + 6, winY + 9, TEXT_MUTED, false);
 
         int mainTotal = EncyclopediaRegistry.filter(EncyclopediaCategory.ALL, "").size();
@@ -405,17 +416,47 @@ public class EncyclopediaScreen extends Screen {
         context.fill(winX + 1, barY, winX + winW - 1, winY + winH - 1, 0xFF101622);
         context.fill(winX + 1, barY, winX + winW - 1, barY + 1, BORDER_SUBTLE);
 
+        this.socialTargets.clear();
+        int rightCursor = winX + winW - 8;
+        if (winW > 420) {
+            for (int i = SOCIAL_LINKS.size() - 1; i >= 0; i--) {
+                SocialLink link = SOCIAL_LINKS.get(i);
+                int btnW = this.textRenderer.getWidth(link.label()) + 10;
+                int btnH = 12;
+                int btnX = rightCursor - btnW;
+                int btnY = barY + 3;
+                boolean hovered = isOver(this.currentMouseX, this.currentMouseY, btnX, btnY, btnW, btnH);
+                int bg = hovered ? 0xFF263752 : 0xFF182336;
+                int border = hovered ? link.accentColor() : BORDER_SUBTLE;
+                context.fill(btnX, btnY, btnX + btnW, btnY + btnH, bg);
+                context.drawBorder(btnX, btnY, btnW, btnH, border);
+                context.drawText(this.textRenderer, link.label(), btnX + 5, btnY + 2, hovered ? 0xFFFFFFFF : link.accentColor(), false);
+                this.socialTargets.add(new HitTarget(
+                        btnX, btnY, btnW, btnH,
+                        () -> ConfirmLinkScreen.open(this, link.url()),
+                        null,
+                        List.of(Text.literal(link.label()).formatted(Formatting.BOLD), Text.literal("Clic para abrir enlace").formatted(Formatting.GRAY))
+                ));
+                if (hovered) {
+                    this.pendingTooltipLines = List.of(
+                            Text.literal(link.label()).formatted(Formatting.BOLD),
+                            Text.literal("Clic para abrir en el navegador").formatted(Formatting.AQUA)
+                    );
+                }
+                rightCursor = btnX - 4;
+            }
+        }
+
         StringBuilder hints = new StringBuilder("[G] Abrir/Cerrar   [↑↓←→] Navegar   [ESC] Cerrar");
         if (selectedEntry != null && selectedEntry.isEntityEntry()) {
             hints.append("   [Arrastrar] Rotar 3D");
         }
-        context.drawText(this.textRenderer, hints.toString(), winX + 10, barY + 5, TEXT_MUTED, false);
-
-        String rightLabel = "Mod Lon Terry · Fabric 1.21.4";
-        int rw = this.textRenderer.getWidth(rightLabel);
-        if (winW > 420) {
-            context.drawText(this.textRenderer, rightLabel, winX + winW - rw - 10, barY + 5, TEXT_MUTED, false);
+        String hintStr = hints.toString();
+        int maxHintW = Math.max(80, rightCursor - (winX + 16));
+        if (this.textRenderer.getWidth(hintStr) > maxHintW) {
+            hintStr = "[G] Cerrar  [↑↓←→] Navegar";
         }
+        context.drawText(this.textRenderer, hintStr, winX + 10, barY + 5, TEXT_MUTED, false);
     }
 
     private void renderSidebar(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -887,13 +928,18 @@ public class EncyclopediaScreen extends Screen {
         );
 
         if (preview != null && preview.supportsDevilMode()) {
-            String devilLabel = jefriDevilModePreview ? "Modo Diablo: ON" : "Modo Diablo: OFF";
+            boolean isJose = "entity_jose_torres".equals(entry.getId());
+            String phaseName = isJose ? "Jhospeh Towers" : "Modo Diablo";
+            String devilLabel = phaseName + (jefriDevilModePreview ? ": ON" : ": OFF");
             int dw = this.textRenderer.getWidth(devilLabel) + 12;
+            int activeBg = isJose ? 0xFF1E3A5F : 0xFF4D1720;
+            int activeBorder = isJose ? 0xFF70D6FF : ACCENT_CRIMSON_BRIGHT;
+            int activeText = isJose ? 0xFFFFFFFF : 0xFFFF8888;
             drawActionPill(
                     context, x + width - dw - 6, btnY, devilLabel,
-                    jefriDevilModePreview ? 0xFF4D1720 : 0xFF1A2538,
-                    jefriDevilModePreview ? ACCENT_CRIMSON_BRIGHT : BORDER_SUBTLE,
-                    jefriDevilModePreview ? 0xFFFF8888 : TEXT_MUTED,
+                    jefriDevilModePreview ? activeBg : 0xFF1A2538,
+                    jefriDevilModePreview ? activeBorder : BORDER_SUBTLE,
+                    jefriDevilModePreview ? activeText : TEXT_MUTED,
                     () -> this.jefriDevilModePreview = !this.jefriDevilModePreview,
                     mouseX, mouseY, viewTop, viewBottom
             );
@@ -1362,6 +1408,14 @@ public class EncyclopediaScreen extends Screen {
                     selectEntry(filteredEntries.get(i), true);
                     return true;
                 }
+            }
+        }
+
+        for (int i = socialTargets.size() - 1; i >= 0; i--) {
+            HitTarget target = socialTargets.get(i);
+            if (target.onClick() != null && target.contains(mouseX, mouseY)) {
+                target.onClick().run();
+                return true;
             }
         }
 

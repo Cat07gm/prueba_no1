@@ -27,6 +27,7 @@ import net.minecraft.world.World;
 import pruebano1.modid.ModItem;
 import pruebano1.modid.entity.JefriPensteinEntity;
 import pruebano1.modid.entity.ModEntities;
+import pruebano1.modid.world.IslaPensteinStructure;
 
 import java.util.List;
 
@@ -109,6 +110,18 @@ public class JefriMailboxBlock extends HorizontalFacingBlock {
                 return ActionResult.SUCCESS;
             }
 
+            if (!BossSummonHelper.ensureAllPlayersPresent(
+                    serverWorld,
+                    pos,
+                    player,
+                    "Buzón de Jefri penstein",
+                    "Jefri penstein",
+                    120.0D,
+                    p -> IslaPensteinStructure.isPosOnIsland(serverWorld, p)
+            )) {
+                return ActionResult.SUCCESS;
+            }
+
             if (!player.isCreative()) {
                 if (held.isOf(ModItem.ARREST_WARRANT)) {
                     held.decrement(1);
@@ -125,6 +138,10 @@ public class JefriMailboxBlock extends HorizontalFacingBlock {
                 boss.refreshPositionAndAngles(spawnX, spawnY + 14.0D, spawnZ, player.getYaw() + 180.0F, 0.0F);
                 boss.startSpawnCinematic(serverWorld, spawnX, spawnY, spawnZ);
                 serverWorld.spawnEntity(boss);
+
+                Text encounterMsg = Text.literal(player.getName().getString() + " se acaba de topar con " + boss.getName().getString())
+                        .formatted(Formatting.GOLD, Formatting.BOLD);
+                serverWorld.getServer().getPlayerManager().broadcast(encounterMsg, false);
             }
         }
         return ActionResult.SUCCESS;

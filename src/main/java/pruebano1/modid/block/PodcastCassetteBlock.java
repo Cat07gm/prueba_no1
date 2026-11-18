@@ -26,6 +26,7 @@ import net.minecraft.world.World;
 import pruebano1.modid.ModItem;
 import pruebano1.modid.entity.JoseTorresEntity;
 import pruebano1.modid.entity.ModEntities;
+import pruebano1.modid.world.CasaJoseTorresStructure;
 
 import java.util.List;
 
@@ -102,6 +103,18 @@ public class PodcastCassetteBlock extends HorizontalFacingBlock {
                 return ActionResult.SUCCESS;
             }
 
+            if (!BossSummonHelper.ensureAllPlayersPresent(
+                    serverWorld,
+                    pos,
+                    player,
+                    "Cassete de Podcast",
+                    "José Torres",
+                    120.0D,
+                    p -> CasaJoseTorresStructure.isPosInCasaJoseTorres(serverWorld, p)
+            )) {
+                return ActionResult.SUCCESS;
+            }
+
             if (!player.isCreative()) {
                 if (held.isOf(ModItem.JOSE_TORRES_ACCORDION)) {
                     held.decrement(1);
@@ -118,6 +131,10 @@ public class PodcastCassetteBlock extends HorizontalFacingBlock {
                 boss.refreshPositionAndAngles(spawnX, spawnY, spawnZ, player.getYaw() + 180.0F, 0.0F);
                 boss.startSpawnCinematic(serverWorld, spawnX, spawnY, spawnZ);
                 serverWorld.spawnEntity(boss);
+
+                Text encounterMsg = Text.literal(player.getName().getString() + " se acaba de topar con " + boss.getName().getString())
+                        .formatted(Formatting.GOLD, Formatting.BOLD);
+                serverWorld.getServer().getPlayerManager().broadcast(encounterMsg, false);
             }
         }
         return ActionResult.SUCCESS;

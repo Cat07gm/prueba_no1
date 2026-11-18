@@ -238,6 +238,20 @@ public class ModEntities {
                     .build(TONY_FASE3_KEY)
     );
 
+    public static final RegistryKey<EntityType<?>> CHARLIE_KIRK_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "charlie_kirk")
+    );
+
+    public static final EntityType<CharlieKirkEntity> CHARLIE_KIRK = Registry.register(
+            Registries.ENTITY_TYPE,
+            CHARLIE_KIRK_KEY,
+            EntityType.Builder.create(CharlieKirkEntity::new, SpawnGroup.MONSTER)
+                    .dimensions(0.8F, 2.2F)
+                    .maxTrackingRange(200)
+                    .build(CHARLIE_KIRK_KEY)
+    );
+
     public static void registerModEntities() {
         Prueba_no1.LOGGER.info("Registrando entidades para " + Prueba_no1.MOD_ID);
         FabricDefaultAttributeRegistry.register(PI_DIDI, PiDidiEntity.createPiDidiAttributes());
@@ -250,6 +264,7 @@ public class ModEntities {
         FabricDefaultAttributeRegistry.register(TONY_FASE1, TonyFase1Entity.createTonyFase1Attributes());
         FabricDefaultAttributeRegistry.register(TONY_FASE2, TonyFase2Entity.createTonyFase2Attributes());
         FabricDefaultAttributeRegistry.register(TONY_FASE3, TonyFase3Entity.createTonyFase3Attributes());
+        FabricDefaultAttributeRegistry.register(CHARLIE_KIRK, CharlieKirkEntity.createCharlieKirkAttributes());
 
         // Permitir spawneo natural de los 4 niños en la Isla Penstein tanto de día como de noche,
         // manteniendo un límite local (máximo 12 niños en un radio de 28 bloques) para que sea abundante pero controlable para 2 jugadores full diamante.

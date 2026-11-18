@@ -53,7 +53,9 @@ public class ModItemGroups {
                 // 6. Ítems, Bloques y Drops de la Dungeon (Isla Penstein) y Bosses
                 entries.add(ModBlocks.JEFRI_MAILBOX);
                 entries.add(ModBlocks.PODCAST_CASSETTE);
+                entries.add(ModBlocks.WHITE_HOUSE_MAILBOX);
                 entries.add(ModItem.ARREST_WARRANT);
+                entries.add(ModItem.GUN_PERMIT);
                 entries.add(ModItem.JOSE_TORRES_ACCORDION);
                 entries.add(ModItem.TOALLA_KOTEX);
                 entries.add(ModItem.ICE_BALL);
@@ -77,6 +79,7 @@ public class ModItemGroups {
                 // 8. Huevos Generadores (Jefes y Familia de Niños)
                 entries.add(ModItem.JEFRI_PENSTEIN_SPAWN_EGG);
                 entries.add(ModItem.JOSE_TORRES_SPAWN_EGG);
+                entries.add(ModItem.CHARLIE_KIRK_SPAWN_EGG);
                 entries.add(ModItem.PI_DIDI_SPAWN_EGG);
                 entries.add(ModItem.YOSTIN_BIBER_SPAWN_EGG);
                 entries.add(ModItem.VITOR_JUGO_SPAWN_EGG);

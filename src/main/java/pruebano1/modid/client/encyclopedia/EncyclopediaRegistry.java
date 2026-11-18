@@ -107,10 +107,10 @@ public final class EncyclopediaRegistry {
                 .type("Material / Lingote")
                 .category(EncyclopediaCategory.RESOURCES)
                 .icon(ModItem.SCARLET_INGOT)
-                .description("Lingote carmesí forjado al fundir Mena de Escarlata. Es el material principal para fabricar armas, herramientas, armaduras, brazaletes y las alas Scarty.")
+                .description("Lingote de escarlata. Es el material principal para fabricar armas, herramientas, armaduras, brazaletes y las alas Scarty.")
                 .stats(
-                        new StatInfo("Calidad", "Superior al Diamante", EncyclopediaEntry.GOLD_STAT_COLOR),
-                        new StatInfo("Usos principales", "Armas, Armadura y Alas")
+                        new StatInfo("Calidad", "ligeramente superior al Diamante", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new StatInfo("Usos principales", "Armas, Armadura, Alas y objetos especiales")
                 )
                 .obtaining(
                         ObtainingMethod.smelting(
@@ -139,7 +139,7 @@ public final class EncyclopediaRegistry {
                 .type("Mineral Subterráneo")
                 .category(EncyclopediaCategory.RESOURCES, EncyclopediaCategory.BLOCKS)
                 .icon(ModBlocks.SCARLET_ORE)
-                .description("Mineral rojizo poco común escondido bajo tierra. Al picarlo obtienes el bloque para fundirlo en un Horno o Alto Horno.")
+                .description("Mineral poco común escondido bajo tierra. Al picarlo obtienes el bloque para fundirlo en un Horno o Alto Horno.")
                 .stats(
                         new StatInfo("Altura recomendada", "Nivel 0 a 16", EncyclopediaEntry.CYAN_STAT_COLOR),
                         new StatInfo("Herramienta mínima", "Pico de Hierro")
@@ -159,7 +159,7 @@ public final class EncyclopediaRegistry {
                 .type("Mineral Profundo")
                 .category(EncyclopediaCategory.RESOURCES, EncyclopediaCategory.BLOCKS)
                 .icon(ModBlocks.DEEPSLATE_SCARLET_ORE)
-                .description("Variante profunda de la Mena de Escarlata. Es más dura de picar, pero aparece con mayor frecuencia en las cavernas más bajas.")
+                .description("Variante profunda de la Mena de Escarlata. Es más dura de picar, pero aparece con mayor frecuencia en las cuevas más bajas.")
                 .stats(
                         new StatInfo("Altura recomendada", "Nivel -64 a -1", EncyclopediaEntry.CYAN_STAT_COLOR),
                         new StatInfo("Herramienta mínima", "Pico de Hierro")
@@ -184,7 +184,7 @@ public final class EncyclopediaRegistry {
                 .type("Arma / Espada")
                 .category(EncyclopediaCategory.TOOLS)
                 .icon(ModItem.SCARLET_SWORD)
-                .description("Espada carmesí con empuñadura reforzada de pizarra profunda. Muy efectiva contra los enemigos y jefes de Isla Penstein.")
+                .description("Espada de escarlata con empuñadura reforzada de pizarra profunda. Muy efectiva contra los enemigos y jefes de Isla Penstein.")
                 .statsSupplier(() -> buildGearStats(ModItem.SCARLET_SWORD, List.of(
                         new StatInfo("Reparación", "Lingote de Escarlata")
                 )))
@@ -192,7 +192,7 @@ public final class EncyclopediaRegistry {
                         "Mesa de Crafteo",
                         patternGrid("#  ", "#  ", "x  ", '#', ingot, 'x', handle),
                         SlotRef.of(ModItem.SCARLET_SWORD),
-                        "Usa Pizarra profunda labrada en lugar de palo para el mango."
+                        "Usa Pizarra profunda labrada para el mango."
                 ))
                 .keywords("sword espada arma combate")
                 .build());
@@ -201,7 +201,7 @@ public final class EncyclopediaRegistry {
                 .type("Herramienta / Pico")
                 .category(EncyclopediaCategory.TOOLS)
                 .icon(ModItem.SCARLET_PICKAXE)
-                .description("Pico rápido y resistente capaz de minar obsidiana y cualquier mineral avanzado. Ideal para recibir buenos encantamientos.")
+                .description("Pico rápido y resistente capaz de minar obsidiana y cualquier mineral. Ideal para recibir buenos encantamientos.")
                 .statsSupplier(() -> buildGearStats(ModItem.SCARLET_PICKAXE, List.of(
                         new StatInfo("Reparación", "Lingote de Escarlata")
                 )))
@@ -218,7 +218,7 @@ public final class EncyclopediaRegistry {
                 .type("Herramienta / Hacha")
                 .category(EncyclopediaCategory.TOOLS)
                 .icon(ModItem.SCARLET_AXE)
-                .description("Hacha pesada de gran filo que tala árboles al instante y asesta golpes muy potentes en combate.")
+                .description("Hacha pesada de gran filo q asesta golpes muy potentes en combate.")
                 .statsSupplier(() -> buildGearStats(ModItem.SCARLET_AXE, List.of(
                         new StatInfo("Reparación", "Lingote de Escarlata")
                 )))
@@ -235,7 +235,7 @@ public final class EncyclopediaRegistry {
                 .type("Herramienta / Pala")
                 .category(EncyclopediaCategory.TOOLS)
                 .icon(ModItem.SCARLET_SHOVEL)
-                .description("Pala ligera y duradera para despejar tierra, arena, grava o nieve a gran velocidad.")
+                .description("Pala ligera y duradera de gran velocidad.")
                 .statsSupplier(() -> buildGearStats(ModItem.SCARLET_SHOVEL, List.of(
                         new StatInfo("Reparación", "Lingote de Escarlata")
                 )))
@@ -252,7 +252,7 @@ public final class EncyclopediaRegistry {
                 .type("Herramienta / Azada")
                 .category(EncyclopediaCategory.TOOLS)
                 .icon(ModItem.SCARLET_HOE)
-                .description("Azada muy resistente para preparar cultivos extensos y limpiar bloques vegetales rápidamente.")
+                .description("Azada muy resistente.")
                 .statsSupplier(() -> buildGearStats(ModItem.SCARLET_HOE, List.of(
                         new StatInfo("Reparación", "Lingote de Escarlata")
                 )))
@@ -273,7 +273,7 @@ public final class EncyclopediaRegistry {
                 .type("Armadura / Cabeza")
                 .category(EncyclopediaCategory.ARMOR)
                 .icon(ModItem.SCARLET_HELMET)
-                .description("Yelmo blindado de Escarlata que ofrece alta protección y admite encantamientos fuertes con facilidad.")
+                .description("Casco de Escarlata que ofrece alta protección y admite encantamientos fuertes con facilidad.")
                 .statsSupplier(() -> buildGearStats(ModItem.SCARLET_HELMET, List.of(
                         new StatInfo("Reparación", "Lingote de Escarlata")
                 )))
@@ -290,7 +290,7 @@ public final class EncyclopediaRegistry {
                 .type("Armadura / Torso")
                 .category(EncyclopediaCategory.ARMOR)
                 .icon(ModItem.SCARLET_CHESTPLATE)
-                .description("La pieza más protectora del conjunto Escarlata, pensada para resistir los golpes directos de Pi Didi y Jefri Penstein.")
+                .description("La pieza más god del conjunto Escarlata, pensada para resistir los golpes directos de Pi Didi y Jefri Penstein.")
                 .statsSupplier(() -> buildGearStats(ModItem.SCARLET_CHESTPLATE, List.of(
                         new StatInfo("Reparación", "Lingote de Escarlata")
                 )))
@@ -307,7 +307,7 @@ public final class EncyclopediaRegistry {
                 .type("Armadura / Piernas")
                 .category(EncyclopediaCategory.ARMOR)
                 .icon(ModItem.SCARLET_LEGGINGS)
-                .description("Grebas resistentes de Escarlata para aguantar largas batallas y protegerte contra ataques fuertes.")
+                .description("Pantalones resistentes de Escarlata para largas batallas.")
                 .statsSupplier(() -> buildGearStats(ModItem.SCARLET_LEGGINGS, List.of(
                         new StatInfo("Reparación", "Lingote de Escarlata")
                 )))
@@ -324,7 +324,7 @@ public final class EncyclopediaRegistry {
                 .type("Armadura / Pies")
                 .category(EncyclopediaCategory.ARMOR)
                 .icon(ModItem.SCARLET_BOOTS)
-                .description("Botas reforzadas de Escarlata que completan la armadura ideal para explorar Isla Penstein.")
+                .description("Botas de Escarlata que completan la armadura ideal para explorar Isla Penstein.")
                 .statsSupplier(() -> buildGearStats(ModItem.SCARLET_BOOTS, List.of(
                         new StatInfo("Reparación", "Lingote de Escarlata")
                 )))
@@ -341,15 +341,15 @@ public final class EncyclopediaRegistry {
                 .type("Armadura / Élitros Blindados")
                 .category(EncyclopediaCategory.ARMOR, EncyclopediaCategory.ACCESSORIES)
                 .icon(ModItem.SCARTY)
-                .description("Élitros evolucionados con blindaje de Escarlata, diamante y membranas de fantasma. Te permiten volar por el cielo mientras conservas armadura, fuerza extra y amortiguación contra caídas.")
+                .description("Élytras evolucionados con Escarlata, diamante y membranas de fantasma. Te permiten volar por el cielo mientras conservas armadura, fuerza extra y amortiguación contra caídas.")
                 .statsSupplier(() -> buildGearStats(ModItem.SCARTY, List.of(
                         new StatInfo("Daño por caída", "-75%", EncyclopediaEntry.GREEN_STAT_COLOR),
                         new StatInfo("Altura segura", "+4 bloques", EncyclopediaEntry.CYAN_STAT_COLOR)
                 )))
                 .effects(
-                        new EffectInfo("Vuelo en Planeo", "Funciona igual que unos Élitros usando cohetes.", EncyclopediaEntry.CYAN_STAT_COLOR),
-                        new EffectInfo("Furia Blindada", "Otorga defensa extra en el pecho y +10% de fuerza de ataque.", EncyclopediaEntry.PURPLE_STAT_COLOR),
-                        new EffectInfo("Aterrizaje Suave", "Reduce drásticamente el daño al caer desde las alturas.", EncyclopediaEntry.GREEN_STAT_COLOR)
+                        new EffectInfo("Vuelo en Planeo", "Funciona igual que unas Elytras usando cohetes.", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new EffectInfo("Blindaje", "Otorga defensa extra en el pecho y +10% de fuerza de ataque.", EncyclopediaEntry.PURPLE_STAT_COLOR),
+                        new EffectInfo("Aterrizaje", "Reduce drásticamente el daño al caer desde las alturas.", EncyclopediaEntry.GREEN_STAT_COLOR)
                 )
                 .obtaining(ObtainingMethod.shaped(
                         "Mesa de Crafteo",
@@ -359,7 +359,7 @@ public final class EncyclopediaRegistry {
                                 'E', SlotRef.of(Items.ELYTRA),
                                 'M', SlotRef.of(Items.PHANTOM_MEMBRANE)),
                         SlotRef.of(ModItem.SCARTY),
-                        "Combina tus Élitros con Escarlata, un diamante y membranas de fantasma."
+                        "Combina tus Élytras con Escarlata, un diamante y membranas de fantasma."
                 ))
                 .keywords("scarty elytra elitros alas volar")
                 .build());
@@ -370,7 +370,7 @@ public final class EncyclopediaRegistry {
                 .type("Accesorio de Curación")
                 .category(EncyclopediaCategory.ACCESSORIES)
                 .icon(ModItem.SCARLET_BRACELET)
-                .description("Reliquia portátil que cura salud al instante cuando haces clic derecho. Muy útil en medio de combates intensos.")
+                .description("Reliquia portátil que cura salud al instante cuando haces clic derecho.")
                 .stats(
                         new StatInfo("Curación", "4 corazones", EncyclopediaEntry.GREEN_STAT_COLOR),
                         new StatInfo("Recarga", "25 seg", EncyclopediaEntry.CYAN_STAT_COLOR),
@@ -423,7 +423,7 @@ public final class EncyclopediaRegistry {
                 .type("Tótem Especial")
                 .category(EncyclopediaCategory.TOTEMS)
                 .icon(ModItem.NAZITOTEM)
-                .description("Tótem especial que evita que mueras cuando lo llevas en la mano y avisa a todo el mundo con un estruendo al salvar tu vida.")
+                .description("Tótem especial que evita que mueras cuando lo llevas en la mano")
                 .stats(
                         new StatInfo("Protección", "Evita 1 muerte"),
                         new StatInfo("Uso", "En cualquier mano")
@@ -434,7 +434,7 @@ public final class EncyclopediaRegistry {
                 .obtaining(ObtainingMethod.info(
                         "Cómo conseguirlo",
                         SlotRef.link(ModItem.NAZITOTEM, "isla_penstein"),
-                        "Se consigue explorando Isla Penstein y enfrentando sus desafíos."
+                        "Se consigue explorando Isla Penstein y enemistandote con los Nazillagers."
                 ))
                 .keywords("totem nazitotem inmortal muerte")
                 .build());
@@ -443,7 +443,7 @@ public final class EncyclopediaRegistry {
                 .type("Tótem Protector")
                 .category(EncyclopediaCategory.TOTEMS)
                 .icon(ModItem.ISRATOTEM)
-                .description("Tótem avanzado que te salva de morir, otorga 5 corazones dorados extra de protección y anuncia tu salvación con un estruendo.")
+                .description("Tótem avanzado que te salva de morir y otorga 5 corazones dorados extra de protección")
                 .stats(
                         new StatInfo("Escudo extra", "5 corazones dorados", EncyclopediaEntry.CYAN_STAT_COLOR),
                         new StatInfo("Uso", "En cualquier mano")
@@ -454,7 +454,7 @@ public final class EncyclopediaRegistry {
                 .obtaining(ObtainingMethod.info(
                         "Cómo conseguirlo",
                         SlotRef.link(ModItem.ISRATOTEM, "isla_penstein"),
-                        "Recompensa especial ligada a Isla Penstein y los jefes del mod."
+                        "Recompensa especial ligada a Isla Penstein y Aliandote con los Israelitas."
                 ))
                 .keywords("totem isratotem absorcion")
                 .build());
@@ -474,7 +474,7 @@ public final class EncyclopediaRegistry {
                 .obtaining(ObtainingMethod.info(
                         "Reliquia Épica",
                         SlotRef.link(ModItem.LONTOTEM, "isla_penstein"),
-                        "Tesoro supremo ligado a los combates más difíciles de Lon Terry."
+                        "Tesoro supremo para los combates más canijos de Lon Terry."
                 ))
                 .keywords("totem lontotem epico doble vida")
                 .build());
@@ -485,7 +485,7 @@ public final class EncyclopediaRegistry {
                 .type("Bloque / Almacenamiento")
                 .category(EncyclopediaCategory.BLOCKS, EncyclopediaCategory.RESOURCES)
                 .icon(ModBlocks.SCARLET_BLOCK)
-                .description("Bloque metálico compacto ideal para ahorrar espacio en tus cofres o decorar construcciones. Puedes volver a convertirlo en lingotes en cualquier momento.")
+                .description("Bloque ideal para ahorrar espacio en tus cofres o decorar construcciones. Puedes volver a convertirlo en lingotes en cualquier momento.")
                 .stats(
                         new StatInfo("Equivalente", "9 Lingotes"),
                         new StatInfo("Herramienta", "Pico de Hierro+")
@@ -504,7 +504,7 @@ public final class EncyclopediaRegistry {
                 .category(EncyclopediaCategory.BLOCKS, EncyclopediaCategory.MISC)
                 .rarity(EncyclopediaRarity.RARE)
                 .icon(ModBlocks.JEFRI_MAILBOX)
-                .description("Buzón misterioso situado frente a la entrada de la mansión en Isla Penstein. Entrega una Orden de Arresto aquí para despertar al jefe final.")
+                .description("Buzón de correos situado frente a la entrada de la mansión en Isla Penstein. Entrega una Orden de Arresto aquí para despertar al primer jefe final.")
                 .stats(
                         new StatInfo("Resistencia", "Indestructible"),
                         new StatInfo("Llave", "Orden de Arresto", EncyclopediaEntry.CYAN_STAT_COLOR),
@@ -516,10 +516,34 @@ public final class EncyclopediaRegistry {
                 .obtaining(ObtainingMethod.info(
                         "Dónde encontrarlo",
                         SlotRef.link(ModItem.ARREST_WARRANT, "arrest_warrant"),
-                        "Aparece frente a la entrada Norte de la Residencia Principal en Isla Penstein."
+                        "Aparece frente a la entrada de la Residencia Principal en Isla Penstein."
                 ))
-                .related("entity_jefri_penstein", "Ver Jefe Jefri 3D")
+                .related("entity_jefri_penstein", "Ver Jefe Jefri")
                 .keywords("mailbox buzon jefri altar invocar jefe")
+                .build());
+
+        list.add(EncyclopediaEntry.builder("white_house_mailbox", "Buzón de la Casa Blanca")
+                .type("Altar de Invocación")
+                .category(EncyclopediaCategory.BLOCKS, EncyclopediaCategory.MISC)
+                .rarity(EncyclopediaRarity.EPIC)
+                .icon(ModBlocks.WHITE_HOUSE_MAILBOX)
+                .description("Buzón presidencial indestructible ubicado en la entrada principal Sur de La Casa Blanca. Deposita un Permiso para portar armas para invocar a Charlie Kirk en la Gran Zona Principal de Conferencias.")
+                .stats(
+                        new StatInfo("Resistencia", "Indestructible"),
+                        new StatInfo("Ubicación", "Entrada de La Casa Blanca", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Llave", "Permiso para portar armas", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new StatInfo("Invoca a", "Charlie Kirk", EncyclopediaEntry.RED_STAT_COLOR)
+                )
+                .effects(
+                        new EffectInfo("Invocar a Charlie Kirk", "Haz clic derecho con el Permiso para portar armas en la mano y entra al Salón Principal de Conferencias.", EncyclopediaEntry.CYAN_STAT_COLOR)
+                )
+                .obtaining(ObtainingMethod.info(
+                        "Dónde encontrarlo",
+                        SlotRef.link(ModItem.GUN_PERMIT, "gun_permit"),
+                        "Ubicado junto a la reja de la entrada principal Sur de La Casa Blanca."
+                ))
+                .related("entity_charlie_kirk", "Ver Jefe Charlie Kirk")
+                .keywords("buzon casa blanca white house mailbox invocar charlie kirk permiso armas")
                 .build());
 
         list.add(EncyclopediaEntry.builder("podcast_cassette", "Cassete de Podcast")
@@ -527,10 +551,10 @@ public final class EncyclopediaRegistry {
                 .category(EncyclopediaCategory.BLOCKS, EncyclopediaCategory.MISC)
                 .rarity(EncyclopediaRarity.EPIC)
                 .icon(ModBlocks.PODCAST_CASSETTE)
-                .description("Cassete indestructible en supervivencia ubicado en el centro del Escenario del Podcast. Haz clic derecho sobre él con el Acordeon de José Torres para invocar al boss final José Torres con su cinemática musical de entrada.")
+                .description("Cassete indestructible ubicado en el patio trasero al lado de la piscina de La Casa de José Torres. Haz clic derecho sobre él con el Acordeon de José Torres para invocar al boss final José Torres god.")
                 .stats(
                         new StatInfo("Resistencia", "Indestructible"),
-                        new StatInfo("Ubicación", "Escenario del Podcast", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Ubicación", "Casa de José Torres (Piscina)", EncyclopediaEntry.CYAN_STAT_COLOR),
                         new StatInfo("Llave", "Acordeon de José Torres", EncyclopediaEntry.GOLD_STAT_COLOR),
                         new StatInfo("Invoca a", "José Torres", EncyclopediaEntry.RED_STAT_COLOR)
                 )
@@ -539,11 +563,11 @@ public final class EncyclopediaRegistry {
                 )
                 .obtaining(ObtainingMethod.info(
                         "Dónde encontrarlo",
-                        SlotRef.link(ModItem.JOSE_TORRES_ACCORDION, "escenario_podcast"),
-                        "Se genera sobre el pedestal central del Escenario del Podcast en el Overworld."
+                        SlotRef.link(ModItem.JOSE_TORRES_ACCORDION, "casa_jose_torres"),
+                        "Se encuentra en el patio trasero justo al lado de la gran piscina curva de La Casa de José Torres."
                 ))
-                .related("entity_jose_torres", "Ver Boss José Torres 3D")
-                .keywords("cassete podcast bloque altar invocar jose torres acordeon escenario")
+                .related("entity_jose_torres", "Ver Boss José Torres")
+                .keywords("cassete podcast bloque altar invocar jose torres acordeon casa piscina")
                 .build());
 
         list.add(EncyclopediaEntry.builder("draftea", "Máquina Draftea")
@@ -551,10 +575,10 @@ public final class EncyclopediaRegistry {
                 .category(EncyclopediaCategory.BLOCKS, EncyclopediaCategory.MISC)
                 .rarity(EncyclopediaRarity.RARE)
                 .icon(ModBlocks.DRAFTEA)
-                .description("Máquina recreativa de 3 rodillos. Inserta un Tony Coin haciendo clic derecho para ponerla a girar y llevarte recompensas al azar.")
+                .description("Inserta un Tony Coin haciendo clic derecho para ponerla a girar y llevarte recompensas al azar... o regalar tus coins a la casa.")
                 .stats(
                         new StatInfo("Costo por giro", "1 Tony Coin", EncyclopediaEntry.GOLD_STAT_COLOR),
-                        new StatInfo("Premio", "Garantizado al girar", EncyclopediaEntry.GREEN_STAT_COLOR)
+                        new StatInfo("Premio", "No Garantizado al girar", EncyclopediaEntry.GREEN_STAT_COLOR)
                 )
                 .drops(
                         DropInfo.of(Items.EXPERIENCE_BOTTLE, "Frasco de Experiencia", "x8 (25%)"),
@@ -567,7 +591,7 @@ public final class EncyclopediaRegistry {
                 .obtaining(ObtainingMethod.info(
                         "Cómo usarla",
                         SlotRef.link(ModItem.TONY_COIN, "tony_coin"),
-                        "Ten un Tony Coin en la mano y haz clic derecho en la máquina para hacerla girar."
+                        "Ten un Tony Coin en la mano y haz clic derecho en la máquina."
                 ))
                 .related("tony_coin", "Ver Tony Coin")
                 .keywords("draftea casino tragamonedas maquina premio")
@@ -578,7 +602,7 @@ public final class EncyclopediaRegistry {
                 .category(EncyclopediaCategory.BLOCKS)
                 .rarity(EncyclopediaRarity.UNCOMMON)
                 .icon(ModBlocks.DRAFTEA_LIGHT)
-                .description("Bloque luminoso de color morado característico de las máquinas Draftea con un suave pulso de luz. Perfecto para combinar con decoración negra y blanca en el casino.")
+                .description("Bloque luminoso de color morado característico de las máquinas Draftea.")
                 .stats(
                         new StatInfo("Iluminación", "Nivel 15 (Máxima)", EncyclopediaEntry.CYAN_STAT_COLOR),
                         new StatInfo("Color principal", "Morado Neón Draftea", EncyclopediaEntry.PURPLE_STAT_COLOR),
@@ -603,7 +627,7 @@ public final class EncyclopediaRegistry {
                 .category(EncyclopediaCategory.BLOCKS)
                 .rarity(EncyclopediaRarity.RARE)
                 .icon(ModBlocks.CASINO_LIGHT)
-                .description("Bloque de neón animado para letreros, fachadas y carruseles que alterna entre morado, rojo, amarillo y verde con destellos de transición al estilo de un casino clásico.")
+                .description("Bloque de neón animado para letreros, fachadas y carruseles que alterna entre morado, rojo, amarillo y verde con destellos muy bonitos, la neta.")
                 .stats(
                         new StatInfo("Iluminación", "Nivel 15 (Máxima)", EncyclopediaEntry.CYAN_STAT_COLOR),
                         new StatInfo("Colores", "Morado, Rojo, Amarillo y Verde", EncyclopediaEntry.GOLD_STAT_COLOR),
@@ -628,7 +652,7 @@ public final class EncyclopediaRegistry {
                 .category(EncyclopediaCategory.BLOCKS)
                 .rarity(EncyclopediaRarity.COMMON)
                 .icon(ModBlocks.CASINO_CHAIR)
-                .description("Elegante banquito negro de casino con pedestal metálico, reposapiés cromado y respaldo acolchado. Haz clic derecho sobre la silla para sentarte frente a las máquinas Draftea, mesas de juego o en la barra del bar.")
+                .description("Elegante banquito negro de casino. Haz clic derecho sobre la silla para sentarte.")
                 .stats(
                         new StatInfo("Interacción", "Clic derecho para sentarse", EncyclopediaEntry.GREEN_STAT_COLOR),
                         new StatInfo("Acabado", "Cuero negro y acero cromado", EncyclopediaEntry.CYAN_STAT_COLOR),
@@ -651,7 +675,7 @@ public final class EncyclopediaRegistry {
 
     private static void registerEntities(List<EncyclopediaEntry> list) {
         list.add(EncyclopediaEntry.builder("entity_jefri_penstein", "Jefri Penstein")
-                .type("Jefe Final · Entidad 3D")
+                .type("Jefe Final · Entidad")
                 .category(EncyclopediaCategory.ENTITIES)
                 .rarity(EncyclopediaRarity.EPIC)
                 .icon(ModBlocks.JEFRI_MAILBOX)
@@ -659,7 +683,7 @@ public final class EncyclopediaRegistry {
                         () -> ModEntities.JEFRI_PENSTEIN,
                         50.0F, 13.0F, 1.05F, 22.0F, 8.0F, true
                 ))
-                .description("El gran jefe de Isla Penstein. Llega con una entrada espectacular y música propia; cuando pierde suficiente vida entra en su temible Modo Diablo de furia carmesí.")
+                .description("El gran jefe de Isla Penstein. Llega con una entrada y música god; cuando pierde suficiente vida entra en su temible Modo Diablo de MrStiven.")
                 .statsSupplier(() -> buildEntityStats(ModEntities.JEFRI_PENSTEIN, List.of(
                         new StatInfo("Peligro", "Jefe Final", EncyclopediaEntry.RED_STAT_COLOR),
                         new StatInfo("Fases", "Normal / Modo Diablo", EncyclopediaEntry.PURPLE_STAT_COLOR)
@@ -674,11 +698,11 @@ public final class EncyclopediaRegistry {
                         "Lleva una Orden de Arresto al Buzón de Jefri en la entrada de la mansión de Isla Penstein."
                 ))
                 .related("jefri_mailbox", "Ver Buzón de Jefri")
-                .keywords("jefri penstein boss jefe 3d devil modo diablo")
+                .keywords("jefri penstein boss jefe devil modo diablo")
                 .build());
 
         list.add(EncyclopediaEntry.builder("entity_jose_torres", "José Torres / Jhoseph towers")
-                .type("Jefe Final · Entidad 3D (2 Fases)")
+                .type("Jefe Final · Entidad")
                 .category(EncyclopediaCategory.ENTITIES)
                 .rarity(EncyclopediaRarity.EPIC)
                 .icon(ModItem.JOSE_TORRES_ACCORDION)
@@ -686,20 +710,20 @@ public final class EncyclopediaRegistry {
                         () -> ModEntities.JOSE_TORRES,
                         50.0F, 13.0F, 1.05F, 22.0F, 8.0F, true
                 ))
-                .description("El jefe final invocado en el Cassete de Podcast del Escenario del Podcast con el Acordeon de José Torres. Entra con una cinemática de 5 segundos tocando su acordeón y nunca deja de tocarlo (no ataca cuerpo a cuerpo). Posee 4 ataques especiales, empuje defensivo en su Fase 2 (Jhoseph towers) y una cinemática final de muerte con explosión de hielo.")
+                .description("El jefe final invocado en el Cassete de Podcast del Escenario del Podcast con el Acordeon de José Torres. Posee 4 ataques especiales.")
                 .statsSupplier(() -> buildEntityStats(ModEntities.JOSE_TORRES, List.of(
                         new StatInfo("Fase 1", "José Torres (Traje Negro/Dorado)", EncyclopediaEntry.GOLD_STAT_COLOR),
-                        new StatInfo("Fase 2 (50% HP)", "Jhoseph towers (Blanco + Empuje)", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Fase 2", "Jhoseph towers (Blanco + Empuje)", EncyclopediaEntry.CYAN_STAT_COLOR),
                         new StatInfo("Bola de Hielo Ráfaga", "5.5 - 6.5 ❤ + Congelación", EncyclopediaEntry.CYAN_STAT_COLOR),
                         new StatInfo("Una Bola de Hielo", "14 - 16 ❤ + Explosión", EncyclopediaEntry.RED_STAT_COLOR),
-                        new StatInfo("Dialecto / Zombies", "9-11 ❤ / 3-6 Zombies (1m CD)", EncyclopediaEntry.GREEN_STAT_COLOR)
+                        new StatInfo("Dialecto / Zombies", "9-11 ❤ / 3-6 Zombies", EncyclopediaEntry.GREEN_STAT_COLOR)
                 )))
                 .effects(
-                        new EffectInfo("1. Zombies (CD 1 min)", "Invoca de 3 a 6 zombies con partículas de virus encapsulado. En Fase 2 tienen Fuerza I y pueden aparecer equipados.", EncyclopediaEntry.GREEN_STAT_COLOR),
-                        new EffectInfo("2. Dialecto (CD 1 min)", "Flota muy alto elevando a los jugadores con él, los empuja provocando mucho daño y desciende lentamente.", EncyclopediaEntry.RED_STAT_COLOR),
+                        new EffectInfo("1. Zombies", "Invoca de 3 a 6 zombies con partículas del virus T. En Fase 2 tienen Fuerza I y pueden aparecer equipados.", EncyclopediaEntry.GREEN_STAT_COLOR),
+                        new EffectInfo("2. Dialecto", "Flota muy alto elevando a los jugadores con él, los empuja provocando mucho daño.", EncyclopediaEntry.RED_STAT_COLOR),
                         new EffectInfo("3. La Bola de Hielo Ráfaga", "Dispara ráfagas de Bolas de Hielo más fuertes que la Toalla Kotex que aplican Lentitud y Congelación.", EncyclopediaEntry.CYAN_STAT_COLOR),
-                        new EffectInfo("4. Una Bola de Hielo", "Se eleva mientras suena su audio especial cargando una gigantesca bola de hielo y la lanza al jugador más cercano causando daño masivo y empuje en área.", EncyclopediaEntry.GOLD_STAT_COLOR),
-                        new EffectInfo("Fase 2: Jhoseph towers (Empuje)", "Al 50% de vida viste de blanco y empuja violentamente a quienes se acerquen causando gran daño (7.5 ❤).", EncyclopediaEntry.PURPLE_STAT_COLOR)
+                        new EffectInfo("4. Una Bola de Hielo", "Se eleva mientras habla bien raro cargando una gigantesca bola de hielo y la lanza al jugador más cercano causando daño masivo y empuje en área.", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new EffectInfo("Fase 2: Jhoseph towers", "Al 50% de vida viste su traje blanco y empuja violentamente a quienes se acerquen causando gran daño (7.5 ❤).", EncyclopediaEntry.PURPLE_STAT_COLOR)
                 )
                 .drops(
                         DropInfo.link(ModItem.ICE_BALL, "Bola de Hielo", "x16–24 (100%)", "ice_ball"),
@@ -709,14 +733,47 @@ public final class EncyclopediaRegistry {
                 .obtaining(ObtainingMethod.info(
                         "Invocación",
                         SlotRef.link(ModBlocks.PODCAST_CASSETTE, "podcast_cassette"),
-                        "Haz clic derecho en el bloque Cassete de Podcast del Escenario del Podcast sosteniendo el Acordeon de José Torres."
+                        "Haz clic derecho en el Cassete de Podcast sosteniendo el Acordeon de José Torres."
                 ))
-                .related("escenario_podcast", "Ver Escenario del Podcast")
+                .related("casa_jose_torres", "Ver Casa de José Torres")
                 .keywords("jose torres jhoseph towers boss jefe final acordeon zombies dialecto bola hielo 3d")
                 .build());
 
+        list.add(EncyclopediaEntry.builder("entity_charlie_kirk", "Charlie Kirk")
+                .type("Jefe de la Casa Blanca · Entidad")
+                .category(EncyclopediaCategory.ENTITIES)
+                .rarity(EncyclopediaRarity.EPIC)
+                .icon(ModBlocks.WHITE_HOUSE_MAILBOX)
+                .entityPreview(new EntityPreviewConfig(
+                        () -> ModEntities.CHARLIE_KIRK,
+                        50.0F, 13.0F, 1.05F, 22.0F, 8.0F, false
+                ))
+                .description("El temible jefe de La Casa Blanca. Al depositar el Permiso para portar armas en el Buzón de la Casa Blanca de la entrada, aguarda en el podio de la Gran Zona Principal de Conferencias hasta que entres a enfrentarlo.")
+                .statsSupplier(() -> buildEntityStats(ModEntities.CHARLIE_KIRK, List.of(
+                        new StatInfo("Peligro", "Jefe de Dungeon", EncyclopediaEntry.RED_STAT_COLOR),
+                        new StatInfo("Barra de Jefe", "Azul Presidencial", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Ubicación", "Salón Principal de Conferencias", EncyclopediaEntry.GOLD_STAT_COLOR)
+                )))
+                .effects(
+                        new EffectInfo("Segunda Fase", "Al bajar al 50% de vida entra en su segunda fase manteniendo su tema épico de batalla.", EncyclopediaEntry.PURPLE_STAT_COLOR),
+                        new EffectInfo("Cómo invocarlo", "Usa el Permiso para portar armas en el Buzón de la Casa Blanca de la entrada Sur.", EncyclopediaEntry.CYAN_STAT_COLOR)
+                )
+                .drops(
+                        DropInfo.link(ModItem.SCARLET_INGOT, "Lingote de Escarlata", "x8–12 (100%)", "scarlet_ingot"),
+                        DropInfo.link(ModItem.TONY_COIN, "Tony Coin", "x12–20 (100%)", "tony_coin"),
+                        DropInfo.link(ModItem.LONTOTEM, "Lontotem", "x1 (100%)", "lontotem")
+                )
+                .obtaining(ObtainingMethod.info(
+                        "Invocación",
+                        SlotRef.link(ModBlocks.WHITE_HOUSE_MAILBOX, "white_house_mailbox"),
+                        "Deposita un Permiso para portar armas en el Buzón de la Casa Blanca y entra al Salón de Conferencias."
+                ))
+                .related("casa_blanca", "Ver La Casa Blanca")
+                .keywords("charlie kirk jefe boss casa blanca white house conferencia permiso armas 3d")
+                .build());
+
         list.add(EncyclopediaEntry.builder("entity_pi_didi", "Pi Didi")
-                .type("Jefe de Mansión · Entidad 3D")
+                .type("Jefe de Mansión · Entidad")
                 .category(EncyclopediaCategory.ENTITIES)
                 .rarity(EncyclopediaRarity.EPIC)
                 .icon(Items.GOLD_BLOCK)
@@ -730,7 +787,7 @@ public final class EncyclopediaRegistry {
                         new StatInfo("Ubicación", "Mansión de la Isla", EncyclopediaEntry.CYAN_STAT_COLOR)
                 )))
                 .effects(
-                        new EffectInfo("Guardián del Trono", "Defiende el interior de la mansión donde se esconden los cofres de tesoro.", EncyclopediaEntry.GOLD_STAT_COLOR)
+                        new EffectInfo("Guardián del Trono", "Defiende el interior de la mansión donde se encuentra mucho loot.", EncyclopediaEntry.GOLD_STAT_COLOR)
                 )
                 .obtaining(ObtainingMethod.info(
                         "Dónde habita",
@@ -738,11 +795,11 @@ public final class EncyclopediaRegistry {
                         "Se encuentra en el salón central de la mansión en Isla Penstein."
                 ))
                 .related("isla_penstein", "Ir a Isla Penstein")
-                .keywords("pi didi boss jefe 3d")
+                .keywords("pi didi boss jefe")
                 .build());
 
         list.add(EncyclopediaEntry.builder("entity_yostin_biber", "Yostin Biber")
-                .type("Enemigo · Entidad 3D")
+                .type("Enemigo · Entidad")
                 .category(EncyclopediaCategory.ENTITIES)
                 .rarity(EncyclopediaRarity.RARE)
                 .icon(Items.IRON_SWORD)
@@ -750,7 +807,7 @@ public final class EncyclopediaRegistry {
                         () -> ModEntities.YOSTIN_BIBER,
                         82.0F, 22.0F, 0.52F, 22.0F, 8.0F, false
                 ))
-                .description("El más común de los niños hostiles que protegen Isla Penstein. Suele atacar en grupos pequeños por toda la explanada.")
+                .description("El más común de los niños hostiles que protegen Isla Penstein. Suele atacar en grupos pequeños y le cae bien a pi didi.")
                 .statsSupplier(() -> buildEntityStats(ModEntities.YOSTIN_BIBER, List.of(
                         new StatInfo("Frecuencia", "Muy común en la isla"),
                         new StatInfo("Comportamiento", "Ataca en grupo")
@@ -758,14 +815,14 @@ public final class EncyclopediaRegistry {
                 .obtaining(ObtainingMethod.info(
                         "Dónde aparece",
                         SlotRef.link(Items.FILLED_MAP, "isla_penstein"),
-                        "Patrulla las calles, jardines y villas de Isla Penstein."
+                        "Patrulla la Isla Penstein."
                 ))
                 .related("isla_penstein", "Ir a Isla Penstein")
-                .keywords("yostin biber nino enemigo isla 3d")
+                .keywords("yostin biber nino enemigo isla")
                 .build());
 
         list.add(EncyclopediaEntry.builder("entity_vitor_jugo", "Vitor Jugo")
-                .type("Enemigo · Entidad 3D")
+                .type("Enemigo · Entidad")
                 .category(EncyclopediaCategory.ENTITIES)
                 .rarity(EncyclopediaRarity.UNCOMMON)
                 .icon(Items.IRON_SWORD)
@@ -773,7 +830,7 @@ public final class EncyclopediaRegistry {
                         () -> ModEntities.VITOR_JUGO,
                         68.0F, 18.0F, 0.54F, 40.0F, 24.0F, false
                 ))
-                .description("Peculiar enemigo de Isla Penstein que flota horizontalmente mientras persigue a cualquier jugador que pise la isla.")
+                .description("Peculiar enemigo de la secundaria en la Isla Penstein que flota como consecuencia de consumir no sé que cosa mientras persigue a cualquier jugador que pise la isla.")
                 .statsSupplier(() -> buildEntityStats(ModEntities.VITOR_JUGO, List.of(
                         new StatInfo("Frecuencia", "Poco común en la isla"),
                         new StatInfo("Rasgo", "Postura horizontal")
@@ -781,14 +838,14 @@ public final class EncyclopediaRegistry {
                 .obtaining(ObtainingMethod.info(
                         "Dónde aparece",
                         SlotRef.link(Items.FILLED_MAP, "isla_penstein"),
-                        "Aparece dentro de las zonas abiertas de Isla Penstein."
+                        "Aparece dentro de las zonas de Isla Penstein."
                 ))
                 .related("isla_penstein", "Ir a Isla Penstein")
-                .keywords("vitor jugo nino enemigo isla 3d")
+                .keywords("vitor jugo nino enemigo isla")
                 .build());
 
         list.add(EncyclopediaEntry.builder("entity_fer_ovilla", "Fer Ovilla")
-                .type("Enemigo · Entidad 3D")
+                .type("Enemigo · Entidad")
                 .category(EncyclopediaCategory.ENTITIES)
                 .rarity(EncyclopediaRarity.UNCOMMON)
                 .icon(Items.IRON_SWORD)
@@ -796,7 +853,7 @@ public final class EncyclopediaRegistry {
                         () -> ModEntities.FER_OVILLA,
                         82.0F, 22.0F, 0.52F, -18.0F, 8.0F, false
                 ))
-                .description("Centinela de Isla Penstein que acompaña a las patrullas exteriores para impedir que alcances la mansión.")
+                .description("victima en la Isla Penstein que acompaña a los demas niños para impedir que alcances la mansión.")
                 .statsSupplier(() -> buildEntityStats(ModEntities.FER_OVILLA, List.of(
                         new StatInfo("Frecuencia", "Común en la isla"),
                         new StatInfo("Comportamiento", "Hostil al acercarse")
@@ -804,14 +861,14 @@ public final class EncyclopediaRegistry {
                 .obtaining(ObtainingMethod.info(
                         "Dónde aparece",
                         SlotRef.link(Items.FILLED_MAP, "isla_penstein"),
-                        "Patrulla alrededor de la explanada y alberca de Isla Penstein."
+                        "Patrulla por toda la explanada de la isla Penstein... su mejor amigo."
                 ))
                 .related("isla_penstein", "Ir a Isla Penstein")
-                .keywords("fer ovilla nino enemigo isla 3d")
+                .keywords("fer ovilla nino enemigo isla")
                 .build());
 
         list.add(EncyclopediaEntry.builder("entity_valentina_prieta", "Valentina Prieta")
-                .type("Enemigo · Entidad 3D")
+                .type("Enemigo · Entidad")
                 .category(EncyclopediaCategory.ENTITIES)
                 .rarity(EncyclopediaRarity.RARE)
                 .icon(Items.IRON_SWORD)
@@ -819,7 +876,7 @@ public final class EncyclopediaRegistry {
                         () -> ModEntities.VALENTINA_PRIETA,
                         82.0F, 22.0F, 0.52F, 18.0F, 8.0F, false
                 ))
-                .description("Integrante del grupo hostil de Isla Penstein que persigue sin descanso a los intrusos cerca de la residencia.")
+                .description("Integrante veracruzano de la Isla Penstein que persigue sin descanso a los intrusos que quieran salvarla de mi heores PENSTEIN.")
                 .statsSupplier(() -> buildEntityStats(ModEntities.VALENTINA_PRIETA, List.of(
                         new StatInfo("Frecuencia", "Común en la isla"),
                         new StatInfo("Comportamiento", "Combate cercano")
@@ -827,14 +884,14 @@ public final class EncyclopediaRegistry {
                 .obtaining(ObtainingMethod.info(
                         "Dónde aparece",
                         SlotRef.link(Items.FILLED_MAP, "isla_penstein"),
-                        "Ronda el complejo principal de Isla Penstein."
+                        "no sé, la neta. En todos lados de la isla."
                 ))
                 .related("isla_penstein", "Ir a Isla Penstein")
-                .keywords("valentina prieta nino enemigo isla 3d")
+                .keywords("valentina prieta nino enemigo isla")
                 .build());
 
         list.add(EncyclopediaEntry.builder("entity_tony_fase1", "Tony Fase 1")
-                .type("Personal del Casino · Entidad 3D")
+                .type("Personal del Casino · Entidad")
                 .category(EncyclopediaCategory.ENTITIES)
                 .rarity(EncyclopediaRarity.UNCOMMON)
                 .icon(Items.BREWING_STAND)
@@ -842,7 +899,7 @@ public final class EncyclopediaRegistry {
                         () -> ModEntities.TONY_FASE1,
                         50.0F, 13.0F, 1.05F, -20.0F, 8.0F, false
                 ))
-                .description("Bartender oficial del casino Draftea Tony Diaz con su característica sudadera verde. Atiende fijo detrás de la barra batiendo bebidas con coctelera y puliendo vasos.")
+                .description("Bartender oficial del casino Draftea Tony Diaz. Atiende fijo detrás de la barra batiendo bebidas con coctelera y puliendo vasos el buen chambeador.")
                 .statsSupplier(() -> buildEntityStats(ModEntities.TONY_FASE1, List.of(
                         new StatInfo("Actitud", "Pasivo", EncyclopediaEntry.GREEN_STAT_COLOR),
                         new StatInfo("Rol", "Bartender Fijo", EncyclopediaEntry.CYAN_STAT_COLOR),
@@ -854,11 +911,11 @@ public final class EncyclopediaRegistry {
                         "Se encuentra atendiendo el Lounge Bar dentro del casino Draftea Tony Diaz."
                 ))
                 .related("draftea_tony_diaz", "Ver Casino Draftea Tony Diaz")
-                .keywords("tony fase 1 bartender bar sudadera verde pasivo casino 3d")
+                .keywords("tony fase 1 bartender bar sudadera verde pasivo casino")
                 .build());
 
         list.add(EncyclopediaEntry.builder("entity_tony_fase2", "Tony Fase 2")
-                .type("Cliente del Casino · Entidad 3D")
+                .type("Cliente del Casino · Entidad")
                 .category(EncyclopediaCategory.ENTITIES)
                 .rarity(EncyclopediaRarity.COMMON)
                 .icon(ModBlocks.DRAFTEA)
@@ -866,7 +923,7 @@ public final class EncyclopediaRegistry {
                         () -> ModEntities.TONY_FASE2,
                         50.0F, 13.0F, 1.05F, 22.0F, 8.0F, false
                 ))
-                .description("Cliente habitual del casino Draftea Tony Diaz con sudadera blanca. Varios de ellos recorren las salas del casino o se detienen a jugar frente a las máquinas Draftea.")
+                .description("Cliente habitual del casino Draftea Tony Diaz. Le gusta apostar todo y varios de ellos recorren las salas del casino o se detienen a jugar frente a las máquinas Draftea.")
                 .statsSupplier(() -> buildEntityStats(ModEntities.TONY_FASE2, List.of(
                         new StatInfo("Actitud", "Pasivo", EncyclopediaEntry.GREEN_STAT_COLOR),
                         new StatInfo("Rol", "Cliente del Casino", EncyclopediaEntry.GOLD_STAT_COLOR),
@@ -878,11 +935,11 @@ public final class EncyclopediaRegistry {
                         "Un grupo de clientes pasea y juega por la planta baja y el Mezzanine VIP del casino."
                 ))
                 .related("draftea_tony_diaz", "Ver Casino Draftea Tony Diaz")
-                .keywords("tony fase 2 cliente sudadera blanca pasivo draftea casino 3d")
+                .keywords("tony fase 2 cliente sudadera blanca pasivo draftea casino")
                 .build());
 
         list.add(EncyclopediaEntry.builder("entity_tony_fase3", "Tony Fase 3")
-                .type("Guardia del Casino · Entidad 3D")
+                .type("Guardia del Casino · Entidad")
                 .category(EncyclopediaCategory.ENTITIES)
                 .rarity(EncyclopediaRarity.RARE)
                 .icon(ModBlocks.CASINO_CHAIR)
@@ -890,7 +947,7 @@ public final class EncyclopediaRegistry {
                         () -> ModEntities.TONY_FASE3,
                         50.0F, 13.0F, 1.05F, -18.0F, 8.0F, false
                 ))
-                .description("Personal de seguridad y vigilancia del casino Draftea Tony Diaz con sudadera negra. Dos custodian la entrada principal y cuatro vigilan el interior con firmes posturas de guardia.")
+                .description("Personal de seguridad y vigilancia del casino Draftea Tony Diaz. Dos custodian la entrada principal y cuatro vigilan el interior con firmes posturas.")
                 .statsSupplier(() -> buildEntityStats(ModEntities.TONY_FASE3, List.of(
                         new StatInfo("Actitud", "Pasivo", EncyclopediaEntry.GREEN_STAT_COLOR),
                         new StatInfo("Rol", "Guardia de Seguridad", EncyclopediaEntry.PURPLE_STAT_COLOR),
@@ -902,7 +959,7 @@ public final class EncyclopediaRegistry {
                         "Vigila los arcos de entrada y las zonas clave dentro del casino Draftea Tony Diaz."
                 ))
                 .related("draftea_tony_diaz", "Ver Casino Draftea Tony Diaz")
-                .keywords("tony fase 3 guardia seguridad sudadera negra pasivo casino 3d")
+                .keywords("tony fase 3 guardia seguridad sudadera negra pasivo casino")
                 .build());
     }
 
@@ -911,7 +968,7 @@ public final class EncyclopediaRegistry {
                 .type("Comida / Fruta")
                 .category(EncyclopediaCategory.FOOD)
                 .icon(ModItem.BANANA)
-                .description("Fruta tropical dulce ideal para recuperar energía rápido mientras combates o exploras Isla Penstein.")
+                .description("Fruta tropical dulce para tragar.")
                 .statsSupplier(() -> buildConsumableStats(ModItem.BANANA, List.of(
                         new StatInfo("Tipo", "Alimento rápido")
                 )))
@@ -930,13 +987,13 @@ public final class EncyclopediaRegistry {
                 .type("Llave de Jefe")
                 .category(EncyclopediaCategory.MISC)
                 .icon(ModItem.ARREST_WARRANT)
-                .description("Documento especial necesario para retar al jefe final. Úsalo con clic derecho frente al Buzón de Jefri en Isla Penstein.")
+                .description("Documento especial necesario para llamar al jefe final. Úsalo con clic derecho frente al Buzón de Jefri en Isla Penstein.")
                 .stats(
                         new StatInfo("Cómo usar", "Clic derecho en Buzón"),
                         new StatInfo("Invoca a", "Jefri Penstein", EncyclopediaEntry.RED_STAT_COLOR)
                 )
                 .effects(
-                        new EffectInfo("Despertar al Jefe", "Activa la batalla contra Jefri Penstein al entregarla en su buzón.", EncyclopediaEntry.CYAN_STAT_COLOR)
+                        new EffectInfo("Despertar al Jefe", "Activa el pvp contra Jefri Penstein al entregarla en su buzón.", EncyclopediaEntry.CYAN_STAT_COLOR)
                 )
                 .obtaining(ObtainingMethod.info(
                         "Uso en la Isla",
@@ -947,19 +1004,42 @@ public final class EncyclopediaRegistry {
                 .keywords("orden arresto warrant invocar jefri")
                 .build());
 
+        list.add(EncyclopediaEntry.builder("gun_permit", "Permiso para portar armas")
+                .type("Llave de Jefe")
+                .category(EncyclopediaCategory.MISC)
+                .rarity(EncyclopediaRarity.RARE)
+                .icon(ModItem.GUN_PERMIT)
+                .description("Documento oficial sellado en azul real necesario para invocar a Charlie Kirk. Úsalo con clic derecho en el Buzón de la Casa Blanca ubicado en la entrada Sur.")
+                .stats(
+                        new StatInfo("Sello", "Azul Presidencial", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Cómo usar", "Clic derecho en Buzón"),
+                        new StatInfo("Invoca a", "Charlie Kirk", EncyclopediaEntry.RED_STAT_COLOR)
+                )
+                .effects(
+                        new EffectInfo("Despertar a Charlie Kirk", "Invoca a Charlie Kirk en la Gran Zona Principal de Conferencias de La Casa Blanca.", EncyclopediaEntry.CYAN_STAT_COLOR)
+                )
+                .obtaining(ObtainingMethod.info(
+                        "Uso en La Casa Blanca",
+                        SlotRef.link(ModBlocks.WHITE_HOUSE_MAILBOX, "white_house_mailbox"),
+                        "Llave ligada al Buzón de la Casa Blanca situado junto a la entrada principal Sur."
+                ))
+                .related("white_house_mailbox", "Ver Buzón de la Casa Blanca")
+                .keywords("permiso portar armas sello azul gun permit invocar charlie kirk casa blanca")
+                .build());
+
         list.add(EncyclopediaEntry.builder("jose_torres_accordion", "Acordeon de José Torres")
                 .type("Instrumento / Llave de Jefe")
                 .category(EncyclopediaCategory.MISC)
                 .rarity(EncyclopediaRarity.EPIC)
                 .icon(ModItem.JOSE_TORRES_ACCORDION)
-                .description("Acordeón tradicional norteño con diseño ligero en 3D que suelta Jefri penstein al ser derrotado. Es únicamente un ítem (no colocable) y sirve para invocar a José Torres haciendo clic derecho sobre el bloque Cassete de Podcast.")
+                .description("Acordeón tradicional norteño que suelta Jefri penstein al ser derrotado. sirve para invocar a José Torres haciendo clic derecho sobre el bloque Cassete de Podcast.")
                 .stats(
                         new StatInfo("Obtenido de", "Jefri penstein", EncyclopediaEntry.RED_STAT_COLOR),
                         new StatInfo("Uso", "Clic en Cassete de Podcast", EncyclopediaEntry.GOLD_STAT_COLOR),
                         new StatInfo("Invoca a", "José Torres", EncyclopediaEntry.CYAN_STAT_COLOR)
                 )
                 .effects(
-                        new EffectInfo("Invocar a José Torres", "Haz clic derecho en un Cassete de Podcast para iniciar la cinemática de 5 segundos y el combate.", EncyclopediaEntry.GOLD_STAT_COLOR)
+                        new EffectInfo("Invocar a José Torres", "Haz clic derecho en un Cassete de Podcast para iniciar el Pebepe.", EncyclopediaEntry.GOLD_STAT_COLOR)
                 )
                 .obtaining(ObtainingMethod.info(
                         "Recompensa de Jefe",
@@ -974,7 +1054,7 @@ public final class EncyclopediaRegistry {
                 .type("Proyectil / Munición")
                 .category(EncyclopediaCategory.MISC, EncyclopediaCategory.TOOLS)
                 .icon(ModItem.TOALLA_KOTEX)
-                .description("Proyectil arrojadizo muy rápido que inflige fuerte daño al impactar y también sirve como munición alternativa para arcos.")
+                .description("Proyectil arrojadizo muy rápido que inflige fuerte daño y también sirve como munición alternativa para arcos.")
                 .stats(
                         new StatInfo("Daño al golpear", "4 corazones", EncyclopediaEntry.RED_STAT_COLOR),
                         new StatInfo("Cadencia", "Disparo muy rápido", EncyclopediaEntry.CYAN_STAT_COLOR),
@@ -986,7 +1066,7 @@ public final class EncyclopediaRegistry {
                 .obtaining(ObtainingMethod.info(
                         "Dónde conseguirla",
                         SlotRef.link(ModItem.TOALLA_KOTEX, "isla_penstein"),
-                        "Botín especial vinculado a las batallas en Isla Penstein."
+                        "Botín especial de las batallas en Isla Penstein."
                 ))
                 .keywords("toalla kotex proyectil flecha arrojadizo")
                 .build());
@@ -996,14 +1076,14 @@ public final class EncyclopediaRegistry {
                 .category(EncyclopediaCategory.MISC, EncyclopediaCategory.TOOLS)
                 .rarity(EncyclopediaRarity.RARE)
                 .icon(ModItem.ICE_BALL)
-                .description("Esfera de hielo cristalino utilizada por José Torres en su ataque 'La Bola de Hielo Ráfaga'. Se lanza como una bola de nieve con sonido de hielo al impactar, causando más daño que la Toalla Kotex y aplicando Lentitud y Congelación.")
+                .description("pequeña bola de hielo utilizada por José Torres en su ataque 'La Bola de Hielo Ráfaga'. Se lanza como una bola de nieve, causando más daño que la Toalla Kotex y aplicando Lentitud y Congelación.")
                 .stats(
                         new StatInfo("Daño al golpear", "5.5 corazones (11 HP)", EncyclopediaEntry.RED_STAT_COLOR),
                         new StatInfo("Efecto", "Lentitud II + Congelación", EncyclopediaEntry.CYAN_STAT_COLOR),
                         new StatInfo("Sonido", "Impacto de Hielo", EncyclopediaEntry.GREEN_STAT_COLOR)
                 )
                 .effects(
-                        new EffectInfo("Impacto Glacial", "Congela y ralentiza al objetivo al impactar con partículas de nieve y hielo.", EncyclopediaEntry.CYAN_STAT_COLOR)
+                        new EffectInfo("Impacto Glacial", "Congela y ralentiza al objetivo.", EncyclopediaEntry.CYAN_STAT_COLOR)
                 )
                 .obtaining(ObtainingMethod.info(
                         "Recompensa de Jefe",
@@ -1018,7 +1098,7 @@ public final class EncyclopediaRegistry {
                 .type("Consumible Especial")
                 .category(EncyclopediaCategory.MISC, EncyclopediaCategory.FOOD)
                 .icon(ModItem.MARIJUANA)
-                .description("Hierba exótica característica de Isla Penstein que desprende volutas de humo verde al utilizarse.")
+                .description("Hierba god característica de Isla Penstein para los niños (vitor, ya dejalo).")
                 .statsSupplier(() -> buildConsumableStats(ModItem.MARIJUANA, List.of(
                         new StatInfo("Origen", "Isla Penstein", EncyclopediaEntry.GREEN_STAT_COLOR)
                 )))
@@ -1028,7 +1108,7 @@ public final class EncyclopediaRegistry {
                 .obtaining(ObtainingMethod.info(
                         "Dónde conseguirla",
                         SlotRef.link(ModItem.MARIJUANA, "isla_penstein"),
-                        "Se encuentra ligada al botín temático de Isla Penstein."
+                        "Se encuentra en el botín temático de Isla Penstein."
                 ))
                 .keywords("marijuana marihuana hierba weed consumible")
                 .build());
@@ -1037,7 +1117,7 @@ public final class EncyclopediaRegistry {
                 .type("Ficha de Premios")
                 .category(EncyclopediaCategory.MISC)
                 .icon(ModItem.TONY_COIN)
-                .description("Moneda dorada especial que acepta la máquina Draftea. Cada moneda garantiza un premio al azar entre experiencia, hierro, oro, diamantes o manzanas doradas.")
+                .description("Moneda de Tony que acepta la máquina Draftea. Cada moneda puede dar un premio al azar.")
                 .stats(
                         new StatInfo("Sirve para", "Girar la Draftea", EncyclopediaEntry.GOLD_STAT_COLOR),
                         new StatInfo("Mejores premios", "Diamantes y Manzana Dorada", EncyclopediaEntry.CYAN_STAT_COLOR)
@@ -1061,39 +1141,39 @@ public final class EncyclopediaRegistry {
                 .category(EncyclopediaCategory.STRUCTURES)
                 .rarity(EncyclopediaRarity.EPIC)
                 .icon(Items.FILLED_MAP)
-                .description("Una enorme isla privada en medio del océano profundo llena de lujos y peligros. Alberga villas de huéspedes, una alberca olímpica, un yate atracado y la mansión principal donde te esperan tesoros y dos jefes temibles.")
+                .description("Una enorme isla privada en medio del océano profundo llena de lujos y niños. Alberga sus casitas pa los niños, una alberca olímpica, un yate atracado y la mansión principal donde te esperan los gods.")
                 .stats(
                         new StatInfo("Tamaño", "Isla Gigante", EncyclopediaEntry.GOLD_STAT_COLOR),
                         new StatInfo("Bioma", "Océano Profundo", EncyclopediaEntry.CYAN_STAT_COLOR),
-                        new StatInfo("Cofres de tesoro", "4 en la Mansión", EncyclopediaEntry.GREEN_STAT_COLOR),
+                        new StatInfo("Cofres de tesoro", "Por toda la Isla", EncyclopediaEntry.GREEN_STAT_COLOR),
                         new StatInfo("Jefes", "Pi Didi y Jefri", EncyclopediaEntry.RED_STAT_COLOR)
                 )
                 .structureContents(
                         StructureFeatureInfo.link(
                                 "Gran Residencia Principal y Trono",
-                                "Mansión blanca de cuarzo custodiada por Pi Didi en su trono dorado. En sus alas laterales esconde 4 cofres con recompensas de alto nivel.",
+                                "Mansión blanca de cuarzo custodiada por Pi Didi. Trae cofres con recompensas de alto nivel.",
                                 Items.CHEST,
                                 "entity_pi_didi"
                         ),
                         StructureFeatureInfo.link(
                                 "Altar y Buzón de Jefri",
-                                "Frente a la entrada Norte de la mansión encontrarás el Buzón de Jefri sobre un pedestal de oro. Entrega ahí una Orden de Arresto para invocar al jefe final.",
+                                "Frente a la entrada Norte de la mansión encontrarás el Buzón de Jefri. Entrega ahí una Orden de Arresto para invocar al jefe final.",
                                 ModBlocks.JEFRI_MAILBOX,
                                 "jefri_mailbox"
                         ),
                         StructureFeatureInfo.of(
-                                "Explanada, Alberca y 4 Villas",
-                                "Amplio patio pavimentado con alberca olímpica, fuente de cuarzo, jardines de palmeras, 4 villas decoradas y 2 helipuertos al Sur.",
+                                "Explanada, Alberca y 4 Casillas",
+                                "Amplio patio pavimentado con alberca olímpica, fuente de cuarzo, jardines de palmeras, 4 casillas decoradas y 2 helipuertos.",
                                 Items.QUARTZ_BLOCK
                         ),
                         StructureFeatureInfo.of(
                                 "Muelle Este y Yate de Lujo",
-                                "Gran embarcadero de madera en la costa Este con un yate blanco amarrado y escalinata amurallada directo al patio principal.",
+                                "Embarcadero de madera en la costa con un yate blanco amarrado.",
                                 Items.OAK_BOAT
                         ),
                         StructureFeatureInfo.link(
                                 "Patrullas Hostiles",
-                                "Toda la isla está vigilada por Yostin Biber, Fer Ovilla, Valentina Prieta y Vitor Jugo, listos para atacar al verte.",
+                                "Toda la isla está vigilada por Yostin Biber, Fer Ovilla, Valentina Prieta y Vitor Jugo.",
                                 Items.IRON_SWORD,
                                 "entity_yostin_biber"
                         )
@@ -1102,34 +1182,27 @@ public final class EncyclopediaRegistry {
                         StructureStepInfo.link(
                                 1,
                                 "Prepárate antes de zarpar",
-                                "Lleva armadura de Escarlata (o alas Scarty para moverte rápido), buena espada, un Brazalete curativo, comida y un tótem (Isratotem o Lontotem), además de una Orden de Arresto.",
+                                "Lleva armadura de Escarlata, buena espada, un Brazalete curativo, comida y totems, además de una Orden de Arresto.",
                                 ModItem.SCARLET_CHESTPLATE,
                                 "scarlet_chestplate"
                         ),
                         StructureStepInfo.link(
                                 2,
-                                "Limpia la explanada primero",
-                                "Llega por el muelle Este o planeando con Scarty y derrota primero a los guardias exteriores (Yostin Biber, Fer Ovilla, Valentina Prieta y Vitor Jugo) para evitar que te acorralen.",
-                                ModItem.SCARTY,
-                                "scarty"
-                        ),
-                        StructureStepInfo.link(
-                                3,
                                 "Asalta la mansión y vence a Pi Didi",
-                                "Cruza los arcos principales, derrota a Pi Didi en el centro del salón y saquea los 4 cofres repartidos dentro de la mansión.",
+                                "Cruza los arcos principales, derrota a Pi Didi en el centro del salón y saquea los cofres repartidos dentro de la mansión.",
                                 ModItem.SCARLET_SWORD,
                                 "entity_pi_didi"
                         ),
                         StructureStepInfo.link(
-                                4,
+                                3,
                                 "Desafía a Jefri Penstein en su buzón",
-                                "Cuando estés listo, acércate al Buzón de Jefri frente a la mansión y usa una Orden de Arresto con clic derecho para iniciar la pelea.",
+                                "Cuando estés listo, acércate al Buzón de Jefri frente a la mansión y usa una Orden de Arresto con clic derecho para iniciar el pebepe.",
                                 ModItem.ARREST_WARRANT,
                                 "arrest_warrant"
                         ),
                         StructureStepInfo.link(
-                                5,
-                                "Sobrevive a su Modo Diablo",
+                                4,
+                                "Acaba con su Modo Diablo",
                                 "En la segunda mitad del combate, Jefri se torna rojo y ataca con furia. Muévete sin parar, cúrate con tu Brazalete entre golpes y guarda tu Tótem por emergencia.",
                                 ModItem.LONTOTEM,
                                 "entity_jefri_penstein"
@@ -1144,7 +1217,7 @@ public final class EncyclopediaRegistry {
                 .obtaining(ObtainingMethod.info(
                         "Cómo encontrarla",
                         SlotRef.of(Items.FILLED_MAP),
-                        "Navega o vuela sobre océanos profundos hasta avistar la gran isla con muelles, palmeras y edificios blancos de cuarzo."
+                        "Intercambiando el Mapa de la Isla Penstein con un Israelita."
                 ))
                 .keywords("isla penstein estructura dungeon oceano mansion jefri pi didi como vencer")
                 .build());
@@ -1154,7 +1227,7 @@ public final class EncyclopediaRegistry {
                 .category(EncyclopediaCategory.STRUCTURES)
                 .rarity(EncyclopediaRarity.EPIC)
                 .icon(ModBlocks.CASINO_LIGHT)
-                .description("Monumental casino único por mundo que se genera cerca del spawn inicial. Destaca por su fachada Art-Deco con letrero luminoso CASINO, palmeras, fuentes y dos pisos decorados con carruseles Draftea, mesas de juego, barra de bar y zona VIP. Dentro ningún jugador recibe daño y el recinto está protegido contra destrucción.")
+                .description("Monumental casino único que se genera cerca del spawn inicial.Dentro ningún jugador recibe daño y el recinto está protegido contra destrucción (Zona Segura).")
                 .stats(
                         new StatInfo("Aparición", "1 única vez cerca del spawn", EncyclopediaEntry.CYAN_STAT_COLOR),
                         new StatInfo("Protección", "Bloques indestructibles", EncyclopediaEntry.GREEN_STAT_COLOR),
@@ -1164,7 +1237,7 @@ public final class EncyclopediaRegistry {
                 .structureContents(
                         StructureFeatureInfo.link(
                                 "Carruseles y Máquinas Draftea",
-                                "Dos carruseles centrales gigantes y múltiples hileras de tragamonedas Draftea con sillas giratorias listas para apostar tus Tony Coins.",
+                                "Dos carruseles centrales gigantes y múltiples hileras de tragamonedas Draftea con sillas giratorias para apostar tus Tony Coins.",
                                 ModBlocks.DRAFTEA,
                                 "draftea"
                         ),
@@ -1191,20 +1264,20 @@ public final class EncyclopediaRegistry {
                         StructureStepInfo.link(
                                 1,
                                 "Ubica el casino saliendo del spawn",
-                                "Camina unos 175–220 bloques desde el punto de aparición (normalmente hacia el Norte) buscando la gran fachada negra, blanca y morada con luces de neón y palmeras.",
+                                "Camina unos 175–220 bloques desde el punto de aparición (normalmente hacia el Norte) buscando la gran fachada colorida.",
                                 ModBlocks.CASINO_LIGHT,
                                 "casino_light"
                         ),
                         StructureStepInfo.link(
                                 2,
                                 "Entra y juega tus Tony Coins",
-                                "Al entrar aparecerá el subtítulo 'Draftea Tony Diaz'. No podrás romper ni colocar bloques en supervivencia y serás invulnerable mientras usas las máquinas Draftea.",
+                                "Al entrar aparecerá el subtítulo 'Draftea Tony Diaz'. No podrás romper ni colocar bloques en supervivencia, pero si podrás activar el waystone y serás invulnerable mientras usas las máquinas Draftea.",
                                 ModItem.TONY_COIN,
                                 "tony_coin"
                         ),
                         StructureStepInfo.of(
                                 3,
-                                "Personalización en modo Creativo",
+                                "Personalización en modo Creativo (Extra)",
                                 "Los administradores en modo Creativo pueden modificar detalles del edificio y guardar la plantilla para futuros mundos con el comando /drafteacasino guardar.",
                                 Items.COMMAND_BLOCK
                         )
@@ -1213,27 +1286,28 @@ public final class EncyclopediaRegistry {
                 .keywords("casino draftea tony diaz estructura spawn seguro invulnerable tragamonedas")
                 .build());
 
-        list.add(EncyclopediaEntry.builder("escenario_podcast", "Escenario del Podcast")
-                .type("Estructura / Arena del Jefe Final")
+        list.add(EncyclopediaEntry.builder("casa_jose_torres", "Casa de José Torres")
+                .type("Dungeon Única / Mansión Colosal")
                 .category(EncyclopediaCategory.STRUCTURES)
                 .rarity(EncyclopediaRarity.EPIC)
                 .icon(ModBlocks.PODCAST_CASSETTE)
-                .description("Arena circular de piedra negra, cuarzo y hielo compacto que se genera en el Overworld cerca del spawn (~140–200 bloques). Cuenta con un escenario de podcast con bocinas laterales al Norte y el pedestal central con el bloque indestructible Cassete de Podcast para invocar a José Torres.")
+                .description("Segunda gran dungeon del mod. Es única en todo el mundo y puede aparecer en cualquier bioma con tierra. Mansión de 2 pisos totalmente amueblada y el Cassete de Podcast al lado de la piscina.")
                 .stats(
-                        new StatInfo("Ubicación", "~150 bloques del Spawn", EncyclopediaEntry.CYAN_STAT_COLOR),
-                        new StatInfo("Centro", "Cassete de Podcast", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new StatInfo("Tamaño", "Muy grande", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new StatInfo("Bioma", "Cualquier bioma con tierra", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Altar", "Cassete al lado de la Piscina", EncyclopediaEntry.GREEN_STAT_COLOR),
                         new StatInfo("Jefe Final", "José Torres / Jhoseph towers", EncyclopediaEntry.RED_STAT_COLOR)
                 )
                 .structureContents(
                         StructureFeatureInfo.link(
-                                "Pedestal Central con el Cassete de Podcast",
-                                "En el centro exacto de la explanada reposa el bloque indestructible Cassete de Podcast sobre oro cincelado.",
+                                "Patio Trasero, Piscina y Cassete de Podcast",
+                                "Justo al lado de la piscina, el altar con el bloque indestructible Cassete de Podcast.",
                                 ModBlocks.PODCAST_CASSETTE,
                                 "podcast_cassette"
                         ),
                         StructureFeatureInfo.link(
-                                "Arena de Combate de José Torres",
-                                "Amplia explanada despejada de 38 bloques de diámetro diseñada para esquivar las Bolas de Hielo, los Zombies y el ataque de Dialecto.",
+                                "Mansión de 2 Pisos y Pórtico Monumental",
+                                "Casilla de Jose torres con buen loot y el chance de enfrentarte a esa cosa.",
                                 ModItem.JOSE_TORRES_ACCORDION,
                                 "entity_jose_torres"
                         )
@@ -1248,21 +1322,79 @@ public final class EncyclopediaRegistry {
                         ),
                         StructureStepInfo.link(
                                 2,
-                                "Encuentra el Escenario del Podcast",
-                                "Explora alrededor del punto de aparición del Overworld (o usa /escenariopodcast tp si eres administrador) hasta ver el título 'Escenario del Podcast'.",
+                                "Adquiere el mapa de La Casa de José Torres",
+                                "Tradea con un Israelita el mapa de La Casa de José Torres una vez hayas conseguido el Acordeon de José Torres en la Isla Penstein y usalo en el Cassette de Podcast",
                                 ModBlocks.PODCAST_CASSETTE,
                                 "podcast_cassette"
                         ),
                         StructureStepInfo.link(
                                 3,
-                                "Invoca y vence a José Torres / Jhoseph towers",
-                                "Haz clic derecho con el Acordeón sobre el Cassete de Podcast y sobrevive a sus dos fases y sus 4 ataques especiales.",
+                                "Invoca a José Torres junto a la Piscina",
+                                "Dirígete al patio trasero junto a la piscina, haz clic derecho con el Acordeón sobre el Cassete de Podcast y vence a José Torres / Jhoseph towers.",
                                 ModItem.ICE_BALL,
                                 "entity_jose_torres"
                         )
                 )
-                .related("entity_jose_torres", "Ver Boss José Torres 3D")
-                .keywords("escenario podcast estructura altar cassete jose torres jhoseph towers")
+                .related("entity_jose_torres", "Ver Boss José Torres")
+                .keywords("casa jose torres estructura dungeon tierra mansion piscina cassete podcast jhoseph towers")
+                .build());
+
+        list.add(EncyclopediaEntry.builder("casa_blanca", "La Casa Blanca")
+                .type("Dungeon Única / Sede Presidencial")
+                .category(EncyclopediaCategory.STRUCTURES)
+                .rarity(EncyclopediaRarity.EPIC)
+                .icon(ModBlocks.WHITE_HOUSE_MAILBOX)
+                .description("Tercera gran dungeon del mod. Única en todo el Overworld en biomas terrestres templados. Incluye jardines Monumentales, Rose Garden, Helipuerto Marine One, Oficina Oval, Salas de Estado y la Gran Zona Principal de Conferencias donde habita Charlie Kirk.")
+                .stats(
+                        new StatInfo("Tamaño", "448 x 448 bloques", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new StatInfo("Bioma", "Terrestre sin nieve", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Altar", "Buzón en la entrada Sur", EncyclopediaEntry.GREEN_STAT_COLOR),
+                        new StatInfo("Jefe", "Charlie Kirk", EncyclopediaEntry.RED_STAT_COLOR)
+                )
+                .structureContents(
+                        StructureFeatureInfo.link(
+                                "Buzón de la Casa Blanca (Entrada Sur)",
+                                "Justo junto a la reja de entrada principal encontrarás el Buzón de la Casa Blanca. Usa un Permiso para portar armas para invocar a Charlie Kirk.",
+                                ModBlocks.WHITE_HOUSE_MAILBOX,
+                                "white_house_mailbox"
+                        ),
+                        StructureFeatureInfo.link(
+                                "Gran Zona Principal de Conferencias",
+                                "Imponente salón interior de doble altura con podio presidencial y banderas donde Charlie Kirk te espera para desatar la batalla.",
+                                ModItem.GUN_PERMIT,
+                                "entity_charlie_kirk"
+                        ),
+                        StructureFeatureInfo.of(
+                                "Oficina Oval, Alas Este/Oeste y Jardines",
+                                "Interiores completamente amueblados con cofres de tesoro, Rose Garden, Estanque Este y Helipuerto con el Marine One.",
+                                Items.CHEST
+                        )
+                )
+                .structureSteps(
+                        StructureStepInfo.link(
+                                1,
+                                "Consigue el Permiso para portar armas",
+                                "Obtén el documento oficial con sello azul para activar la invocación en la entrada.",
+                                ModItem.GUN_PERMIT,
+                                "gun_permit"
+                        ),
+                        StructureStepInfo.link(
+                                2,
+                                "Deposita el permiso en el Buzón de la Casa Blanca",
+                                "Acércate a la reja Sur exterior e interactúa con el Buzón de la Casa Blanca.",
+                                ModBlocks.WHITE_HOUSE_MAILBOX,
+                                "white_house_mailbox"
+                        ),
+                        StructureStepInfo.link(
+                                3,
+                                "Entra al Salón Principal de Conferencias",
+                                "Cruza el Pórtico Sur y el gran vestíbulo hasta el Salón Principal de Conferencias para iniciar el combate contra Charlie Kirk.",
+                                ModBlocks.WHITE_HOUSE_MAILBOX,
+                                "entity_charlie_kirk"
+                        )
+                )
+                .related("entity_charlie_kirk", "Ver Jefe Charlie Kirk")
+                .keywords("casa blanca white house dungeon charlie kirk oficina oval marine one conferencia buzon permiso")
                 .build());
     }
 
