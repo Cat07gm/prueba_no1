@@ -22,6 +22,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import pruebano1.modid.client.BananaProjectileRenderer;
+import pruebano1.modid.client.CharlieEpsteinPopupOverlay;
 import pruebano1.modid.client.CharlieKirkBossMusicInstance;
 import pruebano1.modid.client.CharlieKirkCinematicController;
 import pruebano1.modid.client.CharlieKirkRenderer;
@@ -30,6 +31,7 @@ import pruebano1.modid.client.DrafteaBlockEntityRenderer;
 import pruebano1.modid.client.EncapsulatedVirusParticle;
 import pruebano1.modid.client.encyclopedia.EncyclopediaScreen;
 import pruebano1.modid.client.FerOvillaRenderer;
+import pruebano1.modid.client.GuardProjectileRenderer;
 import pruebano1.modid.client.HelloKittyParticle;
 import pruebano1.modid.client.IceBallProjectileRenderer;
 import pruebano1.modid.client.JefriBossMusicInstance;
@@ -47,12 +49,14 @@ import pruebano1.modid.client.TonyFase3Renderer;
 import pruebano1.modid.client.ValentinaPrietaRenderer;
 import pruebano1.modid.client.VitorJugoRenderer;
 import pruebano1.modid.client.WeedLeafParticle;
+import pruebano1.modid.client.WhiteHouseGuardRenderer;
 import pruebano1.modid.client.YostinBiberRenderer;
 import pruebano1.modid.entity.CharlieKirkEntity;
 import pruebano1.modid.entity.JefriPensteinEntity;
 import pruebano1.modid.entity.JoseTorresEntity;
 import pruebano1.modid.entity.ModEntities;
 import pruebano1.modid.entity.PiDidiEntity;
+import pruebano1.modid.network.CharlieEpsteinPopupPayload;
 import pruebano1.modid.network.PlayerDeathKoPayload;
 
 import java.util.List;
@@ -107,6 +111,11 @@ public class Prueba_no1Client implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.TONY_FASE2, TonyFase2Renderer::new);
         EntityRendererRegistry.register(ModEntities.TONY_FASE3, TonyFase3Renderer::new);
         EntityRendererRegistry.register(ModEntities.CHARLIE_KIRK, CharlieKirkRenderer::new);
+        EntityRendererRegistry.register(ModEntities.WHITE_HOUSE_GUARD_PISTOL, WhiteHouseGuardRenderer::pistol);
+        EntityRendererRegistry.register(ModEntities.WHITE_HOUSE_GUARD_RIFLE, WhiteHouseGuardRenderer::rifle);
+        EntityRendererRegistry.register(ModEntities.WHITE_HOUSE_GUARD_BAZOOKA, WhiteHouseGuardRenderer::bazooka);
+        EntityRendererRegistry.register(ModEntities.GUARD_BULLET_PROJECTILE, GuardProjectileRenderer::bullet);
+        EntityRendererRegistry.register(ModEntities.GUARD_ROCKET_PROJECTILE, GuardProjectileRenderer::rocket);
 
         // Pantalla de la Draftea: dibuja los ítems de los rodillos
         BlockEntityRendererFactories.register(ModBlockEntities.DRAFTEA, DrafteaBlockEntityRenderer::new);
@@ -123,6 +132,11 @@ public class Prueba_no1Client implements ClientModInitializer {
             context.client().execute(() -> PlayerDeathKoOverlay.trigger(payload.deadPlayerName()));
         });
 
+        // Recibir aviso rápido de telequinesis / Efecto Epstein de Charlie Kirk
+        ClientPlayNetworking.registerGlobalReceiver(CharlieEpsteinPopupPayload.ID, (payload, context) -> {
+            context.client().execute(() -> CharlieEpsteinPopupOverlay.trigger(payload.phase2()));
+        });
+
         // Recibir límites protegidos del casino "Draftea Tony Diaz" y bloquear clics en cliente sin parpadeo
         ClientPlayNetworking.registerGlobalReceiver(pruebano1.modid.network.CasinoBoundsPayload.ID, (payload, context) -> {
             context.client().execute(() -> pruebano1.modid.world.DrafteaCasinoManager.setClientBounds(payload));
@@ -132,9 +146,13 @@ public class Prueba_no1Client implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(pruebano1.modid.network.LobbyBoundsPayload.ID, (payload, context) -> {
             context.client().execute(() -> pruebano1.modid.world.LobbyTowerManager.setClientBounds(payload));
         });
-        net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register((handler, client) ->
-                pruebano1.modid.world.LobbyTowerManager.clearClientBounds()
-        );
+        ClientPlayNetworking.registerGlobalReceiver(pruebano1.modid.network.DungeonProgressionPayload.ID, (payload, context) -> {
+            context.client().execute(() -> pruebano1.modid.client.encyclopedia.ClientDungeonProgression.applyPayload(payload));
+        });
+        net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            pruebano1.modid.world.LobbyTowerManager.clearClientBounds();
+            pruebano1.modid.client.encyclopedia.ClientDungeonProgression.reset();
+        });
 
         // Música del casino: recibir lo que eligió el DJ, abrir su interfaz y reproducir solo dentro del casino
         ClientPlayNetworking.registerGlobalReceiver(pruebano1.modid.network.CasinoMusicStatePayload.ID, (payload, context) ->
@@ -151,7 +169,10 @@ public class Prueba_no1Client implements ClientModInitializer {
                 pruebano1.modid.world.DrafteaCasinoManager.clearClientBounds()
         );
         net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register((handler, client) ->
-                client.execute(() -> CharlieKirkCinematicController.reset(client))
+                client.execute(() -> {
+                    CharlieKirkCinematicController.reset(client);
+                    CharlieEpsteinPopupOverlay.reset();
+                })
         );
 
         net.fabricmc.fabric.api.event.player.AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
@@ -173,6 +194,9 @@ public class Prueba_no1Client implements ClientModInitializer {
             float tickDelta = tickCounter.getTickDelta(false);
             if (PlayerDeathKoOverlay.isActive()) {
                 PlayerDeathKoOverlay.render(drawContext, tickDelta);
+            }
+            if (CharlieEpsteinPopupOverlay.isActive()) {
+                CharlieEpsteinPopupOverlay.render(drawContext, tickDelta);
             }
             if (activeTiktokCinematicTick > 0 || activeDeathCageCinematic || activeJoseTorresCinematicTick > 0 || activeCharlieKirkCinematicTick > 0) {
                 int w = drawContext.getScaledWindowWidth();
@@ -207,9 +231,10 @@ public class Prueba_no1Client implements ClientModInitializer {
             }
         });
 
-        // Tick de cliente: actualizar efecto K.O., música de jefes y cámara en cinemáticas de Jefri
+        // Tick de cliente: actualizar efecto K.O., avisos, música de jefes y cámara en cinemáticas
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             PlayerDeathKoOverlay.tick();
+            CharlieEpsteinPopupOverlay.tick();
             activeTiktokCinematicTick = 0;
             activeJoseTorresCinematicTick = 0;
             activeCharlieKirkCinematicTick = 0;
@@ -217,6 +242,7 @@ public class Prueba_no1Client implements ClientModInitializer {
 
             if (client.world == null || client.player == null || !client.player.isAlive()) {
                 CharlieKirkCinematicController.reset(client);
+                CharlieEpsteinPopupOverlay.reset();
                 restorePlayerViewAfterCinematic(client);
                 activeBossMusic = null;
                 activeJefriMusic = null;

@@ -3,6 +3,8 @@ package pruebano1.modid.world;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.*;
 import net.minecraft.registry.Registries;
@@ -145,18 +147,37 @@ public class CasaJoseTorresCustomEdits {
         int baseX = chunkX << 4;
         int baseZ = chunkZ << 4;
         BlockPos.Mutable pos = new BlockPos.Mutable();
+        BlockState airState = Blocks.AIR.getDefaultState();
+        BlockState grassState = Blocks.GRASS_BLOCK.getDefaultState();
         int idx = 0;
 
         for (int lx = 0; lx < 16; lx++) {
             int wx = baseX + lx;
+            int dx = wx - centerX;
             for (int lz = 0; lz < 16; lz++) {
                 int wz = baseZ + lz;
+                int dz = wz - centerZ;
+                if (Math.abs(dx) > CasaJoseTorresPiece.FLAT_BOX_HALF || Math.abs(dz) > CasaJoseTorresPiece.FLAT_BOX_HALF) {
+                    idx += Y_COUNT;
+                    continue;
+                }
+
+                int ry1PalIdx = data.blockIndices()[idx + (1 - MIN_REL_Y)];
+                boolean hadWildLogAtBase = ry1PalIdx >= 0 && ry1PalIdx < decodedPalette.size()
+                        && isBakedWildLog(decodedPalette.get(ry1PalIdx), dx, dz);
+
                 for (int ry = MIN_REL_Y; ry <= MAX_REL_Y; ry++) {
                     int wy = baseY + ry;
                     int palIndex = data.blockIndices()[idx++];
                     if (palIndex >= 0 && palIndex < decodedPalette.size()) {
+                        BlockState state = decodedPalette.get(palIndex);
+                        if (ry >= 1 && isBakedWildBiomeVegetation(state, dx, dz)) {
+                            state = airState;
+                        } else if (ry == 0 && hadWildLogAtBase && (state.isOf(Blocks.DIRT) || state.isOf(Blocks.PODZOL))) {
+                            state = grassState;
+                        }
                         pos.set(wx, wy, wz);
-                        world.setBlockState(pos, decodedPalette.get(palIndex), Block.NOTIFY_LISTENERS);
+                        world.setBlockState(pos, state, Block.NOTIFY_LISTENERS);
                     }
                 }
             }
@@ -164,7 +185,13 @@ public class CasaJoseTorresCustomEdits {
 
         if (data.blockEntities() != null) {
             for (SavedBlockEntity savedBe : data.blockEntities()) {
-                BlockPos bePos = new BlockPos(baseX + savedBe.relX(), baseY + savedBe.relY(), baseZ + savedBe.relZ());
+                int beWx = baseX + savedBe.relX();
+                int beWz = baseZ + savedBe.relZ();
+                if (Math.abs(beWx - centerX) > CasaJoseTorresPiece.FLAT_BOX_HALF
+                        || Math.abs(beWz - centerZ) > CasaJoseTorresPiece.FLAT_BOX_HALF) {
+                    continue;
+                }
+                BlockPos bePos = new BlockPos(beWx, baseY + savedBe.relY(), beWz);
                 BlockState stateAtPos = world.getBlockState(bePos);
                 NbtCompound nbtCopy = savedBe.nbt().copy();
                 nbtCopy.putInt("x", bePos.getX());
@@ -183,6 +210,49 @@ public class CasaJoseTorresCustomEdits {
                 }
             }
         }
+    }
+
+    private static boolean isBakedWildLog(BlockState st, int dx, int dz) {
+        if (st.isOf(Blocks.DARK_OAK_LOG)) {
+            return !(dx == -42 && (dz == 5 || dz == 6));
+        }
+        return st.isOf(Blocks.ACACIA_LOG)
+                || st.isOf(Blocks.OAK_LOG)
+                || st.isOf(Blocks.BIRCH_LOG)
+                || st.isOf(Blocks.JUNGLE_LOG)
+                || st.isOf(Blocks.MANGROVE_LOG)
+                || st.isOf(Blocks.CHERRY_LOG)
+                || st.isOf(Blocks.PALE_OAK_LOG);
+    }
+
+    private static boolean isBakedWildBiomeVegetation(BlockState st, int dx, int dz) {
+        if (isBakedWildLog(st, dx, dz)) {
+            return true;
+        }
+        if (st.getBlock() instanceof LeavesBlock) {
+            return !st.contains(LeavesBlock.PERSISTENT) || !st.get(LeavesBlock.PERSISTENT);
+        }
+        return st.isOf(Blocks.VINE)
+                || st.isOf(Blocks.CAVE_VINES)
+                || st.isOf(Blocks.CAVE_VINES_PLANT)
+                || st.isOf(Blocks.WEEPING_VINES)
+                || st.isOf(Blocks.WEEPING_VINES_PLANT)
+                || st.isOf(Blocks.TWISTING_VINES)
+                || st.isOf(Blocks.TWISTING_VINES_PLANT)
+                || st.isOf(Blocks.SHORT_GRASS)
+                || st.isOf(Blocks.TALL_GRASS)
+                || st.isOf(Blocks.FERN)
+                || st.isOf(Blocks.LARGE_FERN)
+                || st.isOf(Blocks.DEAD_BUSH)
+                || st.isOf(Blocks.MOSS_CARPET)
+                || st.isOf(Blocks.BAMBOO)
+                || st.isOf(Blocks.BAMBOO_SAPLING)
+                || st.isOf(Blocks.COCOA)
+                || st.isOf(Blocks.MELON)
+                || st.isOf(Blocks.PUMPKIN)
+                || st.isOf(Blocks.BEE_NEST)
+                || st.isOf(Blocks.POPPY)
+                || st.isOf(Blocks.DANDELION);
     }
 
     public static synchronized int saveHouseFromPlayer(ServerPlayerEntity player, int chunkRadius) {

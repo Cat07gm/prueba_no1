@@ -2,6 +2,7 @@ package pruebano1.modid.entity;
 
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.SpawnLocationTypes;
 import net.minecraft.entity.SpawnReason;
@@ -19,6 +20,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.ServerWorldAccess;
 import pruebano1.modid.Prueba_no1;
+import pruebano1.modid.world.CasaBlancaStructure;
 import pruebano1.modid.world.IslaPensteinStructure;
 
 public class ModEntities {
@@ -252,6 +254,78 @@ public class ModEntities {
                     .build(CHARLIE_KIRK_KEY)
     );
 
+    public static final RegistryKey<EntityType<?>> WHITE_HOUSE_GUARD_PISTOL_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "white_house_guard_pistol")
+    );
+
+    public static final EntityType<WhiteHouseGuardEntity> WHITE_HOUSE_GUARD_PISTOL = Registry.register(
+            Registries.ENTITY_TYPE,
+            WHITE_HOUSE_GUARD_PISTOL_KEY,
+            EntityType.Builder.create(WhiteHouseGuardEntity::createPistolGuard, SpawnGroup.MONSTER)
+                    .dimensions(0.6F, 1.95F)
+                    .maxTrackingRange(64)
+                    .build(WHITE_HOUSE_GUARD_PISTOL_KEY)
+    );
+
+    public static final RegistryKey<EntityType<?>> WHITE_HOUSE_GUARD_RIFLE_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "white_house_guard_rifle")
+    );
+
+    public static final EntityType<WhiteHouseGuardEntity> WHITE_HOUSE_GUARD_RIFLE = Registry.register(
+            Registries.ENTITY_TYPE,
+            WHITE_HOUSE_GUARD_RIFLE_KEY,
+            EntityType.Builder.create(WhiteHouseGuardEntity::createRifleGuard, SpawnGroup.MONSTER)
+                    .dimensions(0.6F, 1.95F)
+                    .maxTrackingRange(64)
+                    .build(WHITE_HOUSE_GUARD_RIFLE_KEY)
+    );
+
+    public static final RegistryKey<EntityType<?>> WHITE_HOUSE_GUARD_BAZOOKA_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "white_house_guard_bazooka")
+    );
+
+    public static final EntityType<WhiteHouseGuardEntity> WHITE_HOUSE_GUARD_BAZOOKA = Registry.register(
+            Registries.ENTITY_TYPE,
+            WHITE_HOUSE_GUARD_BAZOOKA_KEY,
+            EntityType.Builder.create(WhiteHouseGuardEntity::createBazookaGuard, SpawnGroup.MONSTER)
+                    .dimensions(0.6F, 1.95F)
+                    .maxTrackingRange(64)
+                    .build(WHITE_HOUSE_GUARD_BAZOOKA_KEY)
+    );
+
+    public static final RegistryKey<EntityType<?>> GUARD_BULLET_PROJECTILE_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "guard_bullet_projectile")
+    );
+
+    public static final EntityType<GuardBulletProjectileEntity> GUARD_BULLET_PROJECTILE = Registry.register(
+            Registries.ENTITY_TYPE,
+            GUARD_BULLET_PROJECTILE_KEY,
+            EntityType.Builder.<GuardBulletProjectileEntity>create(GuardBulletProjectileEntity::new, SpawnGroup.MISC)
+                    .dimensions(0.25F, 0.25F)
+                    .maxTrackingRange(64)
+                    .trackingTickInterval(5)
+                    .build(GUARD_BULLET_PROJECTILE_KEY)
+    );
+
+    public static final RegistryKey<EntityType<?>> GUARD_ROCKET_PROJECTILE_KEY = RegistryKey.of(
+            RegistryKeys.ENTITY_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "guard_rocket_projectile")
+    );
+
+    public static final EntityType<GuardRocketProjectileEntity> GUARD_ROCKET_PROJECTILE = Registry.register(
+            Registries.ENTITY_TYPE,
+            GUARD_ROCKET_PROJECTILE_KEY,
+            EntityType.Builder.<GuardRocketProjectileEntity>create(GuardRocketProjectileEntity::new, SpawnGroup.MISC)
+                    .dimensions(0.45F, 0.45F)
+                    .maxTrackingRange(64)
+                    .trackingTickInterval(5)
+                    .build(GUARD_ROCKET_PROJECTILE_KEY)
+    );
+
     public static void registerModEntities() {
         Prueba_no1.LOGGER.info("Registrando entidades para " + Prueba_no1.MOD_ID);
         FabricDefaultAttributeRegistry.register(PI_DIDI, PiDidiEntity.createPiDidiAttributes());
@@ -265,6 +339,9 @@ public class ModEntities {
         FabricDefaultAttributeRegistry.register(TONY_FASE2, TonyFase2Entity.createTonyFase2Attributes());
         FabricDefaultAttributeRegistry.register(TONY_FASE3, TonyFase3Entity.createTonyFase3Attributes());
         FabricDefaultAttributeRegistry.register(CHARLIE_KIRK, CharlieKirkEntity.createCharlieKirkAttributes());
+        FabricDefaultAttributeRegistry.register(WHITE_HOUSE_GUARD_PISTOL, WhiteHouseGuardEntity.createGuardAttributes());
+        FabricDefaultAttributeRegistry.register(WHITE_HOUSE_GUARD_RIFLE, WhiteHouseGuardEntity.createGuardAttributes());
+        FabricDefaultAttributeRegistry.register(WHITE_HOUSE_GUARD_BAZOOKA, WhiteHouseGuardEntity.createGuardAttributes());
 
         // Permitir spawneo natural de los 4 niños en la Isla Penstein tanto de día como de noche,
         // manteniendo un límite local (máximo 12 niños en un radio de 28 bloques) para que sea abundante pero controlable para 2 jugadores full diamante.
@@ -272,6 +349,39 @@ public class ModEntities {
         SpawnRestriction.register(VITOR_JUGO, SpawnLocationTypes.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ModEntities::canIslandChildSpawn);
         SpawnRestriction.register(FER_OVILLA, SpawnLocationTypes.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ModEntities::canIslandChildSpawn);
         SpawnRestriction.register(VALENTINA_PRIETA, SpawnLocationTypes.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ModEntities::canIslandChildSpawn);
+
+        // Solo permitir agentes de Seguridad de la Casa Blanca dentro de La Casa Blanca, bien espaciados y sin grupos grandes
+        SpawnRestriction.register(WHITE_HOUSE_GUARD_PISTOL, SpawnLocationTypes.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ModEntities::canWhiteHouseGuardSpawn);
+        SpawnRestriction.register(WHITE_HOUSE_GUARD_RIFLE, SpawnLocationTypes.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ModEntities::canWhiteHouseGuardSpawn);
+        SpawnRestriction.register(WHITE_HOUSE_GUARD_BAZOOKA, SpawnLocationTypes.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ModEntities::canWhiteHouseGuardSpawn);
+    }
+
+    public static boolean canWhiteHouseGuardSpawn(
+            EntityType<? extends HostileEntity> type,
+            ServerWorldAccess world,
+            SpawnReason spawnReason,
+            BlockPos pos,
+            Random random
+    ) {
+        if (world.getDifficulty() == Difficulty.PEACEFUL) {
+            return false;
+        }
+        if (!world.getBlockState(pos.down()).isSolidBlock(world, pos.down())) {
+            return false;
+        }
+        if (!CasaBlancaStructure.isPosInCasaBlanca(world, pos)) {
+            return false;
+        }
+        // Lógica equivalente a Isla Penstein (< 12 en radio 28) aumentada un +10% (< 13 en radio 28), evitando amontonamientos
+        if (world.getEntitiesByClass(WhiteHouseGuardEntity.class, new Box(pos).expand(7.0D), LivingEntity::isAlive).size() >= 2) {
+            return false;
+        }
+        int nearby28 = world.getEntitiesByClass(WhiteHouseGuardEntity.class, new Box(pos).expand(28.0D), LivingEntity::isAlive).size();
+        if (nearby28 >= 13) {
+            return false;
+        }
+        int totalDungeonGuards = world.getEntitiesByClass(WhiteHouseGuardEntity.class, new Box(pos).expand(140.0D), LivingEntity::isAlive).size();
+        return totalDungeonGuards < 28;
     }
 
     private static boolean canIslandChildSpawn(

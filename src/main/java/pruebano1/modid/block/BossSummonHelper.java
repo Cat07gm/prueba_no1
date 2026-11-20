@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 
 /**
  * Helper compartido para garantizar que el 100% de los jugadores conectados (no espectadores)
- * se encuentren presentes en el lugar antes de consumir un ítem de invocación de jefe.
+ * se encuentren presentes dentro de la dungeon correspondiente antes de invocar a su jefe.
  */
 public final class BossSummonHelper {
 
@@ -31,6 +31,29 @@ public final class BossSummonHelper {
             double fallbackDistance,
             Predicate<BlockPos> dungeonAreaCheck
     ) {
+        return ensureAllPlayersPresent(
+                serverWorld,
+                altarPos,
+                caller,
+                blockTitle,
+                bossDisplayName,
+                "la dungeon",
+                fallbackDistance,
+                dungeonAreaCheck
+        );
+    }
+
+    public static boolean ensureAllPlayersPresent(
+            ServerWorld serverWorld,
+            BlockPos altarPos,
+            PlayerEntity caller,
+            String blockTitle,
+            String bossDisplayName,
+            String dungeonDisplayName,
+            double fallbackDistance,
+            Predicate<BlockPos> dungeonAreaCheck
+    ) {
+        boolean altarInsideDungeon = dungeonAreaCheck.test(altarPos);
         List<ServerPlayerEntity> allPlayers = serverWorld.getServer().getPlayerManager().getPlayerList();
         List<String> missingNames = new ArrayList<>();
         int presentCount = 0;
@@ -42,8 +65,11 @@ public final class BossSummonHelper {
             }
             totalEligible++;
             boolean sameWorld = p.getServerWorld() == serverWorld;
-            boolean inPlace = sameWorld && (dungeonAreaCheck.test(p.getBlockPos())
-                    || p.getBlockPos().isWithinDistance(altarPos, fallbackDistance));
+            // Si el altar está dentro de la dungeon, exigir estrictamente que TODOS los jugadores estén dentro de esa dungeon.
+            // Solo si el altar fue colocado fuera de la dungeon (ej. creativo) usar la distancia de respaldo.
+            boolean inPlace = sameWorld && (altarInsideDungeon
+                    ? dungeonAreaCheck.test(p.getBlockPos())
+                    : p.getBlockPos().isWithinDistance(altarPos, fallbackDistance));
             if (inPlace) {
                 presentCount++;
             } else {
@@ -54,12 +80,14 @@ public final class BossSummonHelper {
         if (!missingNames.isEmpty()) {
             serverWorld.playSound(null, altarPos, SoundEvents.BLOCK_IRON_TRAPDOOR_CLOSE, SoundCategory.BLOCKS, 0.9F, 0.75F);
             String joined = String.join(", ", missingNames);
+            String placeLabel = altarInsideDungeon ? dungeonDisplayName : "el área de invocación";
             caller.sendMessage(
                     Text.literal(blockTitle + ": ")
                             .formatted(Formatting.RED, Formatting.BOLD)
                             .append(Text.literal(
-                                    "El 100% de los jugadores debe estar presente en el lugar para invocar a "
-                                            + bossDisplayName + " (" + presentCount + "/" + totalEligible
+                                    "Todos los jugadores conectados deben estar dentro de " + placeLabel
+                                            + " para invocar a " + bossDisplayName
+                                            + " (" + presentCount + "/" + totalEligible
                                             + "). Faltan: " + joined
                             ).formatted(Formatting.YELLOW)),
                     false

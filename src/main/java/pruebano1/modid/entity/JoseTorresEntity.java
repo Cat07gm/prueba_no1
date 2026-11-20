@@ -1251,6 +1251,10 @@ public class JoseTorresEntity extends HostileEntity implements GeoEntity {
             this.dropStack(world, new ItemStack(ModItem.ICE_BALL, 16 + this.random.nextInt(9)));
             this.dropStack(world, new ItemStack(ModItem.LONTOTEM, 1));
             this.dropStack(world, new ItemStack(ModItem.SCARLET_INGOT, 6 + this.random.nextInt(5)));
+            pruebano1.modid.world.DungeonProgressionState.recordBossDefeated(
+                    world,
+                    pruebano1.modid.world.DungeonProgressionState.DungeonStage.CASA_JOSE_TORRES
+            );
 
             this.bossBar.clearPlayers();
             this.discard();

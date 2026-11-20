@@ -3,23 +3,23 @@ package pruebano1.modid.client.encyclopedia;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
+import pruebano1.modid.ModItem;
 import pruebano1.modid.Prueba_no1Client;
 import pruebano1.modid.client.encyclopedia.EncyclopediaEntry.DropInfo;
 import pruebano1.modid.client.encyclopedia.EncyclopediaEntry.EffectInfo;
@@ -30,6 +30,7 @@ import pruebano1.modid.client.encyclopedia.EncyclopediaEntry.SlotRef;
 import pruebano1.modid.client.encyclopedia.EncyclopediaEntry.StatInfo;
 import pruebano1.modid.client.encyclopedia.EncyclopediaEntry.StructureFeatureInfo;
 import pruebano1.modid.client.encyclopedia.EncyclopediaEntry.StructureStepInfo;
+import pruebano1.modid.client.encyclopedia.EncyclopediaTheme.ButtonStyle;
 import pruebano1.modid.entity.JefriPensteinEntity;
 import pruebano1.modid.entity.JoseTorresEntity;
 
@@ -39,31 +40,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Interactive opaque dark-slate encyclopedia covering all Lon Terry mod items,
- * recipes, 3D animated entities, and a standalone Structures guide section.
+ * Enciclopedia interactiva de Lon Terry rediseñada con estética de Libro / Pergamino de Atril
+ * de Minecraft, marcos de madera oscura biselada, ranuras clásicas de inventario, lomo cosido
+ * y Broches de Escarlata y Oro propios del mod, además de acceso directo al Mapa de Progresión de Dungeons.
  */
 public class EncyclopediaScreen extends Screen {
-
-    // High-contrast, solid/rich obsidian-slate palette (no washed-out transparency)
-    private static final int BG_WINDOW = 0xFF0E141F;
-    private static final int BG_TOP_TOP = 0xFF1C283C;
-    private static final int BG_TOP_BOT = 0xFF131C2B;
-    private static final int BG_SIDEBAR = 0xFF121B2A;
-    private static final int BG_PANEL = 0xFF141D2D;
-    private static final int BG_CARD = 0xFF1B273A;
-    private static final int BG_CARD_HOVER = 0xFF263752;
-    private static final int BG_SLOT = 0xFF182336;
-    private static final int BG_INPUT = 0xFF0C121D;
-
-    private static final int BORDER_SUBTLE = 0xFF38516E;
-    private static final int BORDER_OUTER = 0xFF4A6B8F;
-    private static final int BORDER_ACTIVE = 0xFF2CE6D0;
-    private static final int ACCENT_CRIMSON = 0xFFE53E2D;
-    private static final int ACCENT_CRIMSON_BRIGHT = 0xFFFF5A4A;
-    private static final int ACCENT_TEAL = 0xFF2CE6C8;
-    private static final int TEXT_PRIMARY = 0xFFFFFFFF;
-    private static final int TEXT_SECONDARY = 0xFFE2ECF6;
-    private static final int TEXT_MUTED = 0xFFB0C4DA;
 
     private static final int SIDEBAR_CARD_GAP = 3;
     private static final int SIDEBAR_SECTION_DIVIDER_H = 14;
@@ -71,6 +52,9 @@ public class EncyclopediaScreen extends Screen {
     private static EncyclopediaCategory lastCategory = EncyclopediaCategory.ALL;
     @Nullable
     private static String lastSelectedId = null;
+
+    @Nullable
+    private String pendingInitialEntryId;
 
     private EncyclopediaCategory selectedCategory = lastCategory;
     private String searchQuery = "";
@@ -82,21 +66,23 @@ public class EncyclopediaScreen extends Screen {
 
     private TextFieldWidget searchField;
 
-    // Layout geometry
+    // Geometría general del libro abierto
     private int winX, winY, winW, winH;
-    private final int topBarH = 26;
-    private final int bottomBarH = 18;
+    private final int topBarH = 30;
+    private final int bottomBarH = 20;
     private int sidebarX, sidebarY, sidebarW, sidebarH;
     private int centerX, centerY, centerW, centerH;
+    private int spineX;
     private int gridX, gridY, gridW, gridH;
     private int detailX, detailY, detailW, detailH;
 
-    // Close & clear hitboxes
+    // Controles superiores y búsqueda
+    private int progressionBtnX, progressionBtnY, progressionBtnW, progressionBtnH;
     private int closeBtnX, closeBtnY, closeBtnW, closeBtnH;
     private int searchBoxX, searchBoxY, searchBoxW, searchBoxH;
     private int clearSearchX, clearSearchY, clearSearchSize;
 
-    // Scroll state
+    // Estado de desplazamiento (scroll)
     private int sidebarScroll = 0;
     private int sidebarMaxScroll = 0;
     private int gridScroll = 0;
@@ -104,12 +90,12 @@ public class EncyclopediaScreen extends Screen {
     private int detailScroll = 0;
     private int detailMaxScroll = 0;
 
-    // Smooth hover magnification state
+    // Animaciones suaves al pasar el cursor
     private final Map<String, Float> gridHoverAnim = new HashMap<>();
     private final Map<EncyclopediaCategory, Float> sidebarHoverAnim = new HashMap<>();
     private float itemShowcaseHoverAnim = 0.0F;
 
-    // 3D entity preview state
+    // Vista previa 3D de entidades
     private final Map<EntityType<?>, LivingEntity> entityCache = new HashMap<>();
     private float previewYawDeg = 20.0F;
     private float previewPitchDeg = 8.0F;
@@ -133,9 +119,9 @@ public class EncyclopediaScreen extends Screen {
     }
 
     private static final List<SocialLink> SOCIAL_LINKS = List.of(
-            new SocialLink("Instagram", "https://www.instagram.com/milokgms?srtk=MXNlOHRmMjlqNWltaA==", 0xFFE1306C),
-            new SocialLink("Canal Lon Terry", "https://whatsapp.com/channel/0029Vaz9S5VIiRowWW7Zwy2b", 0xFF25D366),
-            new SocialLink("Canal Milofans", "https://whatsapp.com/channel/0029Vb7yf8e8fewuDpPhlO1b", 0xFF25D366)
+            new SocialLink("Instagram", "https://www.instagram.com/milokgms?srtk=MXNlOHRmMjlqNWltaA==", 0xFFC2255C),
+            new SocialLink("Canal Lon Terry", "https://whatsapp.com/channel/0029Vaz9S5VIiRowWW7Zwy2b", 0xFF1E8E48),
+            new SocialLink("Canal Milofans", "https://whatsapp.com/channel/0029Vb7yf8e8fewuDpPhlO1b", 0xFF1E8E48)
     );
 
     private record HitTarget(
@@ -149,11 +135,24 @@ public class EncyclopediaScreen extends Screen {
         }
     }
 
-    private record GridSlotDraw(EncyclopediaEntry entry, int x, int y, int size, float hoverAnim, boolean selected) {
+    private record GridSlotDraw(
+            EncyclopediaEntry entry,
+            int x,
+            int y,
+            int size,
+            float hoverAnim,
+            boolean selected,
+            boolean spoilerLocked
+    ) {
     }
 
     public EncyclopediaScreen() {
+        this(null);
+    }
+
+    public EncyclopediaScreen(@Nullable String initialEntryId) {
         super(Text.literal("Enciclopedia Lon Terry"));
+        this.pendingInitialEntryId = initialEntryId;
     }
 
     @Override
@@ -173,12 +172,12 @@ public class EncyclopediaScreen extends Screen {
                 searchBoxY + (searchBoxH - 8) / 2,
                 Math.max(40, searchBoxW - 34),
                 12,
-                Text.literal("Buscar elemento")
+                Text.literal("Buscar en el códice")
         );
         this.searchField.setMaxLength(48);
         this.searchField.setDrawsBackground(false);
-        this.searchField.setEditableColor(TEXT_PRIMARY);
-        this.searchField.setPlaceholder(Text.literal("Buscar...").formatted(Formatting.GRAY));
+        this.searchField.setEditableColor(EncyclopediaTheme.INK_TITLE);
+        this.searchField.setPlaceholder(Text.literal("Buscar en el códice...").withColor(EncyclopediaTheme.INK_MUTED));
         this.searchField.setText(prevText);
         this.searchField.setChangedListener(text -> {
             this.searchQuery = text;
@@ -187,7 +186,13 @@ public class EncyclopediaScreen extends Screen {
         });
         addSelectableChild(this.searchField);
 
-        refreshFilteredEntries(true);
+        if (this.pendingInitialEntryId != null) {
+            String target = this.pendingInitialEntryId;
+            this.pendingInitialEntryId = null;
+            navigateToEntryId(target);
+        } else {
+            refreshFilteredEntries(true);
+        }
     }
 
     private void computeLayout() {
@@ -199,41 +204,64 @@ public class EncyclopediaScreen extends Screen {
         this.winY = (height - winH) / 2;
 
         this.closeBtnW = 62;
-        this.closeBtnH = 16;
-        this.closeBtnX = winX + winW - closeBtnW - 8;
-        this.closeBtnY = winY + (topBarH - closeBtnH) / 2;
+        this.closeBtnH = 18;
+        this.closeBtnX = winX + winW - closeBtnW - 12;
+        this.closeBtnY = winY + (topBarH - closeBtnH) / 2 + 2;
 
-        int bodyY = winY + topBarH;
-        int bodyH = winH - topBarH - bottomBarH;
+        this.progressionBtnW = winW >= 620 ? 172 : 124;
+        this.progressionBtnH = 18;
+        this.progressionBtnX = closeBtnX - progressionBtnW - 8;
+        this.progressionBtnY = closeBtnY;
 
-        this.sidebarW = MathHelper.clamp((int) (winW * 0.12F), 68, 88);
-        this.sidebarX = winX + 1;
+        int bodyY = winY + topBarH + 2;
+        int bodyH = winH - topBarH - bottomBarH - 6;
+
+        this.sidebarW = MathHelper.clamp((int) (winW * 0.12F), 70, 90);
+        this.sidebarX = winX + 8;
         this.sidebarY = bodyY;
         this.sidebarH = bodyH;
 
-        int remainingW = winW - sidebarW - 2;
-        this.centerW = MathHelper.clamp((int) (remainingW * 0.43F), 175, 420);
-        this.centerX = sidebarX + sidebarW;
+        int pagesLeft = sidebarX + sidebarW + 4;
+        int pagesRight = winX + winW - 9;
+        int pagesTotalW = pagesRight - pagesLeft;
+
+        this.centerW = MathHelper.clamp((int) (pagesTotalW * 0.44F), 172, 420);
+        this.centerX = pagesLeft;
         this.centerY = bodyY;
         this.centerH = bodyH;
 
-        this.searchBoxX = centerX + 8;
+        this.spineX = centerX + centerW + 3;
+
+        this.detailX = spineX + 4;
+        this.detailY = bodyY;
+        this.detailW = pagesRight - detailX;
+        this.detailH = bodyH;
+
+        this.searchBoxX = centerX + 10;
         this.searchBoxY = centerY + 24;
-        this.searchBoxW = centerW - 16;
+        this.searchBoxW = centerW - 20;
         this.searchBoxH = 18;
         this.clearSearchSize = 14;
         this.clearSearchX = searchBoxX + searchBoxW - clearSearchSize - 2;
         this.clearSearchY = searchBoxY + (searchBoxH - clearSearchSize) / 2;
 
-        this.gridX = centerX + 8;
-        this.gridY = searchBoxY + searchBoxH + 8;
-        this.gridW = centerW - 16;
-        this.gridH = centerY + centerH - gridY - 6;
+        this.gridX = centerX + 10;
+        this.gridY = searchBoxY + searchBoxH + 7;
+        this.gridW = centerW - 20;
+        this.gridH = centerY + centerH - gridY - 8;
+    }
 
-        this.detailX = centerX + centerW;
-        this.detailY = bodyY;
-        this.detailW = winX + winW - 1 - detailX;
-        this.detailH = bodyH;
+    private void openDungeonProgressionMap() {
+        playBookTurnSound();
+        if (this.client != null) {
+            this.client.setScreen(new DungeonProgressionScreen(this));
+        }
+    }
+
+    private void playBookTurnSound() {
+        if (this.client != null) {
+            this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ITEM_BOOK_PAGE_TURN, 1.0F));
+        }
     }
 
     private void refreshFilteredEntries(boolean tryRestoreLast) {
@@ -259,6 +287,9 @@ public class EncyclopediaScreen extends Screen {
     }
 
     private void selectCategory(EncyclopediaCategory category) {
+        if (this.selectedCategory != category) {
+            playBookTurnSound();
+        }
         this.selectedCategory = category;
         lastCategory = category;
         this.gridScroll = 0;
@@ -345,7 +376,7 @@ public class EncyclopediaScreen extends Screen {
 
     @Override
     public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.fillGradient(0, 0, this.width, this.height, 0xF406080E, 0xFA090D16);
+        context.fillGradient(0, 0, this.width, this.height, 0xCC120A06, 0xE60B0604);
     }
 
     @Override
@@ -358,20 +389,18 @@ public class EncyclopediaScreen extends Screen {
         this.hoveredGridEntry = null;
         this.stageBoxW = 0;
 
-        // Render background ONCE before our panels (calling super.render at the end would re-run renderBackground on top!)
         this.renderBackground(context, mouseX, mouseY, delta);
 
-        // Main window container
-        context.fill(winX, winY, winX + winW, winY + winH, BG_WINDOW);
-        context.drawBorder(winX, winY, winW, winH, BORDER_OUTER);
+        // Cubierta exterior de madera oscura con los 4 Broches de Escarlata y Oro
+        EncyclopediaTheme.drawBookOuterFrame(context, winX, winY, winW, winH);
 
         renderTopBar(context, mouseX, mouseY);
         renderSidebar(context, mouseX, mouseY, delta);
-        renderCenterPanel(context, mouseX, mouseY, delta);
-        renderDetailPanel(context, mouseX, mouseY, delta);
+        renderCenterPage(context, mouseX, mouseY, delta);
+        EncyclopediaTheme.drawBookSpine(context, spineX, centerY, centerH);
+        renderDetailPage(context, mouseX, mouseY, delta);
         renderBottomBar(context);
 
-        // Render hovered tooltip above everything
         if (pendingTooltipStack != null && !pendingTooltipStack.isEmpty()) {
             context.drawItemTooltip(this.textRenderer, pendingTooltipStack, mouseX, mouseY);
         } else if (pendingTooltipLines != null && !pendingTooltipLines.isEmpty()) {
@@ -382,55 +411,69 @@ public class EncyclopediaScreen extends Screen {
     }
 
     private void renderTopBar(DrawContext context, int mouseX, int mouseY) {
-        context.fillGradient(winX + 1, winY + 1, winX + winW - 1, winY + topBarH, BG_TOP_TOP, BG_TOP_BOT);
-        context.fill(winX + 1, winY + topBarH - 1, winX + winW - 1, winY + topBarH, BORDER_SUBTLE);
-        context.fill(winX + 1, winY + topBarH - 2, winX + 165, winY + topBarH - 1, ACCENT_CRIMSON);
-
-        drawScaledItem(context, new ItemStack(Items.KNOWLEDGE_BOOK), winX + 16, winY + topBarH / 2.0F, 1.0F);
+        EncyclopediaTheme.drawScaledItem(context, new ItemStack(Items.WRITABLE_BOOK), winX + 22, winY + 17.0F, 1.05F);
         Text brandText = Text.literal("LON TERRY").formatted(Formatting.BOLD);
-        int brandX = winX + 29;
-        context.drawTextWithShadow(this.textRenderer, brandText, brandX, winY + 9, TEXT_PRIMARY);
+        int brandX = winX + 35;
+        context.drawTextWithShadow(this.textRenderer, brandText, brandX, winY + 11, EncyclopediaTheme.GOLD_BRIGHT);
         int brandW = this.textRenderer.getWidth(brandText);
         String topSub = selectedCategory == EncyclopediaCategory.STRUCTURES
-                ? "· Apartado de Estructuras"
-                : "· Enciclopedia";
-        context.drawText(this.textRenderer, topSub, brandX + brandW + 6, winY + 9, TEXT_MUTED, false);
+                ? "· Códice de Estructuras"
+                : "· Códice & Enciclopedia";
+        if (brandX + brandW + 8 + this.textRenderer.getWidth(topSub) < progressionBtnX - 10) {
+            context.drawText(this.textRenderer, topSub, brandX + brandW + 6, winY + 11, EncyclopediaTheme.CREAM_SECONDARY, false);
+        }
 
-        int mainTotal = EncyclopediaRegistry.filter(EncyclopediaCategory.ALL, "").size();
-        String countStr = selectedCategory == EncyclopediaCategory.STRUCTURES
-                ? "Estructuras: " + filteredEntries.size()
-                : (filteredEntries.size() == mainTotal ? "Items: " + mainTotal : "Mostrando: " + filteredEntries.size() + " / " + mainTotal);
-        int subW = this.textRenderer.getWidth(countStr);
-        context.drawText(this.textRenderer, countStr, closeBtnX - subW - 10, winY + 9, TEXT_SECONDARY, false);
+        // Botón destacado: Progresión de Dungeons
+        boolean hoverProg = isOver(mouseX, mouseY, progressionBtnX, progressionBtnY, progressionBtnW, progressionBtnH);
+        EncyclopediaTheme.drawMinecraftButton(
+                context, progressionBtnX, progressionBtnY, progressionBtnW, progressionBtnH,
+                hoverProg, ButtonStyle.SCARLET_GOLD
+        );
+        int comp = ClientDungeonProgression.getCompletedCount();
+        int tot = ClientDungeonProgression.getTotalImplementedDungeons();
+        String progLabel = progressionBtnW >= 165
+                ? "⚔ PROGRESIÓN DUNGEONS (" + comp + "/" + tot + ")"
+                : "⚔ PROGRESIÓN (" + comp + "/" + tot + ")";
+        EncyclopediaTheme.drawCenteredScaledText(
+                context, this.textRenderer, progLabel,
+                progressionBtnX + progressionBtnW / 2.0F, progressionBtnY + 5.0F, 0.86F,
+                hoverProg ? EncyclopediaTheme.GOLD_BRIGHT : 0xFFFFFFFF, true
+        );
+        if (hoverProg) {
+            this.pendingTooltipLines = List.of(
+                    Text.literal("⚔ Mapa de Progresión de Dungeons").formatted(Formatting.GOLD, Formatting.BOLD),
+                    Text.literal("Visualiza de forma dinámica el orden de jefes y tu avance").formatted(Formatting.YELLOW)
+            );
+        }
 
+        // Botón Cerrar
         boolean hoverClose = isOver(mouseX, mouseY, closeBtnX, closeBtnY, closeBtnW, closeBtnH);
-        int closeBg = hoverClose ? 0xFF4F1D27 : 0xFF1D273A;
-        int closeBorder = hoverClose ? ACCENT_CRIMSON_BRIGHT : BORDER_SUBTLE;
-        context.fill(closeBtnX, closeBtnY, closeBtnX + closeBtnW, closeBtnY + closeBtnH, closeBg);
-        context.drawBorder(closeBtnX, closeBtnY, closeBtnW, closeBtnH, closeBorder);
-        drawCenteredScaledText(context, "✕ CERRAR", closeBtnX + closeBtnW / 2.0F, closeBtnY + 4.5F, 0.95F, hoverClose ? 0xFFFFFFFF : TEXT_PRIMARY);
+        EncyclopediaTheme.drawMinecraftButton(context, closeBtnX, closeBtnY, closeBtnW, closeBtnH, hoverClose, ButtonStyle.WOOD);
+        EncyclopediaTheme.drawCenteredScaledText(
+                context, this.textRenderer, "✕ Cerrar",
+                closeBtnX + closeBtnW / 2.0F, closeBtnY + 5.0F, 0.90F,
+                hoverClose ? EncyclopediaTheme.GOLD_BRIGHT : EncyclopediaTheme.CREAM_PRIMARY, true
+        );
     }
 
     private void renderBottomBar(DrawContext context) {
-        int barY = winY + winH - bottomBarH;
-        context.fill(winX + 1, barY, winX + winW - 1, winY + winH - 1, 0xFF101622);
-        context.fill(winX + 1, barY, winX + winW - 1, barY + 1, BORDER_SUBTLE);
-
+        int barY = winY + winH - bottomBarH + 1;
         this.socialTargets.clear();
-        int rightCursor = winX + winW - 8;
-        if (winW > 420) {
+        int rightCursor = winX + winW - 14;
+
+        if (winW > 460) {
             for (int i = SOCIAL_LINKS.size() - 1; i >= 0; i--) {
                 SocialLink link = SOCIAL_LINKS.get(i);
-                int btnW = this.textRenderer.getWidth(link.label()) + 10;
-                int btnH = 12;
+                int btnW = this.textRenderer.getWidth(link.label()) + 12;
+                int btnH = 13;
                 int btnX = rightCursor - btnW;
-                int btnY = barY + 3;
+                int btnY = barY + 2;
                 boolean hovered = isOver(this.currentMouseX, this.currentMouseY, btnX, btnY, btnW, btnH);
-                int bg = hovered ? 0xFF263752 : 0xFF182336;
-                int border = hovered ? link.accentColor() : BORDER_SUBTLE;
-                context.fill(btnX, btnY, btnX + btnW, btnY + btnH, bg);
-                context.drawBorder(btnX, btnY, btnW, btnH, border);
-                context.drawText(this.textRenderer, link.label(), btnX + 5, btnY + 2, hovered ? 0xFFFFFFFF : link.accentColor(), false);
+                EncyclopediaTheme.drawMinecraftButton(context, btnX, btnY, btnW, btnH, hovered, ButtonStyle.PARCHMENT);
+                context.drawText(
+                        this.textRenderer, link.label(), btnX + 6, btnY + 3,
+                        hovered ? EncyclopediaTheme.INK_SCARLET : link.accentColor(), false
+                );
                 this.socialTargets.add(new HitTarget(
                         btnX, btnY, btnW, btnH,
                         () -> ConfirmLinkScreen.open(this, link.url()),
@@ -439,33 +482,37 @@ public class EncyclopediaScreen extends Screen {
                 ));
                 if (hovered) {
                     this.pendingTooltipLines = List.of(
-                            Text.literal(link.label()).formatted(Formatting.BOLD),
-                            Text.literal("Clic para abrir en el navegador").formatted(Formatting.AQUA)
+                            Text.literal(link.label()).formatted(Formatting.GOLD, Formatting.BOLD),
+                            Text.literal("Clic para abrir en el navegador").formatted(Formatting.YELLOW)
                     );
                 }
-                rightCursor = btnX - 4;
+                rightCursor = btnX - 5;
             }
         }
 
-        StringBuilder hints = new StringBuilder("[G] Abrir/Cerrar   [↑↓←→] Navegar   [ESC] Cerrar");
+        StringBuilder hints = new StringBuilder("[G] Cerrar   [P] Progresión   [↑↓←→] Navegar");
         if (selectedEntry != null && selectedEntry.isEntityEntry()) {
             hints.append("   [Arrastrar] Rotar 3D");
         }
         String hintStr = hints.toString();
-        int maxHintW = Math.max(80, rightCursor - (winX + 16));
+        int maxHintW = Math.max(80, rightCursor - (winX + 18));
         if (this.textRenderer.getWidth(hintStr) > maxHintW) {
-            hintStr = "[G] Cerrar  [↑↓←→] Navegar";
+            hintStr = "[G] Cerrar · [P] Progresión";
         }
-        context.drawText(this.textRenderer, hintStr, winX + 10, barY + 5, TEXT_MUTED, false);
+        context.drawTextWithShadow(this.textRenderer, Text.literal(hintStr), winX + 14, barY + 4, EncyclopediaTheme.CREAM_SECONDARY);
     }
 
     private void renderSidebar(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.fill(sidebarX, sidebarY, sidebarX + sidebarW, sidebarY + sidebarH, BG_SIDEBAR);
-        context.fill(sidebarX + sidebarW - 1, sidebarY, sidebarX + sidebarW, sidebarY + sidebarH, BORDER_SUBTLE);
+        // Canal interior de cuero/madera oscura para los separadores del libro
+        context.fill(sidebarX, sidebarY, sidebarX + sidebarW, sidebarY + sidebarH, EncyclopediaTheme.WOOD_SHADOW);
+        context.drawBorder(sidebarX, sidebarY, sidebarW, sidebarH, EncyclopediaTheme.GOLD_DARK);
 
-        drawCenteredScaledText(context, "CATEGORÍAS", sidebarX + sidebarW / 2.0F, sidebarY + 6, 0.85F, TEXT_SECONDARY);
+        EncyclopediaTheme.drawCenteredScaledText(
+                context, this.textRenderer, "ÍNDICE",
+                sidebarX + sidebarW / 2.0F, sidebarY + 5, 0.84F, EncyclopediaTheme.GOLD_BRIGHT, true
+        );
 
-        int listTop = sidebarY + 18;
+        int listTop = sidebarY + 17;
         int listBottom = sidebarY + sidebarH - 4;
         EncyclopediaCategory[] cats = EncyclopediaCategory.values();
         int cardH = getSidebarCardHeight();
@@ -473,7 +520,7 @@ public class EncyclopediaScreen extends Screen {
         this.sidebarMaxScroll = Math.max(0, totalH - (listBottom - listTop));
         this.sidebarScroll = MathHelper.clamp(this.sidebarScroll, 0, this.sidebarMaxScroll);
 
-        context.enableScissor(sidebarX, listTop, sidebarX + sidebarW - 1, listBottom);
+        context.enableScissor(sidebarX + 1, listTop, sidebarX + sidebarW - 1, listBottom);
         int cardW = sidebarW - 10;
         int cardX = sidebarX + 5;
         float hoverStep = Math.min(1.0F, delta * 0.45F);
@@ -484,8 +531,11 @@ public class EncyclopediaScreen extends Screen {
 
             if (cat.isSeparateSection() && i > 0 && !cats[i - 1].isSeparateSection()) {
                 int divY = cy - SIDEBAR_SECTION_DIVIDER_H;
-                context.fill(cardX + 2, divY + 3, cardX + cardW - 2, divY + 4, BORDER_SUBTLE);
-                drawCenteredScaledText(context, "APARTADO", cardX + cardW / 2.0F, divY + 6, 0.72F, ACCENT_TEAL);
+                context.fill(cardX + 2, divY + 3, cardX + cardW - 2, divY + 4, EncyclopediaTheme.GOLD_DARK);
+                EncyclopediaTheme.drawCenteredScaledText(
+                        context, this.textRenderer, "MUNDOS",
+                        cardX + cardW / 2.0F, divY + 6, 0.72F, EncyclopediaTheme.GOLD_BRIGHT, false
+                );
             }
 
             if (cy + cardH < listTop || cy > listBottom) {
@@ -498,36 +548,32 @@ public class EncyclopediaScreen extends Screen {
             float hoverAnim = MathHelper.lerp(hoverStep, prevAnim, hover ? 1.0F : 0.0F);
             sidebarHoverAnim.put(cat, hoverAnim);
 
-            int bg = active ? 0xFF1D354D : (hover ? BG_CARD_HOVER : BG_CARD);
-            int border = active ? BORDER_ACTIVE : (hover ? 0xFF5D87B3 : BORDER_SUBTLE);
-            context.fill(cardX, cy, cardX + cardW, cy + cardH, bg);
-            context.drawBorder(cardX, cy, cardW, cardH, border);
-            if (active) {
-                context.fill(cardX + 1, cy + 1, cardX + 3, cy + cardH - 1, cat.isSeparateSection() ? EncyclopediaRarity.EPIC.getHighlightBorderColor() : ACCENT_TEAL);
-            }
+            EncyclopediaTheme.drawBookmarkTab(context, cardX, cy, cardW, cardH, active, hover, cat.isSeparateSection());
 
             float baseIconScale = cardH >= 30 ? 0.90F : 0.74F;
-            float iconScale = baseIconScale * (1.0F + 0.22F * hoverAnim);
-            drawScaledItem(context, cat.getIcon(), cardX + cardW / 2.0F, cy + cardH * 0.36F, iconScale);
-            float labelScale = Math.min(cardH >= 30 ? 0.76F : 0.68F, (cardW - 6.0F) / Math.max(1.0F, textRenderer.getWidth(cat.getShortLabel())));
-            drawCenteredScaledText(
-                    context,
+            float iconScale = baseIconScale * (1.0F + 0.20F * hoverAnim);
+            EncyclopediaTheme.drawScaledItem(context, cat.getIcon(), cardX + cardW / 2.0F + 1.0F, cy + cardH * 0.36F, iconScale);
+
+            float labelScale = Math.min(cardH >= 30 ? 0.74F : 0.66F, (cardW - 8.0F) / Math.max(1.0F, textRenderer.getWidth(cat.getShortLabel())));
+            EncyclopediaTheme.drawCenteredScaledText(
+                    context, this.textRenderer,
                     cat.getShortLabel(),
-                    cardX + cardW / 2.0F,
-                    cy + cardH * 0.67F,
-                    Math.max(0.55F, labelScale),
-                    active ? 0xFFFFFFFF : (hover ? TEXT_PRIMARY : TEXT_SECONDARY)
+                    cardX + cardW / 2.0F + 1.0F,
+                    cy + cardH * 0.68F,
+                    Math.max(0.54F, labelScale),
+                    active ? EncyclopediaTheme.GOLD_BRIGHT : (hover ? EncyclopediaTheme.CREAM_PRIMARY : EncyclopediaTheme.CREAM_SECONDARY),
+                    active
             );
         }
         context.disableScissor();
 
         if (sidebarMaxScroll > 0) {
-            drawScrollbar(context, sidebarX + sidebarW - 4, listTop, listBottom - listTop, sidebarScroll, sidebarMaxScroll, listBottom - listTop);
+            EncyclopediaTheme.drawParchmentScrollbar(context, sidebarX + sidebarW - 5, listTop, listBottom - listTop, sidebarScroll, sidebarMaxScroll, listBottom - listTop);
         }
     }
 
     private int getSidebarCardHeight() {
-        int listH = Math.max(120, (sidebarY + sidebarH - 4) - (sidebarY + 18));
+        int listH = Math.max(120, (sidebarY + sidebarH - 4) - (sidebarY + 17));
         EncyclopediaCategory[] cats = EncyclopediaCategory.values();
         int fitH = (listH - SIDEBAR_SECTION_DIVIDER_H - (cats.length - 1) * SIDEBAR_CARD_GAP) / cats.length;
         return MathHelper.clamp(fitH, 25, 34);
@@ -551,34 +597,50 @@ public class EncyclopediaScreen extends Screen {
         return getSidebarCardTop(cats, cats.length - 1, cardH) + cardH;
     }
 
-    private void renderCenterPanel(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.fill(centerX, centerY, centerX + centerW, centerY + centerH, BG_PANEL);
-        context.fill(centerX + centerW - 1, centerY, centerX + centerW, centerY + centerH, BORDER_SUBTLE);
+    private void renderCenterPage(DrawContext context, int mouseX, int mouseY, float delta) {
+        EncyclopediaTheme.drawParchmentPage(context, centerX, centerY, centerW, centerH);
 
-        context.drawText(this.textRenderer, "✦", centerX + 8, centerY + 7, ACCENT_TEAL, false);
-        context.drawText(this.textRenderer, selectedCategory.getHeaderTitle().toUpperCase(), centerX + 17, centerY + 7, TEXT_PRIMARY, false);
+        context.drawText(this.textRenderer, "❖", centerX + 10, centerY + 8, EncyclopediaTheme.INK_SCARLET, false);
+        context.drawText(
+                this.textRenderer,
+                Text.literal(selectedCategory.getHeaderTitle().toUpperCase()).formatted(Formatting.BOLD),
+                centerX + 20, centerY + 8, EncyclopediaTheme.INK_TITLE, false
+        );
         String countText = filteredEntries.size() + (selectedCategory == EncyclopediaCategory.STRUCTURES
-                ? (filteredEntries.size() == 1 ? " zona" : " zonas")
-                : " items");
+                ? (filteredEntries.size() == 1 ? " lugar" : " lugares")
+                : " entradas");
         int cw = this.textRenderer.getWidth(countText);
-        context.drawText(this.textRenderer, countText, centerX + centerW - cw - 10, centerY + 7, TEXT_MUTED, false);
+        if (centerX + 28 + this.textRenderer.getWidth(selectedCategory.getHeaderTitle().toUpperCase()) < centerX + centerW - cw - 12) {
+            context.drawText(this.textRenderer, countText, centerX + centerW - cw - 10, centerY + 8, EncyclopediaTheme.INK_MUTED, false);
+        }
 
+        // Caja de búsqueda estilo ranura de pergamino hundida
         boolean searchFocused = this.searchField != null && this.searchField.isFocused();
-        context.fill(searchBoxX, searchBoxY, searchBoxX + searchBoxW, searchBoxY + searchBoxH, BG_INPUT);
-        context.drawBorder(searchBoxX, searchBoxY, searchBoxW, searchBoxH, searchFocused ? BORDER_ACTIVE : BORDER_SUBTLE);
-        drawScaledItem(context, new ItemStack(Items.SPYGLASS), searchBoxX + 9.0F, searchBoxY + searchBoxH / 2.0F, 0.65F);
+        context.fill(searchBoxX, searchBoxY, searchBoxX + searchBoxW, searchBoxY + searchBoxH,
+                searchFocused ? EncyclopediaTheme.PARCHMENT_BRIGHT : EncyclopediaTheme.PARCHMENT_SLOT_BG);
+        context.drawBorder(searchBoxX, searchBoxY, searchBoxW, searchBoxH,
+                searchFocused ? EncyclopediaTheme.SCARLET_MAIN : EncyclopediaTheme.PARCHMENT_SHADOW);
+        EncyclopediaTheme.drawScaledItem(context, new ItemStack(Items.SPYGLASS), searchBoxX + 9.0F, searchBoxY + searchBoxH / 2.0F, 0.68F);
         if (this.searchField != null) {
             this.searchField.render(context, mouseX, mouseY, delta);
         }
 
         if (!this.searchQuery.isEmpty()) {
             boolean hoverClear = isOver(mouseX, mouseY, clearSearchX, clearSearchY, clearSearchSize, clearSearchSize);
-            context.fill(clearSearchX, clearSearchY, clearSearchX + clearSearchSize, clearSearchY + clearSearchSize, hoverClear ? 0xFF3E1E28 : 0xFF1A2538);
-            drawCenteredScaledText(context, "×", clearSearchX + clearSearchSize / 2.0F, clearSearchY + 3.0F, 1.0F, hoverClear ? 0xFFFFFFFF : TEXT_SECONDARY);
+            context.fill(clearSearchX, clearSearchY, clearSearchX + clearSearchSize, clearSearchY + clearSearchSize,
+                    hoverClear ? EncyclopediaTheme.SCARLET_MAIN : EncyclopediaTheme.PARCHMENT_AGED);
+            EncyclopediaTheme.drawCenteredScaledText(
+                    context, this.textRenderer, "×",
+                    clearSearchX + clearSearchSize / 2.0F, clearSearchY + 3.0F, 1.0F,
+                    hoverClear ? 0xFFFFFFFF : EncyclopediaTheme.INK_TITLE, false
+            );
         }
 
         if (filteredEntries.isEmpty()) {
-            drawCenteredScaledText(context, "Sin coincidencias", centerX + centerW / 2.0F, gridY + 36, 1.0F, TEXT_MUTED);
+            EncyclopediaTheme.drawCenteredScaledText(
+                    context, this.textRenderer, "Sin resultados en el códice",
+                    centerX + centerW / 2.0F, gridY + 36, 0.95F, EncyclopediaTheme.INK_MUTED, false
+            );
             this.gridMaxScroll = 0;
             return;
         }
@@ -595,7 +657,7 @@ public class EncyclopediaScreen extends Screen {
         float hoverStep = Math.min(1.0F, delta * 0.45F);
         List<GridSlotDraw> deferredHoveredDraws = new ArrayList<>();
 
-        context.enableScissor(gridX - 3, gridY - 2, gridX + gridW + 3, gridBottom + 2);
+        context.enableScissor(gridX - 2, gridY - 2, gridX + gridW + 2, gridBottom + 2);
 
         for (int i = 0; i < filteredEntries.size(); i++) {
             int col = i % cols;
@@ -621,7 +683,8 @@ public class EncyclopediaScreen extends Screen {
             }
             gridHoverAnim.put(entry.getId(), hoverAnim);
 
-            GridSlotDraw slotDraw = new GridSlotDraw(entry, sx, sy, slotSize, hoverAnim, isSelected);
+            boolean spoilerLocked = ClientDungeonProgression.isStructureEntrySpoilerLocked(entry.getId());
+            GridSlotDraw slotDraw = new GridSlotDraw(entry, sx, sy, slotSize, hoverAnim, isSelected, spoilerLocked);
             if (hoverAnim > 0.01F) {
                 drawGridSlotBackground(context, slotDraw);
                 deferredHoveredDraws.add(slotDraw);
@@ -631,7 +694,6 @@ public class EncyclopediaScreen extends Screen {
             }
         }
 
-        // Draw magnified hovered slots last so enlarged items sit cleanly above neighboring slots
         for (GridSlotDraw slotDraw : deferredHoveredDraws) {
             drawGridSlotBackground(context, slotDraw);
             drawGridSlotContent(context, slotDraw);
@@ -640,71 +702,80 @@ public class EncyclopediaScreen extends Screen {
         context.disableScissor();
 
         if (gridMaxScroll > 0) {
-            drawScrollbar(context, gridX + gridW - 4, gridY, gridH, gridScroll, gridMaxScroll, gridH);
+            EncyclopediaTheme.drawParchmentScrollbar(context, centerX + centerW - 7, gridY, gridH, gridScroll, gridMaxScroll, gridH);
         }
     }
 
     private void drawGridSlotBackground(DrawContext context, GridSlotDraw slot) {
-        EncyclopediaRarity rarity = slot.entry().getRarity();
-        int expand = slot.hoverAnim() > 0.35F ? 1 : 0;
-        int x1 = slot.x() - expand;
-        int y1 = slot.y() - expand;
-        int x2 = slot.x() + slot.size() + expand;
-        int y2 = slot.y() + slot.size() + expand;
-
-        int bg = slot.selected() ? 0xFF21334E : (slot.hoverAnim() > 0.2F ? BG_CARD_HOVER : BG_SLOT);
-        int border = rarity.getDynamicBorderColor(slot.selected() || slot.hoverAnim() > 0.2F, animTimeSec);
-
-        context.fill(x1, y1, x2, y2, bg);
-        context.drawBorder(x1, y1, x2 - x1, y2 - y1, border);
-        if (slot.selected()) {
-            context.drawBorder(x1 + 1, y1 + 1, x2 - x1 - 2, y2 - y1 - 2, (border & 0x00FFFFFF) | 0x99000000);
-        }
+        int rarityBorder = slot.spoilerLocked()
+                ? EncyclopediaTheme.PARCHMENT_SHADOW
+                : slot.entry().getRarity().getDynamicBorderColor(slot.selected() || slot.hoverAnim() > 0.2F, animTimeSec);
+        EncyclopediaTheme.drawMinecraftSlot(
+                context, slot.x(), slot.y(), slot.size(),
+                slot.hoverAnim() > 0.2F, slot.selected(), rarityBorder
+        );
     }
 
     private void drawGridSlotContent(DrawContext context, GridSlotDraw slot) {
-        float zoom = 1.0F + 0.30F * slot.hoverAnim();
         float cx = slot.x() + slot.size() / 2.0F;
         float cy = slot.y() + slot.size() / 2.0F;
 
-        if (slot.entry().isEntityEntry() && client != null && client.world != null) {
-            EntityPreviewConfig preview = slot.entry().getEntityPreview();
-            float miniScale = preview.gridScale() * (slot.size() / 34.0F) * zoom;
-            renderEntityViewport(
-                    context,
-                    slot.x(), slot.y(), slot.x() + slot.size(), slot.y() + slot.size(),
-                    cx, cy + 2.0F,
-                    miniScale, preview,
-                    preview.defaultYawDeg(), preview.defaultPitchDeg(), false
-            );
-        } else {
-            float baseScale = (slot.size() - 8) / 16.0F * 0.85F;
-            drawScaledItem(context, slot.entry().getIcon(), cx, cy, baseScale * zoom);
-        }
-    }
-
-    private void renderDetailPanel(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.detailTargets.clear();
-        context.fill(detailX, detailY, detailX + detailW, detailY + detailH, BG_PANEL);
-
-        if (selectedEntry == null) {
-            drawCenteredScaledText(context, "Selecciona un elemento para ver sus detalles", detailX + detailW / 2.0F, detailY + detailH / 2.0F, 1.0F, TEXT_MUTED);
+        if (slot.spoilerLocked()) {
+            EncyclopediaTheme.drawPixelPadlock(context, Math.round(cx), Math.round(cy - 1));
             return;
         }
 
-        int pad = 10;
+        float zoom = 1.0F + 0.26F * slot.hoverAnim();
+        if (slot.entry().isEntityEntry() && client != null && client.world != null) {
+            EntityPreviewConfig preview = slot.entry().getEntityPreview();
+            LivingEntity entity = getOrCreatePreviewEntity(preview.entityTypeSupplier().get());
+            if (entity != null) {
+                float miniScale = preview.gridScale() * (slot.size() / 34.0F) * zoom;
+                EncyclopediaTheme.renderEntityViewport(
+                        context,
+                        slot.x() + 1, slot.y() + 1, slot.x() + slot.size() - 1, slot.y() + slot.size() - 1,
+                        cx, cy + 2.0F, miniScale,
+                        new Vector3f(0.0F, preview.offsetY(), 0.0F),
+                        preview.defaultYawDeg(), preview.defaultPitchDeg(),
+                        entity, false
+                );
+            }
+        } else {
+            float baseScale = (slot.size() - 8) / 16.0F * 0.85F;
+            EncyclopediaTheme.drawScaledItem(context, slot.entry().getIcon(), cx, cy, baseScale * zoom);
+        }
+    }
+
+    private void renderDetailPage(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.detailTargets.clear();
+        EncyclopediaTheme.drawParchmentPage(context, detailX, detailY, detailW, detailH);
+
+        if (selectedEntry == null) {
+            EncyclopediaTheme.drawCenteredScaledText(
+                    context, this.textRenderer, "Selecciona una página del códice",
+                    detailX + detailW / 2.0F, detailY + detailH / 2.0F, 1.0F, EncyclopediaTheme.INK_MUTED, false
+            );
+            return;
+        }
+
+        // Si es una estructura de dungeon bloqueada por Modo Sin Spoilers, mostrar página sellada sin spoilers
+        if (ClientDungeonProgression.isStructureEntrySpoilerLocked(selectedEntry.getId())) {
+            renderSpoilerLockedDetailPage(context, mouseX, mouseY);
+            return;
+        }
+
+        int pad = 12;
         int contentX = detailX + pad;
-        int contentW = detailW - pad * 2 - 6;
-        int viewTop = detailY + 6;
-        int viewBottom = detailY + detailH - 6;
+        int contentW = detailW - pad * 2 - 4;
+        int viewTop = detailY + 7;
+        int viewBottom = detailY + detailH - 7;
         int viewH = viewBottom - viewTop;
 
-        context.enableScissor(detailX + 1, viewTop, detailX + detailW - 1, viewBottom);
+        context.enableScissor(detailX + 4, viewTop, detailX + detailW - 4, viewBottom);
 
         int y = viewTop - detailScroll;
         EncyclopediaRarity rarity = selectedEntry.getRarity();
 
-        // 1. Header & Prominent Visual Stage (3D Entity OR Large Enlarged Item Showcase)
         if (selectedEntry.isEntityEntry()) {
             y = renderEntityDetailHeader(context, selectedEntry, rarity, contentX, y, contentW, mouseX, mouseY, viewTop, viewBottom);
         } else {
@@ -712,26 +783,25 @@ public class EncyclopediaScreen extends Screen {
         }
         y += 8;
 
-        // 2. Description box with strong crimson left accent
-        List<OrderedText> descLines = this.textRenderer.wrapLines(Text.literal(selectedEntry.getDescription()), contentW - 16);
+        // Caja de descripción sobre pergamino con listón izquierdo Escarlata
+        List<OrderedText> descLines = this.textRenderer.wrapLines(Text.literal(selectedEntry.getDescription()), contentW - 18);
         int descH = Math.max(24, descLines.size() * 10 + 12);
-        context.fill(contentX, y, contentX + contentW, y + descH, BG_CARD);
-        context.drawBorder(contentX, y, contentW, descH, BORDER_SUBTLE);
-        context.fill(contentX + 1, y + 1, contentX + 4, y + descH - 1, ACCENT_CRIMSON);
+        EncyclopediaTheme.drawParchmentCard(context, contentX, y, contentW, descH, false, false);
+        context.fill(contentX + 1, y + 1, contentX + 4, y + descH - 1, EncyclopediaTheme.SCARLET_MAIN);
         int lineY = y + 6;
         for (OrderedText line : descLines) {
-            context.drawText(this.textRenderer, line, contentX + 10, lineY, TEXT_SECONDARY, false);
+            context.drawText(this.textRenderer, line, contentX + 10, lineY, EncyclopediaTheme.INK_BODY, false);
             lineY += 10;
         }
         y += descH + 10;
 
-        // 3. Stats grid (2 columns)
+        // Estadísticas (2 columnas con placa oscura de alto contraste para los valores)
         List<StatInfo> stats = selectedEntry.getStats();
         if (!stats.isEmpty()) {
-            y = drawSectionHeader(context, "ESTADÍSTICAS", contentX, y);
+            y = drawSectionHeader(context, "ESTADÍSTICAS", contentX, y, contentW);
             int colGap = 6;
             int cardW = (contentW - colGap) / 2;
-            int cardH = 26;
+            int cardH = 30;
             for (int i = 0; i < stats.size(); i += 2) {
                 drawStatCard(context, stats.get(i), contentX, y, cardW, cardH);
                 if (i + 1 < stats.size()) {
@@ -742,53 +812,53 @@ public class EncyclopediaScreen extends Screen {
             y += 5;
         }
 
-        // 4. Dedicated Structures Content Section
+        // Contenido de Estructuras
         List<StructureFeatureInfo> structureContents = selectedEntry.getStructureContents();
         if (!structureContents.isEmpty()) {
-            y = drawSectionHeader(context, "QUÉ CONTIENE LA ESTRUCTURA", contentX, y);
+            y = drawSectionHeader(context, "QUÉ CONTIENE LA ESTRUCTURA", contentX, y, contentW);
             for (StructureFeatureInfo feature : structureContents) {
                 y = drawStructureFeatureCard(context, feature, contentX, y, contentW, mouseX, mouseY, viewTop, viewBottom);
             }
             y += 5;
         }
 
-        // 5. Dedicated Structures Conquest / Victory Strategy Section
+        // Pasos de Conquista de Estructuras
         List<StructureStepInfo> structureSteps = selectedEntry.getStructureSteps();
         if (!structureSteps.isEmpty()) {
-            y = drawSectionHeader(context, "CÓMO EXPLORARLA Y VENCERLA", contentX, y);
+            y = drawSectionHeader(context, "CÓMO EXPLORARLA Y VENCERLA", contentX, y, contentW);
             for (StructureStepInfo step : structureSteps) {
                 y = drawStructureStepCard(context, step, contentX, y, contentW, mouseX, mouseY, viewTop, viewBottom);
             }
             y += 5;
         }
 
-        // 6. Effects / abilities
+        // Efectos y Habilidades
         List<EffectInfo> effects = selectedEntry.getEffects();
         if (!effects.isEmpty()) {
-            y = drawSectionHeader(context, "EFECTOS / HABILIDADES", contentX, y);
+            y = drawSectionHeader(context, "EFECTOS / HABILIDADES", contentX, y, contentW);
             for (EffectInfo effect : effects) {
                 y = drawEffectCard(context, effect, contentX, y, contentW);
             }
             y += 5;
         }
 
-        // 7. Drops / Draftea rewards
+        // Drops / Premios
         List<DropInfo> drops = selectedEntry.getDrops();
         if (!drops.isEmpty()) {
-            y = drawSectionHeader(context, "DROPS / PREMIOS", contentX, y);
+            y = drawSectionHeader(context, "DROPS / PREMIOS", contentX, y, contentW);
             for (DropInfo drop : drops) {
                 y = drawDropCard(context, drop, contentX, y, contentW, mouseX, mouseY, viewTop, viewBottom);
             }
             y += 5;
         }
 
-        // 8. Crafting / smelting / obtaining
+        // Crafteo / Obtención con ranuras clásicas de Minecraft
         List<ObtainingMethod> methods = selectedEntry.getObtainingMethods();
         if (!methods.isEmpty()) {
             String sectionTitle = selectedEntry.getCategory() == EncyclopediaCategory.STRUCTURES
                     ? "LOCALIZACIÓN EN EL MUNDO"
                     : "CRAFTEO / OBTENCIÓN";
-            y = drawSectionHeader(context, sectionTitle, contentX, y);
+            y = drawSectionHeader(context, sectionTitle, contentX, y, contentW);
             for (ObtainingMethod method : methods) {
                 y = drawObtainingCard(context, method, contentX, y, contentW, mouseX, mouseY, viewTop, viewBottom);
             }
@@ -801,52 +871,84 @@ public class EncyclopediaScreen extends Screen {
         this.detailScroll = MathHelper.clamp(this.detailScroll, 0, this.detailMaxScroll);
 
         if (detailMaxScroll > 0) {
-            drawScrollbar(context, detailX + detailW - 5, viewTop, viewH, detailScroll, detailMaxScroll, viewH);
+            EncyclopediaTheme.drawParchmentScrollbar(context, detailX + detailW - 7, viewTop, viewH, detailScroll, detailMaxScroll, viewH);
         }
     }
 
-    /**
-     * Renders a prominent large item showcase on the right detail panel so the selected item can be inspected clearly.
-     */
+    private void renderSpoilerLockedDetailPage(DrawContext context, int mouseX, int mouseY) {
+        int pad = 16;
+        int x = detailX + pad;
+        int w = detailW - pad * 2;
+        int cy = detailY + detailH / 2 - 58;
+
+        EncyclopediaTheme.drawCenteredScaledText(
+                context, this.textRenderer, "🔒 DUNGEON OCULTA · ???",
+                detailX + detailW / 2.0F, cy, 1.05F, EncyclopediaTheme.INK_SCARLET, false
+        );
+
+        int boxH = 74;
+        int boxY = cy + 18;
+        EncyclopediaTheme.drawParchmentCard(context, x, boxY, w, boxH, false, false);
+        EncyclopediaTheme.drawMysteryBossEmblem(context, this.textRenderer, x + w / 2, boxY + 28, 1.65F, false);
+        EncyclopediaTheme.drawCenteredScaledText(
+                context, this.textRenderer,
+                "Derrota primero al jefe de la dungeon anterior",
+                x + w / 2.0F, boxY + 50, 0.84F, EncyclopediaTheme.INK_TITLE, false
+        );
+        EncyclopediaTheme.drawCenteredScaledText(
+                context, this.textRenderer,
+                "para revelar los secretos de este lugar.",
+                x + w / 2.0F, boxY + 60, 0.82F, EncyclopediaTheme.INK_MUTED, false
+        );
+
+        int btnW = Math.min(w, 210);
+        int btnH = 20;
+        int btnX = detailX + (detailW - btnW) / 2;
+        int btnY = boxY + boxH + 12;
+        boolean hover = isOver(mouseX, mouseY, btnX, btnY, btnW, btnH);
+        EncyclopediaTheme.drawMinecraftButton(context, btnX, btnY, btnW, btnH, hover, ButtonStyle.SCARLET_GOLD);
+        EncyclopediaTheme.drawCenteredScaledText(
+                context, this.textRenderer, "⚔ Ver Mapa de Progresión →",
+                btnX + btnW / 2.0F, btnY + 6.0F, 0.90F, 0xFFFFFFFF, true
+        );
+        registerDetailTarget(btnX, btnY, btnW, btnH, this::openDungeonProgressionMap, null, null, detailY, detailY + detailH);
+        this.detailMaxScroll = 0;
+    }
+
     private int renderItemDetailHeader(
             DrawContext context, EncyclopediaEntry entry, EncyclopediaRarity rarity,
             int x, int y, int width, int mouseX, int mouseY, int viewTop, int viewBottom, float delta
     ) {
-        context.drawTextWithShadow(this.textRenderer, Text.literal(entry.getName()).formatted(Formatting.BOLD), x, y + 1, TEXT_PRIMARY);
+        context.drawText(this.textRenderer, Text.literal(entry.getName()).formatted(Formatting.BOLD), x, y + 1, EncyclopediaTheme.INK_TITLE, false);
         int badgeW = drawRarityBadge(context, rarity, x, y + 14);
-        context.drawText(this.textRenderer, entry.getTypeLabel(), x + badgeW + 6, y + 16, TEXT_MUTED, false);
+        context.drawText(this.textRenderer, entry.getTypeLabel(), x + badgeW + 6, y + 16, EncyclopediaTheme.INK_MUTED, false);
 
         if (entry.getRelatedEntryId() != null && entry.getRelatedButtonLabel() != null) {
             String btnLabel = entry.getRelatedButtonLabel();
             int btnW = this.textRenderer.getWidth(btnLabel) + 12;
             drawActionPill(
                     context, x + width - btnW, y + 12, btnLabel,
-                    0xFF1A2D42, BORDER_ACTIVE, 0xFF8FF5FF,
+                    ButtonStyle.PARCHMENT, EncyclopediaTheme.INK_SCARLET,
                     () -> navigateToEntryId(entry.getRelatedEntryId()),
                     mouseX, mouseY, viewTop, viewBottom
             );
         }
 
         int showcaseY = y + 31;
-        int showcaseH = MathHelper.clamp((int) (detailH * 0.30F), 86, 120);
+        int showcaseH = MathHelper.clamp((int) (detailH * 0.29F), 84, 118);
         boolean hoverShowcase = mouseY >= viewTop && mouseY < viewBottom && isOver(mouseX, mouseY, x, showcaseY, width, showcaseH);
         this.itemShowcaseHoverAnim = MathHelper.lerp(Math.min(1.0F, delta * 0.45F), this.itemShowcaseHoverAnim, hoverShowcase ? 1.0F : 0.0F);
 
         int border = rarity.getDynamicBorderColor(hoverShowcase, animTimeSec);
-        context.fillGradient(x, showcaseY, x + width, showcaseY + showcaseH, 0xFF0D1422, 0xFF1A273E);
-        context.drawBorder(x, showcaseY, width, showcaseH, border);
-        context.drawBorder(x + 1, showcaseY + 1, width - 2, showcaseH - 2, (border & 0x00FFFFFF) | 0x44000000);
+        EncyclopediaTheme.drawDarkShowcaseAlcove(context, x, showcaseY, width, showcaseH, border);
 
-        // Glowing showcase pedestal line below the large item
         int pedestalY = showcaseY + showcaseH - 16;
-        int pedestalColor = (rarity.getHighlightBorderColor() & 0x00FFFFFF) | 0x66000000;
-        context.fill(x + 28, pedestalY, x + width - 28, pedestalY + 1, pedestalColor);
-        context.fill(x + 48, pedestalY + 4, x + width - 48, pedestalY + 5, (pedestalColor & 0x00FFFFFF) | 0x33000000);
+        context.fill(x + 28, pedestalY, x + width - 28, pedestalY + 1, EncyclopediaTheme.GOLD_DEEP);
 
-        drawScaledText(context, "✦ VISTA DETALLADA", x + 6, showcaseY + 5, 0.80F, TEXT_MUTED);
+        EncyclopediaTheme.drawScaledText(context, this.textRenderer, "✦ RELIQUIA / DETALLE", x + 8, showcaseY + 6, 0.78F, EncyclopediaTheme.CREAM_MUTED, false);
 
-        float largeScale = MathHelper.clamp(showcaseH * 0.046F, 3.6F, 5.2F) * (1.0F + 0.12F * itemShowcaseHoverAnim);
-        drawScaledItem(context, entry.getIcon(), x + width / 2.0F, showcaseY + showcaseH / 2.0F - 2.0F, largeScale);
+        float largeScale = MathHelper.clamp(showcaseH * 0.045F, 3.5F, 5.0F) * (1.0F + 0.12F * itemShowcaseHoverAnim);
+        EncyclopediaTheme.drawScaledItem(context, entry.getIcon(), x + width / 2.0F, showcaseY + showcaseH / 2.0F - 1.0F, largeScale);
         registerDetailTarget(x, showcaseY, width, showcaseH, null, entry.getIcon(), null, viewTop, viewBottom);
 
         return showcaseY + showcaseH;
@@ -856,16 +958,16 @@ public class EncyclopediaScreen extends Screen {
             DrawContext context, EncyclopediaEntry entry, EncyclopediaRarity rarity,
             int x, int y, int width, int mouseX, int mouseY, int viewTop, int viewBottom
     ) {
-        context.drawTextWithShadow(this.textRenderer, Text.literal(entry.getName()).formatted(Formatting.BOLD), x, y + 1, TEXT_PRIMARY);
+        context.drawText(this.textRenderer, Text.literal(entry.getName()).formatted(Formatting.BOLD), x, y + 1, EncyclopediaTheme.INK_TITLE, false);
         int badgeW = drawRarityBadge(context, rarity, x, y + 14);
-        context.drawText(this.textRenderer, entry.getTypeLabel(), x + badgeW + 6, y + 16, TEXT_MUTED, false);
+        context.drawText(this.textRenderer, entry.getTypeLabel(), x + badgeW + 6, y + 16, EncyclopediaTheme.INK_MUTED, false);
 
         if (entry.getRelatedEntryId() != null && entry.getRelatedButtonLabel() != null) {
             String btnLabel = entry.getRelatedButtonLabel();
             int btnW = this.textRenderer.getWidth(btnLabel) + 12;
             drawActionPill(
                     context, x + width - btnW, y + 12, btnLabel,
-                    0xFF1A2D42, BORDER_SUBTLE, TEXT_SECONDARY,
+                    ButtonStyle.PARCHMENT, EncyclopediaTheme.INK_SCARLET,
                     () -> navigateToEntryId(entry.getRelatedEntryId()),
                     mouseX, mouseY, viewTop, viewBottom
             );
@@ -879,36 +981,46 @@ public class EncyclopediaScreen extends Screen {
         this.stageBoxH = stageH;
 
         int border = rarity.getDynamicBorderColor(draggingStage3D, animTimeSec);
-        context.fillGradient(x, stageY, x + width, stageY + stageH, 0xFF0C121E, 0xFF1A273D);
-        context.drawBorder(x, stageY, width, stageH, border);
+        EncyclopediaTheme.drawDarkShowcaseAlcove(context, x, stageY, width, stageH, border);
 
         int floorY = stageY + stageH - 22;
-        context.fill(x + 14, floorY, x + width - 14, floorY + 1, 0x662CE6C8);
-        context.fill(x + 28, floorY + 7, x + width - 28, floorY + 8, 0x332CE6C8);
+        context.fill(x + 18, floorY, x + width - 18, floorY + 1, 0x88E6AF35);
 
         EntityPreviewConfig preview = entry.getEntityPreview();
         if (preview != null && client != null && client.world != null) {
-            float dynamicScale = preview.showcaseScale() * (stageH / 128.0F);
-            renderEntityViewport(
-                    context,
-                    x + 2, stageY + 2, x + width - 2, stageY + stageH - 2,
-                    x + width / 2.0F, stageY + stageH / 2.0F + 2.0F,
-                    dynamicScale, preview,
-                    this.previewYawDeg, this.previewPitchDeg,
-                    preview.supportsDevilMode() && this.jefriDevilModePreview
-            );
+            LivingEntity entity = getOrCreatePreviewEntity(preview.entityTypeSupplier().get());
+            if (entity != null) {
+                boolean devilMode = preview.supportsDevilMode() && this.jefriDevilModePreview;
+                if (entity instanceof JefriPensteinEntity jefri) {
+                    jefri.setClientPreviewDevilMode(devilMode);
+                } else if (entity instanceof JoseTorresEntity jose) {
+                    jose.setClientPreviewPhase2(devilMode);
+                }
+                float dynamicScale = preview.showcaseScale() * (stageH / 128.0F);
+                EncyclopediaTheme.renderEntityViewport(
+                        context,
+                        x + 3, stageY + 3, x + width - 3, stageY + stageH - 3,
+                        x + width / 2.0F, stageY + stageH / 2.0F + 2.0F,
+                        dynamicScale,
+                        new Vector3f(0.0F, preview.offsetY(), 0.0F),
+                        this.previewYawDeg, this.previewPitchDeg,
+                        entity, false
+                );
+            }
         }
 
-        drawScaledText(context, "✦ VISTA 3D INTERACTIVA · Arrastra para rotar", x + 6, stageY + 5, 0.80F, TEXT_MUTED);
+        EncyclopediaTheme.drawScaledText(
+                context, this.textRenderer, "✦ VISTA 3D · Arrastra para rotar",
+                x + 8, stageY + 6, 0.78F, EncyclopediaTheme.CREAM_MUTED, false
+        );
 
         int btnY = stageY + stageH - 18;
         int bx = x + 6;
         String autoLabel = autoRotate3D ? "Auto: ON" : "Auto: OFF";
         int autoW = drawActionPill(
                 context, bx, btnY, autoLabel,
-                autoRotate3D ? 0xFF143C34 : 0xFF1A2538,
-                autoRotate3D ? ACCENT_TEAL : BORDER_SUBTLE,
-                autoRotate3D ? 0xFF7DFFE8 : TEXT_MUTED,
+                autoRotate3D ? ButtonStyle.EMERALD : ButtonStyle.WOOD,
+                0xFFFFFFFF,
                 () -> this.autoRotate3D = !this.autoRotate3D,
                 mouseX, mouseY, viewTop, viewBottom
         );
@@ -916,7 +1028,7 @@ public class EncyclopediaScreen extends Screen {
 
         drawActionPill(
                 context, bx, btnY, "Reset",
-                0xFF1A2538, BORDER_SUBTLE, TEXT_SECONDARY,
+                ButtonStyle.WOOD, EncyclopediaTheme.CREAM_PRIMARY,
                 () -> {
                     if (preview != null) {
                         this.previewYawDeg = preview.defaultYawDeg();
@@ -929,73 +1041,19 @@ public class EncyclopediaScreen extends Screen {
 
         if (preview != null && preview.supportsDevilMode()) {
             boolean isJose = "entity_jose_torres".equals(entry.getId());
-            String phaseName = isJose ? "Jhospeh Towers" : "Modo Diablo";
+            String phaseName = isJose ? "Jhoseph Towers" : "Modo Diablo";
             String devilLabel = phaseName + (jefriDevilModePreview ? ": ON" : ": OFF");
             int dw = this.textRenderer.getWidth(devilLabel) + 12;
-            int activeBg = isJose ? 0xFF1E3A5F : 0xFF4D1720;
-            int activeBorder = isJose ? 0xFF70D6FF : ACCENT_CRIMSON_BRIGHT;
-            int activeText = isJose ? 0xFFFFFFFF : 0xFFFF8888;
             drawActionPill(
                     context, x + width - dw - 6, btnY, devilLabel,
-                    jefriDevilModePreview ? activeBg : 0xFF1A2538,
-                    jefriDevilModePreview ? activeBorder : BORDER_SUBTLE,
-                    jefriDevilModePreview ? activeText : TEXT_MUTED,
+                    jefriDevilModePreview ? ButtonStyle.SCARLET_GOLD : ButtonStyle.WOOD,
+                    0xFFFFFFFF,
                     () -> this.jefriDevilModePreview = !this.jefriDevilModePreview,
                     mouseX, mouseY, viewTop, viewBottom
             );
         }
 
         return stageY + stageH;
-    }
-
-    private void renderEntityViewport(
-            DrawContext context,
-            int scissorLeft, int scissorTop, int scissorRight, int scissorBottom,
-            float centerX, float centerY, float scale,
-            EntityPreviewConfig config,
-            float yawDeg, float pitchDeg, boolean devilMode
-    ) {
-        if (scissorRight <= scissorLeft || scissorBottom <= scissorTop) {
-            return;
-        }
-        LivingEntity entity = getOrCreatePreviewEntity(config.entityTypeSupplier().get());
-        if (entity == null) {
-            return;
-        }
-
-        entity.setPosition(0.0, 0.0, 0.0);
-        entity.prevBodyYaw = 180.0F;
-        entity.bodyYaw = 180.0F;
-        entity.prevHeadYaw = 180.0F;
-        entity.headYaw = 180.0F;
-        entity.prevYaw = 180.0F;
-        entity.setYaw(180.0F);
-        entity.prevPitch = 0.0F;
-        entity.setPitch(0.0F);
-
-        if (entity instanceof JefriPensteinEntity jefri) {
-            jefri.setClientPreviewDevilMode(devilMode);
-        } else if (entity instanceof JoseTorresEntity jose) {
-            jose.setClientPreviewPhase2(devilMode);
-        }
-
-        float pitchRad = (float) Math.toRadians(pitchDeg);
-        float yawRad = (float) Math.toRadians(yawDeg);
-        Quaternionf rotation = new Quaternionf()
-                .rotateZ((float) Math.PI)
-                .rotateX(pitchRad)
-                .rotateY(yawRad);
-        Quaternionf cameraOverride = new Quaternionf().rotateX(pitchRad);
-        Vector3f translation = new Vector3f(0.0F, config.offsetY(), 0.0F);
-
-        context.enableScissor(scissorLeft, scissorTop, scissorRight, scissorBottom);
-        try {
-            InventoryScreen.drawEntity(context, centerX, centerY, scale, translation, rotation, cameraOverride, entity);
-        } catch (Throwable ignored) {
-            // Protect UI from any single-frame third-party model exception
-        } finally {
-            context.disableScissor();
-        }
     }
 
     @Nullable
@@ -1009,17 +1067,22 @@ public class EncyclopediaScreen extends Screen {
         });
     }
 
-    private int drawSectionHeader(DrawContext context, String title, int x, int y) {
-        context.drawText(this.textRenderer, "✦", x, y, ACCENT_TEAL, false);
-        context.drawText(this.textRenderer, title, x + 9, y, TEXT_SECONDARY, false);
+    private int drawSectionHeader(DrawContext context, String title, int x, int y, int w) {
+        context.drawText(this.textRenderer, "❖", x, y, EncyclopediaTheme.INK_SCARLET, false);
+        context.drawText(this.textRenderer, Text.literal(title).formatted(Formatting.BOLD), x + 9, y, EncyclopediaTheme.INK_TITLE, false);
+        int tw = this.textRenderer.getWidth(title) + 14;
+        if (tw < w - 8) {
+            context.fill(x + tw, y + 4, x + w, y + 5, EncyclopediaTheme.PARCHMENT_RULE);
+        }
         return y + 13;
     }
 
     private void drawStatCard(DrawContext context, StatInfo stat, int x, int y, int w, int h) {
-        context.fill(x, y, x + w, y + h, BG_CARD);
-        context.drawBorder(x, y, w, h, BORDER_SUBTLE);
-        drawScaledText(context, stat.label(), x + 6, y + 4, 0.85F, TEXT_MUTED);
-        drawScaledText(context, stat.value(), x + 6, y + 14, 0.92F, stat.valueColor());
+        EncyclopediaTheme.drawParchmentCard(context, x, y, w, h, false, false);
+        EncyclopediaTheme.drawScaledText(context, this.textRenderer, stat.label(), x + 6, y + 4, 0.80F, EncyclopediaTheme.INK_MUTED, false);
+        // Franja inferior en roble oscuro para que cualquier color brillante de stat resalte al 100%
+        context.fill(x + 3, y + 14, x + w - 3, y + h - 3, EncyclopediaTheme.WOOD_DARK);
+        EncyclopediaTheme.drawScaledText(context, this.textRenderer, stat.value(), x + 6, y + 16.5F, 0.86F, stat.valueColor(), true);
     }
 
     private int drawStructureFeatureCard(
@@ -1031,24 +1094,22 @@ public class EncyclopediaScreen extends Screen {
         boolean clickable = feature.targetEntryId() != null;
         boolean hover = mouseY >= viewTop && mouseY < viewBottom && isOver(mouseX, mouseY, x, y, w, h);
 
-        context.fill(x, y, x + w, y + h, hover && clickable ? BG_CARD_HOVER : BG_CARD);
-        context.drawBorder(x, y, w, h, hover && clickable ? BORDER_ACTIVE : BORDER_SUBTLE);
-        context.fill(x + 1, y + 1, x + 3, y + h - 1, ACCENT_TEAL);
+        EncyclopediaTheme.drawParchmentCard(context, x, y, w, h, hover && clickable, false);
+        context.fill(x + 1, y + 1, x + 3, y + h - 1, EncyclopediaTheme.GOLD_DEEP);
 
         ItemStack icon = feature.getIcon();
-        float iconScale = hover ? 1.15F : 0.95F;
-        drawScaledItem(context, icon, x + 16, y + 15.0F, iconScale);
+        EncyclopediaTheme.drawScaledItem(context, icon, x + 16, y + 15.0F, hover ? 1.12F : 0.95F);
 
-        context.drawTextWithShadow(this.textRenderer, Text.literal(feature.title()), x + 30, y + 5, TEXT_PRIMARY);
+        context.drawText(this.textRenderer, Text.literal(feature.title()).formatted(Formatting.BOLD), x + 30, y + 5, EncyclopediaTheme.INK_TITLE, false);
         if (clickable) {
             String linkTag = "Ver →";
             int lw = this.textRenderer.getWidth(linkTag);
-            context.drawText(this.textRenderer, linkTag, x + w - lw - 6, y + 5, 0xFF7BE8FF, false);
+            context.drawText(this.textRenderer, linkTag, x + w - lw - 6, y + 5, EncyclopediaTheme.INK_SCARLET, false);
         }
 
         int dy = y + 16;
         for (OrderedText line : detailLines) {
-            context.drawText(this.textRenderer, line, x + 30, dy, TEXT_MUTED, false);
+            context.drawText(this.textRenderer, line, x + 30, dy, EncyclopediaTheme.INK_BODY, false);
             dy += 9;
         }
 
@@ -1072,25 +1133,26 @@ public class EncyclopediaScreen extends Screen {
         boolean clickable = step.targetEntryId() != null;
         boolean hover = mouseY >= viewTop && mouseY < viewBottom && isOver(mouseX, mouseY, x, y, w, h);
 
-        context.fill(x, y, x + w, y + h, hover && clickable ? BG_CARD_HOVER : BG_CARD);
-        context.drawBorder(x, y, w, h, hover && clickable ? BORDER_ACTIVE : BORDER_SUBTLE);
+        EncyclopediaTheme.drawParchmentCard(context, x, y, w, h, hover && clickable, false);
 
-        // Numbered step badge
         int badgeSize = 14;
         int bx = x + 6;
         int by = y + 6;
-        context.fill(bx, by, bx + badgeSize, by + badgeSize, ACCENT_CRIMSON);
-        context.drawBorder(bx, by, badgeSize, badgeSize, 0xFFFF8A7A);
-        drawCenteredScaledText(context, String.valueOf(step.stepNumber()), bx + badgeSize / 2.0F, by + 3.0F, 0.95F, 0xFFFFFFFF);
+        context.fill(bx, by, bx + badgeSize, by + badgeSize, EncyclopediaTheme.SCARLET_MAIN);
+        context.drawBorder(bx, by, badgeSize, badgeSize, EncyclopediaTheme.GOLD_MAIN);
+        EncyclopediaTheme.drawCenteredScaledText(
+                context, this.textRenderer, String.valueOf(step.stepNumber()),
+                bx + badgeSize / 2.0F, by + 3.0F, 0.95F, 0xFFFFFFFF, true
+        );
 
         if (!icon.isEmpty()) {
-            drawScaledItem(context, icon, bx + badgeSize / 2.0F, by + badgeSize + 10.0F, hover ? 1.05F : 0.85F);
+            EncyclopediaTheme.drawScaledItem(context, icon, bx + badgeSize / 2.0F, by + badgeSize + 10.0F, hover ? 1.05F : 0.85F);
         }
 
-        context.drawTextWithShadow(this.textRenderer, Text.literal(step.title()), x + 28, y + 6, EncyclopediaEntry.GOLD_STAT_COLOR);
+        context.drawText(this.textRenderer, Text.literal(step.title()).formatted(Formatting.BOLD), x + 28, y + 6, EncyclopediaTheme.INK_SCARLET, false);
         int ty = y + 17;
         for (OrderedText line : lines) {
-            context.drawText(this.textRenderer, line, x + 28, ty, TEXT_SECONDARY, false);
+            context.drawText(this.textRenderer, line, x + 28, ty, EncyclopediaTheme.INK_BODY, false);
             ty += 9;
         }
 
@@ -1107,14 +1169,13 @@ public class EncyclopediaScreen extends Screen {
     private int drawEffectCard(DrawContext context, EffectInfo effect, int x, int y, int w) {
         List<OrderedText> detailLines = this.textRenderer.wrapLines(Text.literal(effect.detail()), w - 16);
         int h = 16 + detailLines.size() * 9;
-        context.fill(x, y, x + w, y + h, BG_CARD);
-        context.drawBorder(x, y, w, h, BORDER_SUBTLE);
-        context.fill(x + 1, y + 1, x + 3, y + h - 1, effect.accentColor());
+        EncyclopediaTheme.drawParchmentCard(context, x, y, w, h, false, false);
+        context.fill(x + 1, y + 1, x + 4, y + h - 1, effect.accentColor());
 
-        context.drawText(this.textRenderer, effect.name(), x + 8, y + 4, TEXT_PRIMARY, false);
+        context.drawText(this.textRenderer, Text.literal(effect.name()).formatted(Formatting.BOLD), x + 8, y + 4, EncyclopediaTheme.INK_TITLE, false);
         int dy = y + 14;
         for (OrderedText line : detailLines) {
-            context.drawText(this.textRenderer, line, x + 8, dy, TEXT_MUTED, false);
+            context.drawText(this.textRenderer, line, x + 8, dy, EncyclopediaTheme.INK_BODY, false);
             dy += 9;
         }
         return y + h + 4;
@@ -1128,16 +1189,18 @@ public class EncyclopediaScreen extends Screen {
         boolean clickable = drop.targetEntryId() != null;
         boolean hover = mouseY >= viewTop && mouseY < viewBottom && isOver(mouseX, mouseY, x, y, w, h);
 
-        context.fill(x, y, x + w, y + h, hover && clickable ? BG_CARD_HOVER : BG_CARD);
-        context.drawBorder(x, y, w, h, hover && clickable ? BORDER_ACTIVE : BORDER_SUBTLE);
+        EncyclopediaTheme.drawParchmentCard(context, x, y, w, h, hover && clickable, false);
 
         ItemStack icon = drop.getIcon();
-        drawScaledItem(context, icon, x + 13, y + h / 2.0F, hover ? 1.12F : 0.90F);
-        context.drawText(this.textRenderer, drop.name(), x + 27, y + 8, TEXT_PRIMARY, false);
+        EncyclopediaTheme.drawScaledItem(context, icon, x + 13, y + h / 2.0F, hover ? 1.12F : 0.90F);
+        context.drawText(this.textRenderer, drop.name(), x + 27, y + 8, EncyclopediaTheme.INK_TITLE, false);
 
         String right = drop.detail() + (clickable ? " →" : "");
         int rw = this.textRenderer.getWidth(right);
-        context.drawText(this.textRenderer, right, x + w - rw - 6, y + 8, clickable ? 0xFF7BE8FF : EncyclopediaEntry.GOLD_STAT_COLOR, false);
+        context.drawText(
+                this.textRenderer, right, x + w - rw - 6, y + 8,
+                clickable ? EncyclopediaTheme.INK_LINK : EncyclopediaTheme.INK_SCARLET, false
+        );
 
         registerDetailTarget(
                 x, y, w, h,
@@ -1167,9 +1230,8 @@ public class EncyclopediaScreen extends Screen {
             int noteH = noteLines.isEmpty() ? 0 : (noteLines.size() * 9 + 6);
             int cardH = 18 + contentH + noteH + 6;
 
-            context.fill(x, y, x + w, y + cardH, BG_CARD);
-            context.drawBorder(x, y, w, cardH, BORDER_SUBTLE);
-            context.drawText(this.textRenderer, method.title(), x + innerPad, y + 5, TEXT_MUTED, false);
+            EncyclopediaTheme.drawParchmentCard(context, x, y, w, cardH, false, false);
+            context.drawText(this.textRenderer, Text.literal(method.title()).formatted(Formatting.BOLD), x + innerPad, y + 5, EncyclopediaTheme.INK_MUTED, false);
 
             int gx = x + innerPad;
             int gy = y + 17;
@@ -1182,10 +1244,10 @@ public class EncyclopediaScreen extends Screen {
 
             int arrowX = compact ? (gx + 10) : (gx + gridSize + 10);
             int arrowY = compact ? (gy + gridSize + 10) : (gy + gridSize / 2 - 4);
-            context.drawTextWithShadow(this.textRenderer, Text.literal("→"), arrowX, arrowY, EncyclopediaEntry.GOLD_STAT_COLOR);
+            context.drawText(this.textRenderer, Text.literal("⟹").formatted(Formatting.BOLD), arrowX, arrowY, EncyclopediaTheme.INK_SCARLET, false);
 
             int outSize = 26;
-            int outX = arrowX + 16;
+            int outX = arrowX + 18;
             int outY = compact ? (gy + gridSize + 2) : (gy + (gridSize - outSize) / 2);
             drawRecipeSlot(context, method.output(), outX, outY, outSize, mouseX, mouseY, viewTop, viewBottom);
 
@@ -1197,18 +1259,18 @@ public class EncyclopediaScreen extends Screen {
                     List<OrderedText> outLines = this.textRenderer.wrapLines(outStack.getName(), labelMaxW);
                     int ly = outY + 4;
                     for (OrderedText ol : outLines) {
-                        context.drawText(this.textRenderer, ol, labelX, ly, TEXT_PRIMARY, false);
+                        context.drawText(this.textRenderer, ol, labelX, ly, EncyclopediaTheme.INK_TITLE, false);
                         ly += 10;
                     }
                     if (outStack.getCount() > 1) {
-                        context.drawText(this.textRenderer, "x" + outStack.getCount(), labelX, ly, EncyclopediaEntry.GOLD_STAT_COLOR, false);
+                        context.drawText(this.textRenderer, "x" + outStack.getCount(), labelX, ly, EncyclopediaTheme.INK_SCARLET, false);
                     }
                 }
             }
 
             int ny = gy + contentH + 4;
             for (OrderedText nl : noteLines) {
-                context.drawText(this.textRenderer, nl, x + innerPad, ny, TEXT_MUTED, false);
+                context.drawText(this.textRenderer, nl, x + innerPad, ny, EncyclopediaTheme.INK_MUTED, false);
                 ny += 9;
             }
             return y + cardH + 5;
@@ -1218,24 +1280,23 @@ public class EncyclopediaScreen extends Screen {
             int slot = 24;
             int noteH = noteLines.isEmpty() ? 0 : (noteLines.size() * 9 + 4);
             int cardH = 18 + slot + 6 + noteH + 6;
-            context.fill(x, y, x + w, y + cardH, BG_CARD);
-            context.drawBorder(x, y, w, cardH, BORDER_SUBTLE);
-            context.drawText(this.textRenderer, method.title(), x + innerPad, y + 5, TEXT_MUTED, false);
+            EncyclopediaTheme.drawParchmentCard(context, x, y, w, cardH, false, false);
+            context.drawText(this.textRenderer, Text.literal(method.title()).formatted(Formatting.BOLD), x + innerPad, y + 5, EncyclopediaTheme.INK_MUTED, false);
 
             int rowY = y + 17;
             SlotRef input = method.inputs().isEmpty() ? SlotRef.empty() : method.inputs().get(0);
             drawRecipeSlot(context, input, x + innerPad, rowY, slot, mouseX, mouseY, viewTop, viewBottom);
-            context.drawText(this.textRenderer, "» →", x + innerPad + slot + 8, rowY + 8, 0xFFFFAE42, false);
-            drawRecipeSlot(context, method.output(), x + innerPad + slot + 34, rowY, slot, mouseX, mouseY, viewTop, viewBottom);
+            context.drawText(this.textRenderer, "🔥 ⟹", x + innerPad + slot + 7, rowY + 8, EncyclopediaTheme.INK_SCARLET, false);
+            drawRecipeSlot(context, method.output(), x + innerPad + slot + 36, rowY, slot, mouseX, mouseY, viewTop, viewBottom);
 
             ItemStack outStack = method.output().getStack();
             if (!outStack.isEmpty()) {
-                context.drawText(this.textRenderer, outStack.getName(), x + innerPad + slot + 64, rowY + 8, TEXT_PRIMARY, false);
+                context.drawText(this.textRenderer, outStack.getName(), x + innerPad + slot + 66, rowY + 8, EncyclopediaTheme.INK_TITLE, false);
             }
 
             int ny = rowY + slot + 5;
             for (OrderedText nl : noteLines) {
-                context.drawText(this.textRenderer, nl, x + innerPad, ny, TEXT_MUTED, false);
+                context.drawText(this.textRenderer, nl, x + innerPad, ny, EncyclopediaTheme.INK_MUTED, false);
                 ny += 9;
             }
             return y + cardH + 5;
@@ -1245,15 +1306,14 @@ public class EncyclopediaScreen extends Screen {
         List<OrderedText> infoWrapped = this.textRenderer.wrapLines(Text.literal(method.note()), w - innerPad * 2 - slot - 8);
         int textH = Math.max(slot, infoWrapped.size() * 9 + 4);
         int cardH = 18 + textH + 8;
-        context.fill(x, y, x + w, y + cardH, BG_CARD);
-        context.drawBorder(x, y, w, cardH, BORDER_SUBTLE);
-        context.drawText(this.textRenderer, method.title(), x + innerPad, y + 5, TEXT_MUTED, false);
+        EncyclopediaTheme.drawParchmentCard(context, x, y, w, cardH, false, false);
+        context.drawText(this.textRenderer, Text.literal(method.title()).formatted(Formatting.BOLD), x + innerPad, y + 5, EncyclopediaTheme.INK_MUTED, false);
 
         SlotRef iconRef = method.inputs().isEmpty() ? SlotRef.empty() : method.inputs().get(0);
         drawRecipeSlot(context, iconRef, x + innerPad, y + 18, slot, mouseX, mouseY, viewTop, viewBottom);
         int ty = y + 19;
         for (OrderedText line : infoWrapped) {
-            context.drawText(this.textRenderer, line, x + innerPad + slot + 8, ty, TEXT_SECONDARY, false);
+            context.drawText(this.textRenderer, line, x + innerPad + slot + 8, ty, EncyclopediaTheme.INK_BODY, false);
             ty += 9;
         }
         return y + cardH + 5;
@@ -1267,13 +1327,14 @@ public class EncyclopediaScreen extends Screen {
         boolean hasLink = ref.targetEntryId() != null && !stack.isEmpty();
         boolean hover = !stack.isEmpty() && mouseY >= viewTop && mouseY < viewBottom && isOver(mouseX, mouseY, x, y, size, size);
 
-        context.fill(x, y, x + size, y + size, hover ? BG_CARD_HOVER : BG_INPUT);
-        int border = hover ? (hasLink ? BORDER_ACTIVE : 0xFF6B8FB8) : 0xFF334761;
-        context.drawBorder(x, y, size, size, border);
+        EncyclopediaTheme.drawMinecraftSlot(
+                context, x, y, size, hover, false,
+                hasLink ? EncyclopediaTheme.SCARLET_MAIN : EncyclopediaTheme.GOLD_DEEP
+        );
 
         if (!stack.isEmpty()) {
-            float zoom = hover ? 1.24F : 1.0F;
-            drawScaledItem(context, stack, x + size / 2.0F, y + size / 2.0F, ((size - 4) / 16.0F) * zoom);
+            float zoom = hover ? 1.22F : 1.0F;
+            EncyclopediaTheme.drawScaledItem(context, stack, x + size / 2.0F, y + size / 2.0F, ((size - 4) / 16.0F) * zoom);
             if (stack.getCount() > 1) {
                 String cnt = String.valueOf(stack.getCount());
                 int cw = this.textRenderer.getWidth(cnt);
@@ -1295,21 +1356,27 @@ public class EncyclopediaScreen extends Screen {
         int h = 11;
         context.fill(x, y, x + w, y + h, rarity.getBadgeBackground());
         context.drawBorder(x, y, w, h, rarity.getBorderColor());
-        drawCenteredScaledText(context, label, x + w / 2.0F, y + 2.5F, 0.85F, rarity.getTextColor());
+        EncyclopediaTheme.drawCenteredScaledText(
+                context, this.textRenderer, label,
+                x + w / 2.0F, y + 2.5F, 0.85F, rarity.getTextColor(), true
+        );
         return w;
     }
 
     private int drawActionPill(
             DrawContext context, int x, int y, String label,
-            int bgColor, int borderColor, int textColor, Runnable onClick,
+            ButtonStyle style, int textColor, Runnable onClick,
             int mouseX, int mouseY, int viewTop, int viewBottom
     ) {
         int w = this.textRenderer.getWidth(label) + 12;
         int h = 14;
         boolean hover = mouseY >= viewTop && mouseY < viewBottom && isOver(mouseX, mouseY, x, y, w, h);
-        context.fill(x, y, x + w, y + h, hover ? shiftBrightness(bgColor, 20) : bgColor);
-        context.drawBorder(x, y, w, h, hover ? 0xFFFFFFFF : borderColor);
-        drawCenteredScaledText(context, label, x + w / 2.0F, y + 3.5F, 0.92F, hover ? 0xFFFFFFFF : textColor);
+        EncyclopediaTheme.drawMinecraftButton(context, x, y, w, h, hover, style);
+        boolean shadow = (style != ButtonStyle.PARCHMENT);
+        EncyclopediaTheme.drawCenteredScaledText(
+                context, this.textRenderer, label,
+                x + w / 2.0F, y + 3.5F, 0.90F, textColor, shadow
+        );
         registerDetailTarget(x, y, w, h, onClick, null, null, viewTop, viewBottom);
         return w;
     }
@@ -1338,6 +1405,14 @@ public class EncyclopediaScreen extends Screen {
     }
 
     private void renderGridEntryTooltip(DrawContext context, EncyclopediaEntry entry, int mouseX, int mouseY) {
+        if (ClientDungeonProgression.isStructureEntrySpoilerLocked(entry.getId())) {
+            context.drawTooltip(this.textRenderer, List.of(
+                    Text.literal("🔒 ???").formatted(Formatting.RED, Formatting.BOLD),
+                    Text.literal("Derrota al jefe anterior para revelar esta dungeon").formatted(Formatting.GRAY)
+            ), mouseX, mouseY);
+            return;
+        }
+
         List<Text> lines = new ArrayList<>();
         lines.add(Text.literal(entry.getName()).formatted(Formatting.BOLD));
         lines.add(Text.literal(entry.getRarity().getDisplayName() + " · " + entry.getTypeLabel()).withColor(entry.getRarity().getTextColor()));
@@ -1360,6 +1435,11 @@ public class EncyclopediaScreen extends Screen {
             return true;
         }
 
+        if (isOver(mouseX, mouseY, progressionBtnX, progressionBtnY, progressionBtnW, progressionBtnH)) {
+            openDungeonProgressionMap();
+            return true;
+        }
+
         if (!searchQuery.isEmpty() && isOver(mouseX, mouseY, clearSearchX, clearSearchY, clearSearchSize, clearSearchSize)) {
             this.searchQuery = "";
             if (this.searchField != null) {
@@ -1379,7 +1459,7 @@ public class EncyclopediaScreen extends Screen {
             this.searchField.setFocused(false);
         }
 
-        int listTop = sidebarY + 18;
+        int listTop = sidebarY + 17;
         int listBottom = sidebarY + sidebarH - 4;
         if (mouseX >= sidebarX && mouseX < sidebarX + sidebarW && mouseY >= listTop && mouseY < listBottom) {
             EncyclopediaCategory[] cats = EncyclopediaCategory.values();
@@ -1405,6 +1485,7 @@ public class EncyclopediaScreen extends Screen {
                 int sx = gridX + col * (slotSize + slotGap);
                 int sy = gridY + row * (slotSize + slotGap) - gridScroll;
                 if (isOver(mouseX, mouseY, sx, sy, slotSize, slotSize)) {
+                    playBookTurnSound();
                     selectEntry(filteredEntries.get(i), true);
                     return true;
                 }
@@ -1422,6 +1503,7 @@ public class EncyclopediaScreen extends Screen {
         for (int i = detailTargets.size() - 1; i >= 0; i--) {
             HitTarget target = detailTargets.get(i);
             if (target.onClick() != null && target.contains(mouseX, mouseY)) {
+                playBookTurnSound();
                 target.onClick().run();
                 return true;
             }
@@ -1491,6 +1573,11 @@ public class EncyclopediaScreen extends Screen {
             return true;
         }
 
+        if (keyCode == GLFW.GLFW_KEY_P) {
+            openDungeonProgressionMap();
+            return true;
+        }
+
         if (keyCode == GLFW.GLFW_KEY_SLASH || (keyCode == GLFW.GLFW_KEY_F && hasControlDown())) {
             if (this.searchField != null) {
                 this.searchField.setFocused(true);
@@ -1524,6 +1611,9 @@ public class EncyclopediaScreen extends Screen {
             return false;
         }
         nextIdx = MathHelper.clamp(nextIdx, 0, filteredEntries.size() - 1);
+        if (nextIdx != idx) {
+            playBookTurnSound();
+        }
         selectEntry(filteredEntries.get(nextIdx), true);
         ensureSelectedVisibleInGrid();
         return true;
@@ -1543,51 +1633,7 @@ public class EncyclopediaScreen extends Screen {
         return Math.max(1, (available + getSlotGap()) / step);
     }
 
-    private void drawScaledItem(DrawContext context, ItemStack stack, float centerX, float centerY, float scale) {
-        if (stack.isEmpty()) {
-            return;
-        }
-        MatrixStack matrices = context.getMatrices();
-        matrices.push();
-        matrices.translate(centerX - 8.0F * scale, centerY - 8.0F * scale, 150.0F * (1.0F - scale));
-        matrices.scale(scale, scale, scale);
-        context.drawItem(stack, 0, 0);
-        matrices.pop();
-    }
-
-    private void drawScaledText(DrawContext context, String text, float x, float y, float scale, int color) {
-        MatrixStack matrices = context.getMatrices();
-        matrices.push();
-        matrices.translate(x, y, 0.0F);
-        matrices.scale(scale, scale, 1.0F);
-        context.drawText(this.textRenderer, text, 0, 0, color, false);
-        matrices.pop();
-    }
-
-    private void drawCenteredScaledText(DrawContext context, String text, float centerX, float y, float scale, int color) {
-        float w = this.textRenderer.getWidth(text) * scale;
-        drawScaledText(context, text, centerX - w / 2.0F, y, scale, color);
-    }
-
-    private void drawScrollbar(DrawContext context, int x, int y, int trackH, int scroll, int maxScroll, int viewH) {
-        if (maxScroll <= 0 || trackH <= 8) {
-            return;
-        }
-        context.fill(x, y, x + 3, y + trackH, 0x881A2538);
-        int thumbH = Math.max(14, (int) (trackH * (viewH / (float) (viewH + maxScroll))));
-        int thumbY = y + (int) ((trackH - thumbH) * (scroll / (float) maxScroll));
-        context.fill(x, thumbY, x + 3, thumbY + thumbH, 0xFF53759B);
-    }
-
     private static boolean isOver(double mx, double my, int x, int y, int w, int h) {
         return mx >= x && mx < x + w && my >= y && my < y + h;
-    }
-
-    private static int shiftBrightness(int argb, int delta) {
-        int a = (argb >>> 24) & 0xFF;
-        int r = MathHelper.clamp(((argb >>> 16) & 0xFF) + delta, 0, 255);
-        int g = MathHelper.clamp(((argb >>> 8) & 0xFF) + delta, 0, 255);
-        int b = MathHelper.clamp((argb & 0xFF) + delta, 0, 255);
-        return (a << 24) | (r << 16) | (g << 8) | b;
     }
 }

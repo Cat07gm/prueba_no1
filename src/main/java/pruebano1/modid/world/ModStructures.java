@@ -121,7 +121,46 @@ public class ModStructures {
             Identifier.of(Prueba_no1.MOD_ID, "casa_blanca_feature_placed")
     );
 
+    public static final Feature<DefaultFeatureConfig> CASA_BLANCA_CLEANUP_FEATURE = Registry.register(
+            Registries.FEATURE,
+            Identifier.of(Prueba_no1.MOD_ID, "casa_blanca_cleanup_feature"),
+            new CasaBlancaCleanupFeature(DefaultFeatureConfig.CODEC)
+    );
+
+    public static final RegistryKey<PlacedFeature> CASA_BLANCA_CLEANUP_PLACED_KEY = RegistryKey.of(
+            RegistryKeys.PLACED_FEATURE,
+            Identifier.of(Prueba_no1.MOD_ID, "casa_blanca_cleanup_feature_placed")
+    );
+
+    public static final RegistryKey<Structure> PALACIO_NACIONAL_KEY = RegistryKey.of(
+            RegistryKeys.STRUCTURE,
+            Identifier.of(Prueba_no1.MOD_ID, "palacio_nacional")
+    );
+
+    public static final StructurePieceType PALACIO_NACIONAL_PIECE = Registry.register(
+            Registries.STRUCTURE_PIECE,
+            Identifier.of(Prueba_no1.MOD_ID, "palacio_nacional_piece"),
+            PalacioNacionalPiece::new
+    );
+
+    public static final StructureType<PalacioNacionalStructure> PALACIO_NACIONAL_TYPE = Registry.register(
+            Registries.STRUCTURE_TYPE,
+            Identifier.of(Prueba_no1.MOD_ID, "palacio_nacional"),
+            () -> PalacioNacionalStructure.CODEC
+    );
+
+    public static final Feature<DefaultFeatureConfig> PALACIO_NACIONAL_FEATURE = Registry.register(
+            Registries.FEATURE,
+            Identifier.of(Prueba_no1.MOD_ID, "palacio_nacional_feature"),
+            new PalacioNacionalFeature(DefaultFeatureConfig.CODEC)
+    );
+
+    public static final RegistryKey<PlacedFeature> PALACIO_NACIONAL_PLACED_KEY = RegistryKey.of(
+            RegistryKeys.PLACED_FEATURE,
+            Identifier.of(Prueba_no1.MOD_ID, "palacio_nacional_feature_placed")
+    );
+
     public static void registerModStructures() {
-        Prueba_no1.LOGGER.info("Registrando Isla Penstein, Casino 'Draftea Tony Diaz', La Casa de José Torres y La Casa Blanca para " + Prueba_no1.MOD_ID);
+        Prueba_no1.LOGGER.info("Registrando Isla Penstein, Casino 'Draftea Tony Diaz', La Casa de José Torres, La Casa Blanca y El Palacio Nacional para " + Prueba_no1.MOD_ID);
     }
 }

@@ -6,6 +6,9 @@ import net.minecraft.block.enums.DoorHinge;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.FluidTags;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureContext;
 import net.minecraft.structure.StructurePiece;
 import net.minecraft.util.math.BlockBox;
@@ -13,9 +16,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.Heightmap;
 import net.minecraft.world.StructureWorldAccess;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.noise.NoiseConfig;
 import pruebano1.modid.ModBlocks;
 import pruebano1.modid.block.PodcastCassetteBlock;
 
@@ -36,11 +42,20 @@ import pruebano1.modid.block.PodcastCassetteBlock;
  */
 public class CasaJoseTorresPiece extends StructurePiece {
 
+    /** Radio cuadrado interior plano que cubre toda la barda (156x156) con margen de nivelación. */
+    public static final int FLAT_BOX_HALF = 160;
     /** Radio interior de la propiedad (176 bloques = 352x352 bloques de mansión, explanadas, jardines y piscina). */
     public static final int ESTATE_RADIUS = 176;
-    /** Franja perimetral de 34 bloques donde el terreno nevado se suaviza en rampa sin cortes bruscos (total 420x420). */
-    public static final int GRADE_RANGE = 34;
-    public static final int TOTAL_RADIUS = ESTATE_RADIUS + GRADE_RANGE; // 210 -> 420x420 bloques
+    /** Franja perimetral de 68 bloques donde el terreno se suaviza en rampa hermítica hacia el terreno natural. */
+    public static final int GRADE_RANGE = 68;
+    public static final int TOTAL_RADIUS = FLAT_BOX_HALF + GRADE_RANGE; // 228 -> 456x456 bloques
+    /** Distancia desde el borde plano en que se despejan árboles salvajes. */
+    public static final double TREE_CLEAR_DIST = 18.0D;
+    /** Distancia desde el borde plano en que se coloca placeholder GREEN_TERRACOTTA para bloquear árboles salvajes. */
+    public static final double TREE_BLOCKER_DIST = 26.0D;
+
+    /** Flags para limpieza sin soltar ítems ni provocar cascadas de lianas o vegetación. */
+    private static final int CLEAR_FLAGS = Block.NOTIFY_LISTENERS | Block.FORCE_STATE | Block.SKIP_DROPS;
 
     /** Posición relativa del Cassete de Podcast en el patio trasero justo al lado de la piscina. */
     public static final int CASSETTE_REL_X = 0;
@@ -104,8 +119,20 @@ public class CasaJoseTorresPiece extends StructurePiece {
             int centerZ,
             Random random
     ) {
+        generateChunkForHouse(world, chunkBox, centerX, baseY, centerZ, random, false);
+    }
+
+    public static void generateChunkForHouse(
+            StructureWorldAccess world,
+            BlockBox chunkBox,
+            int centerX,
+            int baseY,
+            int centerZ,
+            Random random,
+            boolean useTreeBlockerPlaceholder
+    ) {
         // 1. Nivelación de los 420x420 bloques y transición suave sin cortes bruscos con el terreno exterior
-        prepareEstateTerrainAndBlending(world, chunkBox, centerX, baseY, centerZ);
+        prepareEstateTerrainAndBlending(world, chunkBox, centerX, baseY, centerZ, useTreeBlockerPlaceholder);
 
         // 2. Barda perimetral de madera, avenidas exteriores, jardines, setos, rocas, reja blanca y árboles
         buildEstateGroundsAndFrontDriveway(world, chunkBox, centerX, baseY, centerZ);
@@ -126,19 +153,59 @@ public class CasaJoseTorresPiece extends StructurePiece {
         buildEstateTrees(world, chunkBox, centerX, baseY, centerZ);
 
         // 8. Aplicar cualquier modificación personalizada guardada con "/casajosetorres guardar"
-        CasaJoseTorresCustomEdits.applyCustomChunkIfPresent(world, chunkBox, centerX, baseY, centerZ);
+        if (!useTreeBlockerPlaceholder) {
+            CasaJoseTorresCustomEdits.applyCustomChunkIfPresent(world, chunkBox, centerX, baseY, centerZ);
+        }
+    }
+
+    /**
+     * Reconstruye y repara un chunk ya generado de La Casa de José Torres en mundos existentes.
+     */
+    public static void upgradeChunkInPlace(
+            ServerWorld world,
+            int chunkX,
+            int chunkZ,
+            CasaJoseTorresStructure.HouseAnchor anchor
+    ) {
+        int minX = chunkX << 4;
+        int minZ = chunkZ << 4;
+        BlockBox chunkBox = new BlockBox(
+                minX,
+                world.getBottomY() + 1,
+                minZ,
+                minX + 15,
+                world.getTopYInclusive(),
+                minZ + 15
+        );
+        generateChunkForHouse(
+                world,
+                chunkBox,
+                anchor.centerX(),
+                anchor.baseY(),
+                anchor.centerZ(),
+                world.getRandom(),
+                false
+        );
+        postCleanJoseTorresChunk(world, chunkBox, anchor.centerX(), anchor.baseY(), anchor.centerZ());
     }
 
     // =========================================================================
     // 1. TERRENO Y TRANSICIÓN SUAVE SIN CORTES BRUSCOS EN BIOMAS TERRESTRES
     // =========================================================================
 
+    public static double getEstateEdgeDistance(int dx, int dz) {
+        int qx = Math.max(0, Math.abs(dx) - FLAT_BOX_HALF);
+        int qz = Math.max(0, Math.abs(dz) - FLAT_BOX_HALF);
+        return Math.sqrt((double) qx * qx + (double) qz * qz);
+    }
+
     private static void prepareEstateTerrainAndBlending(
             StructureWorldAccess world,
             BlockBox chunkBox,
             int centerX,
             int baseY,
-            int centerZ
+            int centerZ,
+            boolean useTreeBlockerPlaceholder
     ) {
         int minX = Math.max(centerX - TOTAL_RADIUS, chunkBox.getMinX());
         int maxX = Math.min(centerX + TOTAL_RADIUS, chunkBox.getMaxX());
@@ -149,112 +216,321 @@ public class CasaJoseTorresPiece extends StructurePiece {
             return;
         }
 
-        int bottomY = Math.max(world.getBottomY() + 1, baseY - 26);
-        int topClearY = Math.min(world.getTopYInclusive(), baseY + 46);
+        int worldBottomY = world.getBottomY() + 1;
+        int worldTopY = world.getTopYInclusive();
+        int seaLevel = world.getSeaLevel();
+        int waterTopY = seaLevel - 1;
         BlockPos.Mutable pos = new BlockPos.Mutable();
 
+        ServerWorld serverWorld = world.toServerWorld();
+        ChunkGenerator chunkGenerator = serverWorld != null ? serverWorld.getChunkManager().getChunkGenerator() : null;
+        NoiseConfig noiseConfig = serverWorld != null ? serverWorld.getChunkManager().getNoiseConfig() : null;
+
         BlockState air = Blocks.AIR.getDefaultState();
+        BlockState water = Blocks.WATER.getDefaultState();
         BlockState stoneFoundation = Blocks.STONE.getDefaultState();
         BlockState dirt = Blocks.DIRT.getDefaultState();
         BlockState grass = Blocks.GRASS_BLOCK.getDefaultState();
+        BlockState treeBlocker = Blocks.GREEN_TERRACOTTA.getDefaultState();
+
+        int cachedChunkX = Integer.MIN_VALUE;
+        int cachedChunkZ = Integer.MIN_VALUE;
+        int cachedTopClearY = Math.min(worldTopY, baseY + 56);
+        int[][] chunkHeights = new int[5][5];
 
         for (int wx = minX; wx <= maxX; wx++) {
             int dx = wx - centerX;
+            int chunkX = wx >> 4;
             for (int wz = minZ; wz <= maxZ; wz++) {
                 int dz = wz - centerZ;
+                int chunkZ = wz >> 4;
 
-                // Distancia radial suavizada (esquinas redondeadas para evitar cortes cuadrados en el terreno)
-                double chebyshev = Math.max(Math.abs(dx), Math.abs(dz));
-                double euclidean = Math.sqrt((double) dx * dx + (double) dz * dz);
-                double effectiveDist = chebyshev * 0.55D + euclidean * 0.45D;
+                if (chunkX != cachedChunkX || chunkZ != cachedChunkZ) {
+                    cachedChunkX = chunkX;
+                    cachedChunkZ = chunkZ;
+                    cachedTopClearY = getChunkMaxClearY(world, world.getChunk(chunkX, chunkZ), baseY);
+                    sampleChunkHeightGrid(world, chunkGenerator, noiseConfig, chunkX, chunkZ, baseY, chunkHeights);
+                }
 
-                if (effectiveDist <= ESTATE_RADIUS) {
-                    // Cimiento sólido hasta abajo para que ninguna parte de la propiedad quede flotando
-                    for (int y = bottomY; y < baseY - 3; y++) {
-                        pos.set(wx, y, wz);
-                        BlockState cur = world.getBlockState(pos);
-                        if (cur.isAir() || cur.isLiquid() || cur.isReplaceable()) {
-                            world.setBlockState(pos, stoneFoundation, Block.NOTIFY_LISTENERS);
-                        }
-                    }
+                double distOut = getEstateEdgeDistance(dx, dz);
+
+                if (distOut <= 0.0D) {
+                    // Cimiento sólido hasta encontrar lecho terrestre firme y limpieza total del cielo superior
+                    fillFoundationColumn(world, pos, wx, wz, baseY - 4, baseY - 28, worldBottomY, stoneFoundation);
                     for (int y = baseY - 3; y < baseY; y++) {
-                        pos.set(wx, y, wz);
-                        world.setBlockState(pos, dirt, Block.NOTIFY_LISTENERS);
+                        world.setBlockState(pos.set(wx, y, wz), dirt, Block.NOTIFY_LISTENERS);
                     }
-
-                    // Superficie base de pasto verde en toda la propiedad (sin nieve)
-                    pos.set(wx, baseY, wz);
-                    world.setBlockState(pos, grass, Block.NOTIFY_LISTENERS);
-
-                    // Limpiar todo el aire superior
-                    for (int y = baseY + 1; y <= topClearY; y++) {
-                        pos.set(wx, y, wz);
-                        if (!world.getBlockState(pos).isAir()) {
-                            world.setBlockState(pos, air, Block.NOTIFY_LISTENERS);
-                        }
-                    }
+                    world.setBlockState(pos.set(wx, baseY, wz), useTreeBlockerPlaceholder ? treeBlocker : grass, Block.NOTIFY_LISTENERS);
+                    clearColumnRange(world, pos, wx, wz, baseY + 1, cachedTopClearY, air);
                     continue;
                 }
 
-                if (effectiveDist > TOTAL_RADIUS) {
+                if (distOut > GRADE_RANGE) {
                     continue;
                 }
 
-                // Franja de transición suave (distOut de 1 a 34 bloques):
-                double distOut = effectiveDist - ESTATE_RADIUS;
-
-                // A) Si la colina/montaña natural es más alta que la propiedad, rebajarla en talud curvo suave
-                //    y cubrir la nueva superficie con pasto y tierra para evitar cualquier pared cortada.
-                int capY = baseY + (int) Math.floor((distOut * distOut) / 14.0D + distOut * 0.55D);
-                boolean trimmedHighTerrain = false;
-                for (int y = topClearY; y > capY; y--) {
-                    pos.set(wx, y, wz);
-                    BlockState st = world.getBlockState(pos);
-                    if (!st.isAir()) {
-                        if (!st.isIn(net.minecraft.registry.tag.BlockTags.LEAVES)
-                                && !st.isIn(net.minecraft.registry.tag.BlockTags.LOGS)
-                                && !st.isOf(Blocks.SNOW)) {
-                            trimmedHighTerrain = true;
-                        }
-                        world.setBlockState(pos, air, Block.NOTIFY_LISTENERS);
-                    }
-                }
-                if (trimmedHighTerrain) {
-                    for (int y = capY; y >= bottomY; y--) {
-                        pos.set(wx, y, wz);
-                        BlockState st = world.getBlockState(pos);
-                        if (!st.isAir() && !st.isLiquid() && !st.isReplaceable()) {
-                            world.setBlockState(pos, grass, Block.NOTIFY_LISTENERS);
-                            if (y - 1 >= bottomY) {
-                                world.setBlockState(pos.set(wx, y - 1, wz), dirt, Block.NOTIFY_LISTENERS);
-                            }
-                            break;
-                        }
-                    }
+                double t = distOut / GRADE_RANGE;
+                double noiseGroundY = sampleBilinearHeight(chunkHeights, wx & 15, wz & 15);
+                double naturalY = noiseGroundY;
+                if (t >= 0.75D) {
+                    int actualGroundY = findActualGroundY(world, pos, wx, wz, worldBottomY, cachedTopClearY, noiseGroundY);
+                    double edgeBlend = (t - 0.75D) / 0.25D;
+                    naturalY = noiseGroundY + edgeBlend * (actualGroundY - noiseGroundY);
                 }
 
-                // B) Si el terreno natural es más bajo que la propiedad, bajar un talud suave de pasto y tierra
-                int slopeTargetY = baseY - (int) Math.ceil(distOut * 0.65D);
-                pos.set(wx, slopeTargetY, wz);
-                BlockState atSlope = world.getBlockState(pos);
-                if (atSlope.isAir() || atSlope.isLiquid() || atSlope.isReplaceable()) {
-                    for (int y = slopeTargetY; y >= Math.max(bottomY, slopeTargetY - 22); y--) {
-                        pos.set(wx, y, wz);
-                        BlockState cur = world.getBlockState(pos);
-                        if (!cur.isAir() && !cur.isLiquid() && !cur.isReplaceable()) {
-                            break;
-                        }
-                        if (y == slopeTargetY) {
-                            world.setBlockState(pos, grass, Block.NOTIFY_LISTENERS);
-                        } else if (y >= slopeTargetY - 3) {
-                            world.setBlockState(pos, dirt, Block.NOTIFY_LISTENERS);
-                        } else {
-                            world.setBlockState(pos, stoneFoundation, Block.NOTIFY_LISTENERS);
-                        }
+                double s = t * t * (3.0D - 2.0D * t);
+                int targetY = (int) Math.round(baseY + s * (naturalY - baseY));
+                targetY = Math.max(worldBottomY + 4, Math.min(worldTopY - 1, targetY));
+
+                boolean hasNaturalWater = waterTopY >= worldBottomY
+                        && world.getFluidState(pos.set(wx, waterTopY, wz)).isIn(FluidTags.WATER);
+                boolean isRiverOrLake = (naturalY < seaLevel - 1 || hasNaturalWater) && targetY < waterTopY;
+
+                if (isRiverOrLake) {
+                    // Conservar ríos/lagos abiertos hasta el nivel natural del agua sin puentes flotantes
+                    clearColumnRange(world, pos, wx, wz, waterTopY + 1, cachedTopClearY, air);
+                    for (int y = targetY + 1; y <= waterTopY; y++) {
+                        world.setBlockState(pos.set(wx, y, wz), water, CLEAR_FLAGS);
                     }
+                    int bedDirtMin = Math.max(worldBottomY, targetY - 2);
+                    for (int y = bedDirtMin; y <= targetY; y++) {
+                        world.setBlockState(pos.set(wx, y, wz), dirt, Block.NOTIFY_LISTENERS);
+                    }
+                    fillFoundationColumn(
+                            world,
+                            pos,
+                            wx,
+                            wz,
+                            targetY - 3,
+                            Math.min((int) Math.floor(naturalY), targetY) - 6,
+                            worldBottomY,
+                            stoneFoundation
+                    );
+                } else {
+                    boolean preserveOuterTrees = distOut > TREE_CLEAR_DIST;
+                    clearColumnAboveBlend(world, pos, wx, wz, targetY + 1, cachedTopClearY, air, preserveOuterTrees);
+                    BlockState surfaceBlock = (useTreeBlockerPlaceholder && distOut <= TREE_BLOCKER_DIST) ? treeBlocker : grass;
+                    world.setBlockState(pos.set(wx, targetY, wz), surfaceBlock, Block.NOTIFY_LISTENERS);
+                    int dirtMin = Math.max(worldBottomY, targetY - 4);
+                    for (int y = dirtMin; y <= targetY - 1; y++) {
+                        world.setBlockState(pos.set(wx, y, wz), dirt, Block.NOTIFY_LISTENERS);
+                    }
+                    fillFoundationColumn(
+                            world,
+                            pos,
+                            wx,
+                            wz,
+                            targetY - 5,
+                            Math.min((int) Math.floor(naturalY), baseY) - 6,
+                            worldBottomY,
+                            stoneFoundation
+                    );
                 }
             }
         }
+    }
+
+    private static int getChunkMaxClearY(StructureWorldAccess world, Chunk chunk, int baseY) {
+        int highestIdx = chunk.getHighestNonEmptySection();
+        int sectionTop = highestIdx >= 0 ? (chunk.sectionIndexToCoord(highestIdx) << 4) + 15 : baseY;
+        return Math.min(world.getTopYInclusive(), Math.max(baseY + 56, sectionTop));
+    }
+
+    private static void sampleChunkHeightGrid(
+            StructureWorldAccess world,
+            ChunkGenerator chunkGenerator,
+            NoiseConfig noiseConfig,
+            int chunkX,
+            int chunkZ,
+            int fallbackY,
+            int[][] outGrid
+    ) {
+        int originX = chunkX << 4;
+        int originZ = chunkZ << 4;
+        for (int ix = 0; ix <= 4; ix++) {
+            for (int iz = 0; iz <= 4; iz++) {
+                outGrid[ix][iz] = (chunkGenerator != null && noiseConfig != null)
+                        ? chunkGenerator.getHeightInGround(
+                                originX + (ix << 2),
+                                originZ + (iz << 2),
+                                Heightmap.Type.OCEAN_FLOOR_WG,
+                                world,
+                                noiseConfig
+                        )
+                        : fallbackY;
+            }
+        }
+    }
+
+    private static double sampleBilinearHeight(int[][] grid, int lx, int lz) {
+        int cx = lx >> 2;
+        int cz = lz >> 2;
+        double fx = (lx & 3) * 0.25D;
+        double fz = (lz & 3) * 0.25D;
+        double h00 = grid[cx][cz];
+        double h10 = grid[cx + 1][cz];
+        double h01 = grid[cx][cz + 1];
+        double h11 = grid[cx + 1][cz + 1];
+        double h0 = h00 + (h10 - h00) * fx;
+        double h1 = h01 + (h11 - h01) * fx;
+        return h0 + (h1 - h0) * fz;
+    }
+
+    private static int findActualGroundY(
+            StructureWorldAccess world,
+            BlockPos.Mutable pos,
+            int wx,
+            int wz,
+            int worldBottomY,
+            int topClearY,
+            double noiseGroundY
+    ) {
+        int scanTop = Math.min(topClearY, (int) Math.ceil(noiseGroundY) + 36);
+        int scanBottom = Math.max(worldBottomY, Math.min((int) Math.floor(noiseGroundY) - 24, 52));
+        for (int y = scanTop; y >= scanBottom; y--) {
+            BlockState st = world.getBlockState(pos.set(wx, y, wz));
+            if (isGroundScanIgnored(st)) {
+                continue;
+            }
+            // Verificar que no sea un fragmento o cornisa flotante con >= 4 bloques de aire debajo
+            int airBelow = 0;
+            boolean floating = false;
+            int checkFloor = Math.max(worldBottomY, y - 14);
+            for (int cy = y - 1; cy >= checkFloor; cy--) {
+                BlockState sub = world.getBlockState(pos.set(wx, cy, wz));
+                if (sub.isAir() || sub.isIn(BlockTags.LEAVES) || isVineBlock(sub) || sub.isOf(Blocks.SNOW)) {
+                    airBelow++;
+                    if (airBelow >= 4) {
+                        floating = true;
+                        break;
+                    }
+                } else if (!isGroundScanIgnored(sub)) {
+                    airBelow = 0;
+                }
+            }
+            if (!floating) {
+                return y;
+            }
+        }
+        return (int) Math.round(noiseGroundY);
+    }
+
+    private static void clearColumnRange(
+            StructureWorldAccess world,
+            BlockPos.Mutable pos,
+            int wx,
+            int wz,
+            int minY,
+            int maxY,
+            BlockState air
+    ) {
+        for (int y = minY; y <= maxY; y++) {
+            pos.set(wx, y, wz);
+            if (!world.getBlockState(pos).isAir()) {
+                world.setBlockState(pos, air, CLEAR_FLAGS);
+            }
+        }
+    }
+
+    private static void clearColumnAboveBlend(
+            StructureWorldAccess world,
+            BlockPos.Mutable pos,
+            int wx,
+            int wz,
+            int minY,
+            int maxY,
+            BlockState air,
+            boolean preserveOuterTrees
+    ) {
+        if (!preserveOuterTrees) {
+            clearColumnRange(world, pos, wx, wz, minY, maxY, air);
+            return;
+        }
+        for (int y = minY; y <= maxY; y++) {
+            pos.set(wx, y, wz);
+            BlockState st = world.getBlockState(pos);
+            if (st.isAir()) {
+                continue;
+            }
+            if (st.isOf(Blocks.SNOW)
+                    || st.isOf(Blocks.SNOW_BLOCK)
+                    || isVineBlock(st)
+                    || !(st.isIn(BlockTags.LOGS) || st.isIn(BlockTags.LEAVES) || isSimpleFoliage(st))) {
+                world.setBlockState(pos, air, CLEAR_FLAGS);
+            }
+        }
+    }
+
+    private static void fillFoundationColumn(
+            StructureWorldAccess world,
+            BlockPos.Mutable pos,
+            int wx,
+            int wz,
+            int startY,
+            int minCheckY,
+            int worldBottomY,
+            BlockState stoneFoundation
+    ) {
+        int consecutiveSolid = 0;
+        for (int y = startY; y >= worldBottomY; y--) {
+            pos.set(wx, y, wz);
+            BlockState cur = world.getBlockState(pos);
+            if (isNonSolidSupport(cur)) {
+                world.setBlockState(pos, stoneFoundation, Block.NOTIFY_LISTENERS);
+                consecutiveSolid = 0;
+            } else {
+                consecutiveSolid++;
+                if (y <= minCheckY && consecutiveSolid >= 3) {
+                    break;
+                }
+            }
+        }
+    }
+
+    private static boolean isGroundScanIgnored(BlockState st) {
+        return st.isAir()
+                || st.isLiquid()
+                || !st.getFluidState().isEmpty()
+                || st.isIn(BlockTags.LEAVES)
+                || st.isIn(BlockTags.LOGS)
+                || st.isOf(Blocks.SNOW)
+                || st.isOf(Blocks.SNOW_BLOCK)
+                || isVineBlock(st)
+                || isSimpleFoliage(st);
+    }
+
+    private static boolean isNonSolidSupport(BlockState st) {
+        return st.isAir()
+                || st.isLiquid()
+                || !st.getFluidState().isEmpty()
+                || st.isReplaceable()
+                || st.isIn(BlockTags.LEAVES)
+                || st.isIn(BlockTags.LOGS)
+                || st.isOf(Blocks.SNOW)
+                || isVineBlock(st)
+                || isSimpleFoliage(st);
+    }
+
+    private static boolean isVineBlock(BlockState st) {
+        return st.isOf(Blocks.VINE)
+                || st.isOf(Blocks.CAVE_VINES)
+                || st.isOf(Blocks.CAVE_VINES_PLANT)
+                || st.isOf(Blocks.WEEPING_VINES)
+                || st.isOf(Blocks.WEEPING_VINES_PLANT)
+                || st.isOf(Blocks.TWISTING_VINES)
+                || st.isOf(Blocks.TWISTING_VINES_PLANT);
+    }
+
+    private static boolean isSimpleFoliage(BlockState st) {
+        return st.isOf(Blocks.SHORT_GRASS)
+                || st.isOf(Blocks.TALL_GRASS)
+                || st.isOf(Blocks.FERN)
+                || st.isOf(Blocks.LARGE_FERN)
+                || st.isOf(Blocks.DEAD_BUSH)
+                || st.isOf(Blocks.MOSS_CARPET)
+                || st.isOf(Blocks.BAMBOO)
+                || st.isOf(Blocks.BAMBOO_SAPLING)
+                || st.isOf(Blocks.BEE_NEST);
     }
 
     // =========================================================================
@@ -1757,8 +2033,10 @@ public class CasaJoseTorresPiece extends StructurePiece {
         setBlock(world, chunkBox, centerX - 9, f2 + 2, centerZ + 23, Blocks.END_ROD.getDefaultState().with(EndRodBlock.FACING, Direction.SOUTH));
         for (int mx : new int[]{-15, 15}) {
             setBlock(world, chunkBox, centerX + mx, f2 + 1, centerZ + 22, Blocks.COMPOSTER.getDefaultState());
-            setBlock(world, chunkBox, centerX + mx, f2 + 2, centerZ + 22, Blocks.FLOWERING_AZALEA_LEAVES.getDefaultState());
-            setBlock(world, chunkBox, centerX + mx, f2 + 3, centerZ + 22, Blocks.AZALEA_LEAVES.getDefaultState());
+            setBlock(world, chunkBox, centerX + mx, f2 + 2, centerZ + 22,
+                    Blocks.FLOWERING_AZALEA_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, true));
+            setBlock(world, chunkBox, centerX + mx, f2 + 3, centerZ + 22,
+                    Blocks.AZALEA_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, true));
         }
         setBlock(world, chunkBox, centerX - 13, f2 + 1, centerZ + 23, Blocks.DECORATED_POT.getDefaultState());
         setBlock(world, chunkBox, centerX + 13, f2 + 1, centerZ + 23, Blocks.DECORATED_POT.getDefaultState());
@@ -2220,6 +2498,33 @@ public class CasaJoseTorresPiece extends StructurePiece {
     // 7. CIPRESES ESBELTOS FRONTALES (FOTO 1) Y PINOS GIGANTES TRASEROS (FOTO 2)
     // =========================================================================
 
+    private static final int[][] CYPRESS_COORDS = {
+            {-36, 29}, {20, 29}, {48, 26}, {-68, 28},
+            {-20, 95}, {20, 95}, {-20, 130}, {20, 130}
+    };
+
+    private static final int[][] PINE_COORDS = {
+            {-75, -60}, {-82, -95}, {-70, -135}, {-38, -148},
+            {38, -148}, {70, -135}, {82, -95}, {75, -60},
+            {-128, -120}, {-135, -40}, {-130, 50}, {-125, 120},
+            {128, -120}, {135, -40}, {130, 50}, {125, 120},
+            {-65, 135}, {65, 135}
+    };
+
+    private static boolean isOwnEstateTreeTrunk(int dx, int dz) {
+        for (int[] c : CYPRESS_COORDS) {
+            if (dx == c[0] && dz == c[1]) {
+                return true;
+            }
+        }
+        for (int[] p : PINE_COORDS) {
+            if ((dx == p[0] || dx == p[0] + 1) && (dz == p[1] || dz == p[1] + 1)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void buildEstateTrees(
             StructureWorldAccess world,
             BlockBox chunkBox,
@@ -2228,23 +2533,12 @@ public class CasaJoseTorresPiece extends StructurePiece {
             int centerZ
     ) {
         // Cipreses altos y esbeltos junto a la fachada frontal (Foto 1)
-        int[][] cypressCoords = {
-                {-36, 29}, {20, 29}, {48, 26}, {-68, 28},
-                {-20, 95}, {20, 95}, {-20, 130}, {20, 130}
-        };
-        for (int[] c : cypressCoords) {
+        for (int[] c : CYPRESS_COORDS) {
             buildSlenderCypressTree(world, chunkBox, centerX + c[0], baseY + 1, centerZ + c[1], 19);
         }
 
         // Grandes Pinos y Secuoyas alrededor del patio trasero, la piscina y la barda de madera (Foto 2)
-        int[][] pineCoords = {
-                {-75, -60}, {-82, -95}, {-70, -135}, {-38, -148},
-                {38, -148}, {70, -135}, {82, -95}, {75, -60},
-                {-128, -120}, {-135, -40}, {-130, 50}, {-125, 120},
-                {128, -120}, {135, -40}, {130, 50}, {125, 120},
-                {-65, 135}, {65, 135}
-        };
-        for (int[] p : pineCoords) {
+        for (int[] p : PINE_COORDS) {
             buildTallPineTree(world, chunkBox, centerX + p[0], baseY + 1, centerZ + p[1], 22);
         }
     }
@@ -2364,5 +2658,383 @@ public class CasaJoseTorresPiece extends StructurePiece {
                 }
             }
         }
+    }
+
+    // =========================================================================
+    // 8. LIMPIEZA POST-VEGETACIÓN (RESTAURAR CÉSPED, LIMPIAR HOJAS FLOTANTES)
+    // =========================================================================
+
+    public static void postCleanJoseTorresChunk(
+            StructureWorldAccess world,
+            BlockBox chunkBox,
+            int centerX,
+            int baseY,
+            int centerZ
+    ) {
+        int minX = Math.max(centerX - TOTAL_RADIUS, chunkBox.getMinX() - 8);
+        int maxX = Math.min(centerX + TOTAL_RADIUS, chunkBox.getMaxX() + 8);
+        int minZ = Math.max(centerZ - TOTAL_RADIUS, chunkBox.getMinZ() - 8);
+        int maxZ = Math.min(centerZ + TOTAL_RADIUS, chunkBox.getMaxZ() + 8);
+        if (minX > maxX || minZ > maxZ) {
+            return;
+        }
+
+        int bottomY = Math.max(world.getBottomY() + 1, Math.min(baseY - 32, 56));
+        int worldTopY = world.getTopYInclusive();
+        BlockPos.Mutable pos = new BlockPos.Mutable();
+        BlockState air = Blocks.AIR.getDefaultState();
+        BlockState grass = Blocks.GRASS_BLOCK.getDefaultState();
+
+        int cachedChunkX = Integer.MIN_VALUE;
+        int cachedChunkZ = Integer.MIN_VALUE;
+        int cachedTopY = Math.min(worldTopY, baseY + 56);
+
+        // Fase 1: Restaurar GREEN_TERRACOTTA -> GRASS_BLOCK y despejar vegetación/troncos salvajes hasta TREE_CLEAR_DIST
+        for (int wx = minX; wx <= maxX; wx++) {
+            int dx = wx - centerX;
+            boolean insideCoreX = wx >= chunkBox.getMinX() && wx <= chunkBox.getMaxX();
+            int chunkX = wx >> 4;
+            for (int wz = minZ; wz <= maxZ; wz++) {
+                int dz = wz - centerZ;
+                boolean insideCoreChunk = insideCoreX && wz >= chunkBox.getMinZ() && wz <= chunkBox.getMaxZ();
+                int chunkZ = wz >> 4;
+                if (!insideCoreChunk && !world.isValidForSetBlock(pos.set(wx, baseY, wz))) {
+                    continue;
+                }
+                double distOut = getEstateEdgeDistance(dx, dz);
+                if (distOut > GRADE_RANGE) {
+                    continue;
+                }
+                if (chunkX != cachedChunkX || chunkZ != cachedChunkZ) {
+                    cachedChunkX = chunkX;
+                    cachedChunkZ = chunkZ;
+                    cachedTopY = getChunkMaxClearY(world, world.getChunk(chunkX, chunkZ), baseY);
+                }
+                int topClearY = cachedTopY;
+
+                if (distOut <= 0.0D) {
+                    pos.set(wx, baseY, wz);
+                    if (world.getBlockState(pos).isOf(Blocks.GREEN_TERRACOTTA)) {
+                        world.setBlockState(pos, grass, Block.NOTIFY_LISTENERS);
+                    }
+                    boolean keepOwnTrunk = isOwnEstateTreeTrunk(dx, dz);
+                    for (int y = baseY + 1; y <= topClearY; y++) {
+                        pos.set(wx, y, wz);
+                        BlockState st = world.getBlockState(pos);
+                        if (isVineBlock(st)) {
+                            world.setBlockState(pos, air, CLEAR_FLAGS);
+                        } else if (isWildVegetationBlock(st) && !(keepOwnTrunk && st.isIn(BlockTags.LOGS))) {
+                            world.setBlockState(pos, air, CLEAR_FLAGS);
+                        }
+                    }
+                } else {
+                    for (int y = bottomY; y <= topClearY; y++) {
+                        pos.set(wx, y, wz);
+                        BlockState st = world.getBlockState(pos);
+                        if (st.isOf(Blocks.GREEN_TERRACOTTA)) {
+                            world.setBlockState(pos, grass, Block.NOTIFY_LISTENERS);
+                            continue;
+                        }
+                        if (isVineBlock(st) || isClutterGroundPlant(st)) {
+                            world.setBlockState(pos, air, CLEAR_FLAGS);
+                            continue;
+                        }
+                        if (distOut <= TREE_CLEAR_DIST) {
+                            if (distOut <= TREE_CLEAR_DIST - 7.0D) {
+                                if (isWildVegetationBlock(st)) {
+                                    world.setBlockState(pos, air, CLEAR_FLAGS);
+                                }
+                            } else if (st.isIn(BlockTags.LOGS)) {
+                                world.setBlockState(pos, air, CLEAR_FLAGS);
+                                clearAdjacent2x2LogColumns(world, wx, wz, centerX, centerZ, bottomY, topClearY, chunkBox);
+                            } else if (isSimpleFoliage(st)) {
+                                world.setBlockState(pos, air, CLEAR_FLAGS);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Fase 2: Limpiar hojas flotantes y troncos huérfanos en la corona de transición exterior
+        cachedChunkX = Integer.MIN_VALUE;
+        cachedChunkZ = Integer.MIN_VALUE;
+        for (int wx = minX; wx <= maxX; wx++) {
+            int dx = wx - centerX;
+            boolean insideCoreX = wx >= chunkBox.getMinX() && wx <= chunkBox.getMaxX();
+            int chunkX = wx >> 4;
+            for (int wz = minZ; wz <= maxZ; wz++) {
+                int dz = wz - centerZ;
+                boolean insideCoreChunk = insideCoreX && wz >= chunkBox.getMinZ() && wz <= chunkBox.getMaxZ();
+                int chunkZ = wz >> 4;
+                if (!insideCoreChunk && !world.isValidForSetBlock(pos.set(wx, baseY, wz))) {
+                    continue;
+                }
+                double distOut = getEstateEdgeDistance(dx, dz);
+                if (distOut <= TREE_CLEAR_DIST - 7.0D || distOut > GRADE_RANGE) {
+                    continue;
+                }
+                if (chunkX != cachedChunkX || chunkZ != cachedChunkZ) {
+                    cachedChunkX = chunkX;
+                    cachedChunkZ = chunkZ;
+                    cachedTopY = getChunkMaxClearY(world, world.getChunk(chunkX, chunkZ), baseY);
+                }
+                int topClearY = cachedTopY;
+
+                for (int y = bottomY; y <= topClearY; y++) {
+                    pos.set(wx, y, wz);
+                    BlockState st = world.getBlockState(pos);
+                    if (isVineBlock(st) || isClutterGroundPlant(st)) {
+                        world.setBlockState(pos, air, CLEAR_FLAGS);
+                        continue;
+                    }
+                    boolean isNonPersistentLeaf = st.isIn(BlockTags.LEAVES) && !isPersistentLeaf(st);
+                    if ((st.isIn(BlockTags.LOGS) || isNonPersistentLeaf)
+                            && !hasValidOuterTreeSupport(world, wx, y, wz, centerX, baseY, centerZ)) {
+                        world.setBlockState(pos, air, CLEAR_FLAGS);
+                    }
+                }
+            }
+        }
+
+        // Reafirmar árboles ornamentales de la propiedad y cambios personalizados guardados
+        buildEstateTrees(world, chunkBox, centerX, baseY, centerZ);
+        CasaJoseTorresCustomEdits.applyCustomChunkIfPresent(world, chunkBox, centerX, baseY, centerZ);
+    }
+
+    private static void clearAdjacent2x2LogColumns(
+            StructureWorldAccess world,
+            int wx,
+            int wz,
+            int centerX,
+            int centerZ,
+            int bottomY,
+            int topClearY,
+            BlockBox chunkBox
+    ) {
+        BlockPos.Mutable scan = new BlockPos.Mutable();
+        BlockState air = Blocks.AIR.getDefaultState();
+        int checkY = Math.min(chunkBox.getMaxY(), chunkBox.getMinY() + 64);
+        for (int ox = -1; ox <= 1; ox++) {
+            for (int oz = -1; oz <= 1; oz++) {
+                if (ox == 0 && oz == 0) {
+                    continue;
+                }
+                int nx = wx + ox;
+                int nz = wz + oz;
+                double dist = getEstateEdgeDistance(nx - centerX, nz - centerZ);
+                if (dist <= TREE_CLEAR_DIST || dist > TREE_CLEAR_DIST + 2.0D) {
+                    continue;
+                }
+                boolean insideChunk = chunkBox.contains(nx, checkY, nz);
+                if (!insideChunk && !world.isValidForSetBlock(scan.set(nx, checkY, nz))) {
+                    continue;
+                }
+                for (int cy = bottomY; cy <= topClearY; cy++) {
+                    scan.set(nx, cy, nz);
+                    BlockState nst = world.getBlockState(scan);
+                    if (nst.isIn(BlockTags.LOGS) || isVineBlock(nst)) {
+                        world.setBlockState(scan, air, CLEAR_FLAGS);
+                    }
+                }
+            }
+        }
+    }
+
+    private static boolean hasValidOuterTreeSupport(
+            StructureWorldAccess world,
+            int wx,
+            int y,
+            int wz,
+            int centerX,
+            int baseY,
+            int centerZ
+    ) {
+        int bottomY = Math.max(world.getBottomY() + 1, Math.min(baseY - 32, 56));
+        int topLimit = Math.min(world.getTopYInclusive(), Math.max(baseY + 72, y + 32));
+        BlockPos.Mutable scan = new BlockPos.Mutable();
+
+        for (int ox = -6; ox <= 6; ox++) {
+            int tx = wx + ox;
+            int tdx = tx - centerX;
+            for (int oz = -6; oz <= 6; oz++) {
+                int tz = wz + oz;
+                int tdz = tz - centerZ;
+                if (getEstateEdgeDistance(tdx, tdz) <= TREE_CLEAR_DIST) {
+                    continue;
+                }
+                if (!world.isChunkLoaded(tx >> 4, tz >> 4)) {
+                    continue;
+                }
+
+                int tGroundY = findSolidGroundTopY(world, scan, tx, tz, bottomY, Math.min(topLimit, Math.max(baseY + 48, y + 2)));
+                if (tGroundY == Integer.MIN_VALUE) {
+                    continue;
+                }
+
+                int rootY = -1;
+                for (int ry = tGroundY + 1; ry <= Math.min(topLimit, tGroundY + 3); ry++) {
+                    if (world.getBlockState(scan.set(tx, ry, tz)).isIn(BlockTags.LOGS)) {
+                        rootY = ry;
+                        break;
+                    }
+                }
+                if (rootY < 0 || rootY > y + 2) {
+                    continue;
+                }
+
+                int curX = tx;
+                int curZ = tz;
+                int topTrunkY = rootY;
+                int gap = 0;
+                boolean reachedNearY = (rootY >= y - 4 && rootY <= y + 2)
+                        && Math.abs(wx - curX) <= 6 && Math.abs(wz - curZ) <= 6;
+
+                for (int cy = rootY + 1; cy <= topLimit; cy++) {
+                    int foundX = Integer.MIN_VALUE;
+                    int foundZ = Integer.MIN_VALUE;
+                    if (world.getBlockState(scan.set(curX, cy, curZ)).isIn(BlockTags.LOGS)) {
+                        foundX = curX;
+                        foundZ = curZ;
+                    } else {
+                        outerBranch:
+                        for (int bx = -1; bx <= 1; bx++) {
+                            for (int bz = -1; bz <= 1; bz++) {
+                                if (bx == 0 && bz == 0) {
+                                    continue;
+                                }
+                                int nx = curX + bx;
+                                int nz = curZ + bz;
+                                if (Math.abs(nx - tx) <= 3 && Math.abs(nz - tz) <= 3
+                                        && world.isChunkLoaded(nx >> 4, nz >> 4)
+                                        && world.getBlockState(scan.set(nx, cy, nz)).isIn(BlockTags.LOGS)) {
+                                    foundX = nx;
+                                    foundZ = nz;
+                                    break outerBranch;
+                                }
+                            }
+                        }
+                    }
+
+                    if (foundX != Integer.MIN_VALUE) {
+                        curX = foundX;
+                        curZ = foundZ;
+                        topTrunkY = cy;
+                        gap = 0;
+                        if (cy >= y - 4 && cy <= y + 2
+                                && Math.abs(wx - curX) <= 6 && Math.abs(wz - curZ) <= 6) {
+                            reachedNearY = true;
+                        }
+                    } else {
+                        gap++;
+                        if (gap > 1) {
+                            break;
+                        }
+                    }
+                }
+
+                if (reachedNearY && topTrunkY >= y - 4 && hasCrownLeaves(world, scan, curX, topTrunkY, curZ, topLimit)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static int findSolidGroundTopY(
+            StructureWorldAccess world,
+            BlockPos.Mutable pos,
+            int wx,
+            int wz,
+            int bottomY,
+            int topY
+    ) {
+        for (int y = topY; y >= bottomY; y--) {
+            BlockState st = world.getBlockState(pos.set(wx, y, wz));
+            if (isGroundScanIgnored(st) || st.isReplaceable()) {
+                continue;
+            }
+            int airBelow = 0;
+            boolean floating = false;
+            int checkFloor = Math.max(bottomY, y - 14);
+            for (int cy = y - 1; cy >= checkFloor; cy--) {
+                BlockState sub = world.getBlockState(pos.set(wx, cy, wz));
+                if (sub.isAir() || sub.isIn(BlockTags.LEAVES) || isVineBlock(sub) || sub.isOf(Blocks.SNOW)) {
+                    airBelow++;
+                    if (airBelow >= 4) {
+                        floating = true;
+                        break;
+                    }
+                } else if (!isGroundScanIgnored(sub)) {
+                    airBelow = 0;
+                }
+            }
+            if (!floating) {
+                return y;
+            }
+        }
+        return Integer.MIN_VALUE;
+    }
+
+    private static boolean hasCrownLeaves(
+            StructureWorldAccess world,
+            BlockPos.Mutable scan,
+            int cx,
+            int topTrunkY,
+            int cz,
+            int topLimit
+    ) {
+        int leavesCount = 0;
+        int minY = topTrunkY - 2;
+        int maxY = Math.min(topLimit, topTrunkY + 5);
+        for (int ly = minY; ly <= maxY; ly++) {
+            for (int ox = -3; ox <= 3; ox++) {
+                for (int oz = -3; oz <= 3; oz++) {
+                    int lx = cx + ox;
+                    int lz = cz + oz;
+                    if (!world.isChunkLoaded(lx >> 4, lz >> 4)) {
+                        continue;
+                    }
+                    if (world.getBlockState(scan.set(lx, ly, lz)).isIn(BlockTags.LEAVES)) {
+                        leavesCount++;
+                        if (leavesCount >= 4) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean isPersistentLeaf(BlockState st) {
+        return st.getBlock() instanceof LeavesBlock
+                && st.contains(LeavesBlock.PERSISTENT)
+                && st.get(LeavesBlock.PERSISTENT);
+    }
+
+    private static boolean isClutterGroundPlant(BlockState st) {
+        return st.isOf(Blocks.BAMBOO)
+                || st.isOf(Blocks.BAMBOO_SAPLING)
+                || st.isOf(Blocks.COCOA)
+                || st.isOf(Blocks.MANGROVE_ROOTS)
+                || st.isOf(Blocks.BEE_NEST)
+                || st.isOf(Blocks.SHROOMLIGHT)
+                || st.isOf(Blocks.MELON)
+                || st.isOf(Blocks.PUMPKIN)
+                || st.isOf(Blocks.BIG_DRIPLEAF)
+                || st.isOf(Blocks.BIG_DRIPLEAF_STEM)
+                || st.isOf(Blocks.SMALL_DRIPLEAF)
+                || st.isOf(Blocks.LARGE_FERN);
+    }
+
+    private static boolean isWildVegetationBlock(BlockState st) {
+        if (isPersistentLeaf(st)) {
+            return false;
+        }
+        return st.isIn(BlockTags.LOGS)
+                || st.isIn(BlockTags.LEAVES)
+                || isSimpleFoliage(st)
+                || isClutterGroundPlant(st);
     }
 }

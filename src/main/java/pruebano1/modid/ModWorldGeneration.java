@@ -76,11 +76,30 @@ public class ModWorldGeneration {
                 ModStructures.CASA_BLANCA_PLACED_KEY
         );
 
+        // Cuarta Gran Dungeon única: "El Palacio Nacional de México" (480x480 bloques)
+        BiomeModifications.addFeature(
+                BiomeSelectors.foundInOverworld(),
+                GenerationStep.Feature.SURFACE_STRUCTURES,
+                ModStructures.PALACIO_NACIONAL_PLACED_KEY
+        );
+
+        // Limpieza posterior a la vegetación del bioma para La Casa Blanca (evitar lianas flotantes y árboles en caminos/vistas)
+        BiomeModifications.addFeature(
+                BiomeSelectors.foundInOverworld(),
+                GenerationStep.Feature.TOP_LAYER_MODIFICATION,
+                ModStructures.CASA_BLANCA_CLEANUP_PLACED_KEY
+        );
+
         // Permitir que los 4 niños spawneen en toda el área de 520x520 de la Isla Penstein
         // (ModEntities.canIslandChildSpawn filtra para que SOLO aparezcan dentro de la Isla Penstein)
         BiomeModifications.addSpawn(BiomeSelectors.tag(BiomeTags.IS_OCEAN), SpawnGroup.MONSTER, ModEntities.YOSTIN_BIBER, 30, 2, 3);
         BiomeModifications.addSpawn(BiomeSelectors.tag(BiomeTags.IS_OCEAN), SpawnGroup.MONSTER, ModEntities.VITOR_JUGO, 20, 1, 2);
         BiomeModifications.addSpawn(BiomeSelectors.tag(BiomeTags.IS_OCEAN), SpawnGroup.MONSTER, ModEntities.FER_OVILLA, 25, 1, 2);
         BiomeModifications.addSpawn(BiomeSelectors.tag(BiomeTags.IS_OCEAN), SpawnGroup.MONSTER, ModEntities.VALENTINA_PRIETA, 25, 1, 2);
+
+        // Agentes de Seguridad de La Casa Blanca (peso total 110 = +10% sobre el 100 de Isla Penstein; filtrado a La Casa Blanca)
+        BiomeModifications.addSpawn(BiomeSelectors.foundInOverworld(), SpawnGroup.MONSTER, ModEntities.WHITE_HOUSE_GUARD_PISTOL, 48, 1, 2);
+        BiomeModifications.addSpawn(BiomeSelectors.foundInOverworld(), SpawnGroup.MONSTER, ModEntities.WHITE_HOUSE_GUARD_RIFLE, 44, 1, 2);
+        BiomeModifications.addSpawn(BiomeSelectors.foundInOverworld(), SpawnGroup.MONSTER, ModEntities.WHITE_HOUSE_GUARD_BAZOOKA, 18, 1, 2);
     }
 }

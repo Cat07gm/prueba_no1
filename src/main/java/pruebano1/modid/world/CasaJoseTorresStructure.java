@@ -47,8 +47,8 @@ public class CasaJoseTorresStructure extends Structure {
             847291635
     );
 
-    /** Radio de chunks (14 chunks = ±224 bloques = 448x448 bloques) que abarca toda la propiedad y su talud suave. */
-    public static final int CHUNK_RADIUS = 14;
+    /** Radio de chunks (15 chunks = ±240 bloques = 480x480 bloques) que abarca toda la propiedad y su talud suave. */
+    public static final int CHUNK_RADIUS = 15;
 
     private static final Object ANCHOR_LOCK = new Object();
     private static final Map<Long, HouseAnchor> SEED_ANCHOR_CACHE = new ConcurrentHashMap<>();
@@ -75,6 +75,11 @@ public class CasaJoseTorresStructure extends Structure {
         super(config);
     }
 
+    public static boolean isValidPlacementStartChunk(long seed, int chunkX, int chunkZ) {
+        ChunkPos expected = PLACEMENT.getStartChunk(seed, chunkX, chunkZ);
+        return expected.x == chunkX && expected.z == chunkZ;
+    }
+
     public static void clearCaches() {
         SEED_ANCHOR_CACHE.clear();
     }
@@ -83,14 +88,24 @@ public class CasaJoseTorresStructure extends Structure {
         if (overworld.getRegistryKey() != World.OVERWORLD) {
             return;
         }
+        boolean needsRecalc = false;
         synchronized (ANCHOR_LOCK) {
             CasaJoseTorresWorldState state = CasaJoseTorresWorldState.get(overworld);
             if (state.isInitialized()) {
-                SEED_ANCHOR_CACHE.put(
-                        overworld.getSeed(),
-                        new HouseAnchor(state.getStartChunkX(), state.getBaseY(), state.getStartChunkZ())
-                );
+                if (isValidPlacementStartChunk(overworld.getSeed(), state.getStartChunkX(), state.getStartChunkZ())) {
+                    SEED_ANCHOR_CACHE.put(
+                            overworld.getSeed(),
+                            new HouseAnchor(state.getStartChunkX(), state.getBaseY(), state.getStartChunkZ())
+                    );
+                } else {
+                    SEED_ANCHOR_CACHE.remove(overworld.getSeed());
+                    state.resetUpgradedChunks();
+                    needsRecalc = true;
+                }
             }
+        }
+        if (needsRecalc) {
+            getOrResolveUniqueAnchor(overworld);
         }
     }
 
@@ -136,21 +151,24 @@ public class CasaJoseTorresStructure extends Structure {
             if (overworld != null && overworld.getRegistryKey() == World.OVERWORLD) {
                 CasaJoseTorresWorldState state = CasaJoseTorresWorldState.get(overworld);
                 if (state.isInitialized()) {
-                    HouseAnchor fromState = new HouseAnchor(state.getStartChunkX(), state.getBaseY(), state.getStartChunkZ());
-                    SEED_ANCHOR_CACHE.put(seed, fromState);
-                    return fromState;
+                    if (isValidPlacementStartChunk(seed, state.getStartChunkX(), state.getStartChunkZ())) {
+                        HouseAnchor fromState = new HouseAnchor(state.getStartChunkX(), state.getBaseY(), state.getStartChunkZ());
+                        SEED_ANCHOR_CACHE.put(seed, fromState);
+                        return fromState;
+                    }
+                    state.resetUpgradedChunks();
                 }
             }
 
             MultiNoiseUtil.MultiNoiseSampler sampler = noiseConfig.getMultiNoiseSampler();
             int seaLevel = chunkGenerator.getSeaLevel();
 
-            ChunkPos chosenChunk = null;
+            SiteCandidate chosenCandidate = null;
 
             // 1. Buscar en anillos lejanos de RandomSpreadStructurePlacement (entre ~4,200 y ~14,000 bloques del origen)
-            // para que sea súper difícil de encontrar y coincida con la rejilla de estructuras.
-            outerSearch:
+            // eligiendo el candidato de menor relieve en el primer anillo con sitios válidos.
             for (int ring = 1; ring <= 4; ring++) {
+                SiteCandidate ringBest = null;
                 for (int rx = -ring; rx <= ring; rx++) {
                     for (int rz = -ring; rz <= ring; rz++) {
                         if (Math.abs(rx) != ring && Math.abs(rz) != ring) {
@@ -162,59 +180,64 @@ public class CasaJoseTorresStructure extends Structure {
                         if (blockDistSq < 4200L * 4200L) {
                             continue; // Garantizar que esté muy lejos del spawn (>= 4,200 bloques)
                         }
-                        if (isValidSnowyEstateSite(biomeSource, sampler, candidate.getCenterX(), candidate.getCenterZ())) {
-                            chosenChunk = candidate;
-                            break outerSearch;
+                        if (!isValidSnowyEstateSite(biomeSource, sampler, candidate.getCenterX(), candidate.getCenterZ())) {
+                            continue;
                         }
+                        SiteCandidate eval = evaluateSiteRelief(candidate, chunkGenerator, noiseConfig, heightLimit, seaLevel);
+                        if (ringBest == null || eval.score() < ringBest.score()) {
+                            ringBest = eval;
+                        }
+                    }
+                }
+                if (ringBest != null) {
+                    chosenCandidate = ringBest;
+                    break;
+                }
+            }
+
+            // 2. Respaldo determinista dentro de la rejilla PLACEMENT (ring = 1..6) con filtro terrestre relajado
+            if (chosenCandidate == null) {
+                for (int ring = 1; ring <= 6; ring++) {
+                    SiteCandidate ringBest = null;
+                    for (int rx = -ring; rx <= ring; rx++) {
+                        for (int rz = -ring; rz <= ring; rz++) {
+                            if (Math.abs(rx) != ring && Math.abs(rz) != ring) {
+                                continue;
+                            }
+                            ChunkPos candidate = PLACEMENT.getStartChunk(seed, rx * 320, rz * 320);
+                            long blockDistSq = (long) candidate.getCenterX() * candidate.getCenterX()
+                                    + (long) candidate.getCenterZ() * candidate.getCenterZ();
+                            if (blockDistSq < 4200L * 4200L) {
+                                continue;
+                            }
+                            if (!isFallbackLandSite(biomeSource, sampler, candidate.getCenterX(), candidate.getCenterZ())) {
+                                continue;
+                            }
+                            SiteCandidate eval = evaluateSiteRelief(candidate, chunkGenerator, noiseConfig, heightLimit, seaLevel);
+                            if (ringBest == null || eval.score() < ringBest.score()) {
+                                ringBest = eval;
+                            }
+                        }
+                    }
+                    if (ringBest != null) {
+                        chosenCandidate = ringBest;
+                        break;
                     }
                 }
             }
 
-            // 2. Respaldo determinista: escanear en espiral a partir de 4,800 bloques hasta hallar un bioma terrestre amplio sin nieve
-            if (chosenChunk == null) {
-                outerFallback:
-                for (int distBlocks = 4800; distBlocks <= 16000; distBlocks += 320) {
-                    int steps = 36;
-                    for (int i = 0; i < steps; i++) {
-                        double angle = (2.0 * Math.PI * i) / steps + ((seed & 0xFF) * 0.05);
-                        int wx = (int) Math.round(Math.cos(angle) * distBlocks);
-                        int wz = (int) Math.round(Math.sin(angle) * distBlocks);
-                        int cx = wx >> 4;
-                        int cz = wz >> 4;
-                        if (isValidSnowyEstateSite(biomeSource, sampler, (cx << 4) + 8, (cz << 4) + 8)) {
-                            chosenChunk = new ChunkPos(cx, cz);
-                            break outerFallback;
-                        }
-                    }
-                }
+            if (chosenCandidate == null) {
+                chosenCandidate = evaluateSiteRelief(
+                        PLACEMENT.getStartChunk(seed, 320, -320),
+                        chunkGenerator,
+                        noiseConfig,
+                        heightLimit,
+                        seaLevel
+                );
             }
 
-            // 3. Último respaldo si la semilla no encontrara bioma terrestre cercano
-            if (chosenChunk == null) {
-                chosenChunk = PLACEMENT.getStartChunk(seed, 320, -320);
-            }
-
-            int centerX = chosenChunk.getCenterX();
-            int centerZ = chosenChunk.getCenterZ();
-
-            // Calcular la altura mediana del terreno para asentar la propiedad con el menor movimiento de tierra posible
-            int[] heights = new int[25];
-            int idx = 0;
-            for (int ox = -96; ox <= 96; ox += 48) {
-                for (int oz = -96; oz <= 96; oz += 48) {
-                    int h = chunkGenerator.getHeightInGround(
-                            centerX + ox,
-                            centerZ + oz,
-                            Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
-                            heightLimit,
-                            noiseConfig
-                    );
-                    heights[idx++] = h;
-                }
-            }
-            Arrays.sort(heights);
-            int medianY = Math.max(heights[heights.length / 2], seaLevel + 4);
-            int baseY = Math.min(Math.max(medianY, 66), 112);
+            ChunkPos chosenChunk = chosenCandidate.chunk();
+            int baseY = Math.min(Math.max(chosenCandidate.medianY(), Math.max(64, seaLevel + 2)), 92);
 
             HouseAnchor resolved = new HouseAnchor(chosenChunk.x, baseY, chosenChunk.z);
             SEED_ANCHOR_CACHE.put(seed, resolved);
@@ -226,8 +249,55 @@ public class CasaJoseTorresStructure extends Structure {
         }
     }
 
+    private record SiteCandidate(ChunkPos chunk, int medianY, int relief, int underwaterCount, int score) {
+    }
+
+    private static SiteCandidate evaluateSiteRelief(
+            ChunkPos chunk,
+            ChunkGenerator chunkGenerator,
+            NoiseConfig noiseConfig,
+            HeightLimitView heightLimit,
+            int seaLevel
+    ) {
+        int centerX = chunk.getCenterX();
+        int centerZ = chunk.getCenterZ();
+        int[] heights = new int[9];
+        int idx = 0;
+        int minH = Integer.MAX_VALUE;
+        int maxH = Integer.MIN_VALUE;
+        int underwaterCount = 0;
+
+        for (int ox = -120; ox <= 120; ox += 120) {
+            for (int oz = -120; oz <= 120; oz += 120) {
+                int h = chunkGenerator.getHeightInGround(
+                        centerX + ox,
+                        centerZ + oz,
+                        Heightmap.Type.OCEAN_FLOOR_WG,
+                        heightLimit,
+                        noiseConfig
+                );
+                heights[idx++] = h;
+                if (h < minH) {
+                    minH = h;
+                }
+                if (h > maxH) {
+                    maxH = h;
+                }
+                if (h < seaLevel) {
+                    underwaterCount++;
+                }
+            }
+        }
+
+        Arrays.sort(heights);
+        int medianY = heights[heights.length / 2];
+        int relief = maxH - minH;
+        int score = relief + underwaterCount * 14;
+        return new SiteCandidate(chunk, medianY, relief, underwaterCount, score);
+    }
+
     /**
-     * Verifica que el centro y sus alrededores estén en cualquier bioma terrestre firme sin nieve (no océano, río ni playa).
+     * Verifica en cuadrícula 5x5 (±160 bloques, Y=64) que el centro y el perímetro estén en tierra firme sin nieve ni océano.
      */
     public static boolean isValidSnowyEstateSite(
             BiomeSource biomeSource,
@@ -235,37 +305,66 @@ public class CasaJoseTorresStructure extends Structure {
             int centerX,
             int centerZ
     ) {
-        RegistryEntry<Biome> centerBiome = biomeSource.getBiome(centerX >> 2, 72 >> 2, centerZ >> 2, sampler);
-        if (!isSnowyLandBiome(centerBiome, new BlockPos(centerX, 72, centerZ))) {
+        RegistryEntry<Biome> centerBiome = biomeSource.getBiome(centerX >> 2, 64 >> 2, centerZ >> 2, sampler);
+        if (!isSnowyLandBiome(centerBiome, new BlockPos(centerX, 64, centerZ))) {
             return false;
         }
-
         int validLandMatches = 0;
-        int totalSamples = 0;
-        for (int ox = -140; ox <= 140; ox += 70) {
-            for (int oz = -140; oz <= 140; oz += 70) {
-                totalSamples++;
+        for (int ox = -160; ox <= 160; ox += 80) {
+            for (int oz = -160; oz <= 160; oz += 80) {
                 int sx = centerX + ox;
                 int sz = centerZ + oz;
-                RegistryEntry<Biome> b = biomeSource.getBiome(sx >> 2, 72 >> 2, sz >> 2, sampler);
-                if (b.isIn(BiomeTags.IS_OCEAN) || b.isIn(BiomeTags.IS_DEEP_OCEAN)) {
+                RegistryEntry<Biome> b = biomeSource.getBiome(sx >> 2, 64 >> 2, sz >> 2, sampler);
+                BlockPos samplePos = new BlockPos(sx, 64, sz);
+                if (b.isIn(BiomeTags.IS_OCEAN)
+                        || b.isIn(BiomeTags.IS_DEEP_OCEAN)
+                        || isSnowyOrColdBiome(b, samplePos)) {
                     return false;
                 }
-                if (isSnowyLandBiome(b, new BlockPos(sx, 72, sz))) {
+                if (isSnowyLandBiome(b, samplePos)) {
                     validLandMatches++;
                 }
             }
         }
-        return validLandMatches >= (totalSamples * 3) / 5;
+        return validLandMatches >= 15;
+    }
+
+    private static boolean isFallbackLandSite(
+            BiomeSource biomeSource,
+            MultiNoiseUtil.MultiNoiseSampler sampler,
+            int centerX,
+            int centerZ
+    ) {
+        RegistryEntry<Biome> centerBiome = biomeSource.getBiome(centerX >> 2, 64 >> 2, centerZ >> 2, sampler);
+        if (!isSnowyLandBiome(centerBiome, new BlockPos(centerX, 64, centerZ))) {
+            return false;
+        }
+        int validLandMatches = 0;
+        for (int ox = -120; ox <= 120; ox += 120) {
+            for (int oz = -120; oz <= 120; oz += 120) {
+                int sx = centerX + ox;
+                int sz = centerZ + oz;
+                RegistryEntry<Biome> b = biomeSource.getBiome(sx >> 2, 64 >> 2, sz >> 2, sampler);
+                if (isSnowyLandBiome(b, new BlockPos(sx, 64, sz))) {
+                    validLandMatches++;
+                }
+            }
+        }
+        return validLandMatches >= 5;
     }
 
     public static boolean isSnowyLandBiome(RegistryEntry<Biome> biomeEntry, BlockPos pos) {
         if (biomeEntry.isIn(BiomeTags.IS_OCEAN)
                 || biomeEntry.isIn(BiomeTags.IS_DEEP_OCEAN)
                 || biomeEntry.isIn(BiomeTags.IS_RIVER)
-                || biomeEntry.isIn(BiomeTags.IS_BEACH)) {
+                || biomeEntry.isIn(BiomeTags.IS_BEACH)
+                || biomeEntry.isIn(BiomeTags.IS_MOUNTAIN)) {
             return false;
         }
+        return !isSnowyOrColdBiome(biomeEntry, pos);
+    }
+
+    private static boolean isSnowyOrColdBiome(RegistryEntry<Biome> biomeEntry, BlockPos pos) {
         Optional<RegistryKey<Biome>> keyOpt = biomeEntry.getKey();
         if (keyOpt.isPresent()) {
             RegistryKey<Biome> key = keyOpt.get();
@@ -276,12 +375,16 @@ public class CasaJoseTorresStructure extends Structure {
                     || key == BiomeKeys.SNOWY_SLOPES
                     || key == BiomeKeys.FROZEN_PEAKS
                     || key == BiomeKeys.JAGGED_PEAKS
-                    || key == BiomeKeys.SNOWY_BEACH) {
-                return false;
+                    || key == BiomeKeys.SNOWY_BEACH
+                    || key == BiomeKeys.STONY_PEAKS
+                    || key == BiomeKeys.WINDSWEPT_HILLS
+                    || key == BiomeKeys.WINDSWEPT_GRAVELLY_HILLS
+                    || key == BiomeKeys.WINDSWEPT_FOREST) {
+                return true;
             }
         }
         Biome biome = biomeEntry.value();
-        return !biome.isCold(pos, 64);
+        return biome.isCold(pos, 64);
     }
 
     /**

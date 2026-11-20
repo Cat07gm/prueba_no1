@@ -80,6 +80,9 @@ public class ModItemGroups {
                 entries.add(ModItem.JEFRI_PENSTEIN_SPAWN_EGG);
                 entries.add(ModItem.JOSE_TORRES_SPAWN_EGG);
                 entries.add(ModItem.CHARLIE_KIRK_SPAWN_EGG);
+                entries.add(ModItem.WHITE_HOUSE_GUARD_PISTOL_SPAWN_EGG);
+                entries.add(ModItem.WHITE_HOUSE_GUARD_RIFLE_SPAWN_EGG);
+                entries.add(ModItem.WHITE_HOUSE_GUARD_BAZOOKA_SPAWN_EGG);
                 entries.add(ModItem.PI_DIDI_SPAWN_EGG);
                 entries.add(ModItem.YOSTIN_BIBER_SPAWN_EGG);
                 entries.add(ModItem.VITOR_JUGO_SPAWN_EGG);

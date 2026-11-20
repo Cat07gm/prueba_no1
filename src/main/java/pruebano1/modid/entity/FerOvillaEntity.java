@@ -69,12 +69,25 @@ public class FerOvillaEntity extends HostileEntity implements GeoEntity {
         this.goalSelector.add(5, new LookAroundGoal(this));
 
         this.targetSelector.add(1, new RevengeGoal(this));
-        this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.add(2, new ActiveTargetGoal<>(
+                this,
+                PlayerEntity.class,
+                true,
+                (target, world) -> CharlieEpsteinSummonHelper.canEpsteinSummonTarget(this, target)
+        ));
+    }
+
+    @Override
+    public boolean canTarget(LivingEntity target) {
+        return CharlieEpsteinSummonHelper.canEpsteinSummonTarget(this, target) && super.canTarget(target);
     }
 
     @Override
     protected void mobTick(ServerWorld world) {
         super.mobTick(world);
+        if (CharlieEpsteinSummonHelper.tickEpsteinSummon(this, world)) {
+            return;
+        }
 
         LivingEntity target = this.getTarget();
         if (target == null || !target.isAlive()) {

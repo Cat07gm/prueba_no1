@@ -64,6 +64,11 @@ public class BananaProjectileEntity extends ThrownEntity implements GeoEntity {
         if (hitEntity == owner) {
             return;
         }
+        if (owner != null && CharlieEpsteinSummonHelper.isEpsteinSummon(owner)) {
+            if (!(hitEntity instanceof LivingEntity living && CharlieEpsteinSummonHelper.hasEpsteinEffect(living))) {
+                return;
+            }
+        }
 
         if (this.getWorld() instanceof ServerWorld serverWorld) {
             // Quitar 5 corazones de daño (10.0F)

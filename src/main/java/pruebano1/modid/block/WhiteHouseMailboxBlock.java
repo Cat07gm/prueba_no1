@@ -117,6 +117,7 @@ public class WhiteHouseMailboxBlock extends HorizontalFacingBlock {
                     player,
                     "Buzón de la Casa Blanca",
                     "Charlie Kirk",
+                    "La Casa Blanca",
                     100.0D,
                     p -> CasaBlancaStructure.isPosInCasaBlanca(serverWorld, p)
             )) {

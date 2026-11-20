@@ -4,13 +4,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
-import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
-import net.minecraft.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.entity.ai.goal.RevengeGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
-import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.BossBar;
@@ -24,8 +22,11 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
@@ -42,9 +43,13 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.Nullable;
+import pruebano1.modid.ModEffects;
 import pruebano1.modid.ModItem;
 import pruebano1.modid.ModParticles;
+import pruebano1.modid.ModSounds;
+import pruebano1.modid.network.CharlieEpsteinPopupPayload;
 import pruebano1.modid.world.CasaBlancaStructure;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -79,17 +84,35 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
     public static final int REVEAL_MODEL_TICK = 956;              // 47.8 segundos (aparece justo al abrirse la imagen en el 48)
     public static final int DEATH_CINEMATIC_DURATION_TICKS = 100; // 5.0 segundos
 
+    public static final int SPECIAL_NONE = 0;
+    public static final int SPECIAL_WEAPON_CIRCLE = 1;
+    public static final int SPECIAL_TELEKINESIS_EPSTEIN = 2;
+
+    public static final int WEAPON_CIRCLE_COUNT = 8;
+    public static final float WEAPON_CIRCLE_RADIUS = 2.65F;
+    public static final float WEAPON_CIRCLE_ROT_SPEED = 0.052F;
+    public static final int WEAPON_CIRCLE_DURATION_TICKS = 76;     // 3.8 segundos
+    public static final int WEAPON_CIRCLE_BAZOOKA_FIRE_TICK = 36;
+    private static final int[] WEAPON_CIRCLE_BURST_TICKS = {22, 32, 42, 52};
+
+    public static final int TELEKINESIS_DURATION_TICKS = 60;       // 3.0 segundos
+    private static final int ATTACK_COOLDOWN_TICKS = 120;          // ~6.0 segundos entre ataques especiales
+    private static final float CIRCLE_BULLET_DAMAGE = 8.0F;        // 4 corazones por bala
+    private static final float CIRCLE_ROCKET_DIRECT_DAMAGE = 16.0F;// 8 corazones por impacto de bazooka
+    private static final float CIRCLE_ROCKET_SPLASH_DAMAGE = 14.0F;// 7 corazones máx. en área (sin romper bloques)
+
     private static final double WAKE_OUTSIDE_DUNGEON_RANGE = 26.0D;
 
     private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenLoop("idle");
-    private static final RawAnimation WALK_ANIM = RawAnimation.begin().thenLoop("walk");
     private static final RawAnimation ATTACK_ANIM = RawAnimation.begin().thenPlay("attack");
     private static final RawAnimation SPAWN_CINEMATIC_ANIM = RawAnimation.begin().thenPlay("spawn_cinematic");
     private static final RawAnimation PHASE2_TRANSFORM_ANIM = RawAnimation.begin().thenPlay("phase2_transform");
     private static final RawAnimation DEATH_CINEMATIC_ANIM = RawAnimation.begin().thenPlay("death_cinematic");
+    private static final RawAnimation WEAPON_CIRCLE_ANIM = RawAnimation.begin().thenPlay("weapon_circle");
+    private static final RawAnimation TELEKINESIS_ANIM = RawAnimation.begin().thenPlay("telekinesis");
 
     private static final DustParticleEffect PRESIDENTIAL_BLUE_DUST = new DustParticleEffect(0x2563EB, 1.35F);
-    private static final DustParticleEffect PRESIDENTIAL_RED_DUST = new DustParticleEffect(0xDC2626, 1.25F);
+    private static final DustParticleEffect TELEKINESIS_PURPLE_DUST = new DustParticleEffect(0xA855F7, 1.25F);
     private static final String CINEMATIC_FROZEN_TAG = "charlie_kirk_cinematic_frozen";
 
     private static final TrackedData<Boolean> WAITING_FOR_PLAYER = DataTracker.registerData(
@@ -113,6 +136,18 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
     private static final TrackedData<Boolean> HAS_DUNGEON_CENTER = DataTracker.registerData(
             CharlieKirkEntity.class, TrackedDataHandlerRegistry.BOOLEAN
     );
+    private static final TrackedData<Integer> ACTIVE_SPECIAL_ATTACK = DataTracker.registerData(
+            CharlieKirkEntity.class, TrackedDataHandlerRegistry.INTEGER
+    );
+    private static final TrackedData<Integer> SPECIAL_ATTACK_TICKS = DataTracker.registerData(
+            CharlieKirkEntity.class, TrackedDataHandlerRegistry.INTEGER
+    );
+    private static final TrackedData<Float> WEAPON_CIRCLE_ANGLE = DataTracker.registerData(
+            CharlieKirkEntity.class, TrackedDataHandlerRegistry.FLOAT
+    );
+    private static final TrackedData<Integer> TELEKINESIS_TARGET_ID = DataTracker.registerData(
+            CharlieKirkEntity.class, TrackedDataHandlerRegistry.INTEGER
+    );
 
     private record SavedPlayerPose(double x, double y, double z, float yaw, float pitch) {}
 
@@ -129,7 +164,14 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
     private double waitingAnchorX = 0.0D;
     private double waitingAnchorZ = 0.0D;
     private int deathCinematicTicks = 0;
-    private int airAttackCooldown = 0;
+    private int specialAttackCooldown = 50;
+    private int lastSpecialAttackType = SPECIAL_TELEKINESIS_EPSTEIN;
+    @Nullable
+    private UUID telekinesisTargetUuid = null;
+    @Nullable
+    private Vec3d telekinesisStartPos = null;
+    @Nullable
+    private Vec3d telekinesisHoldPos = null;
     private final Map<UUID, SavedPlayerPose> frozenPlayerPoses = new HashMap<>();
 
     public CharlieKirkEntity(EntityType<? extends HostileEntity> entityType, World world) {
@@ -148,6 +190,34 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
         builder.add(DYING_CINEMATIC, false);
         builder.add(DUNGEON_CENTER_POS, BlockPos.ORIGIN);
         builder.add(HAS_DUNGEON_CENTER, false);
+        builder.add(ACTIVE_SPECIAL_ATTACK, SPECIAL_NONE);
+        builder.add(SPECIAL_ATTACK_TICKS, 0);
+        builder.add(WEAPON_CIRCLE_ANGLE, 0.0F);
+        builder.add(TELEKINESIS_TARGET_ID, -1);
+    }
+
+    public int getActiveSpecialAttack() {
+        return this.dataTracker.get(ACTIVE_SPECIAL_ATTACK);
+    }
+
+    public boolean isWeaponCircleActive() {
+        return this.getActiveSpecialAttack() == SPECIAL_WEAPON_CIRCLE;
+    }
+
+    public int getWeaponCircleTicks() {
+        return this.dataTracker.get(SPECIAL_ATTACK_TICKS);
+    }
+
+    public float getWeaponCircleAngle() {
+        return this.dataTracker.get(WEAPON_CIRCLE_ANGLE);
+    }
+
+    public int getTelekinesisTargetId() {
+        return this.dataTracker.get(TELEKINESIS_TARGET_ID);
+    }
+
+    public static boolean isBazookaSlot(int slot, boolean phase2) {
+        return phase2 && (slot % 2 == 0);
     }
 
     public boolean isWaitingForPlayer() {
@@ -207,18 +277,16 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
                 .add(EntityAttributes.MOVEMENT_SPEED, 0.30D)
                 .add(EntityAttributes.ATTACK_DAMAGE, 12.0D)
                 .add(EntityAttributes.ARMOR, 14.0D)
-                .add(EntityAttributes.KNOCKBACK_RESISTANCE, 0.85D)
+                .add(EntityAttributes.KNOCKBACK_RESISTANCE, 1.0D)
                 .add(EntityAttributes.FOLLOW_RANGE, 64.0D)
                 .add(EntityAttributes.STEP_HEIGHT, 1.0D);
     }
 
     @Override
     protected void initGoals() {
+        // Jefe estacionario flotando en el aire: sin persecución ni ataques cuerpo a cuerpo
         this.goalSelector.add(0, new SwimGoal(this));
-        this.goalSelector.add(2, new MeleeAttackGoal(this, 1.05D, false));
-        this.goalSelector.add(4, new WanderAroundFarGoal(this, 0.8D));
-        this.goalSelector.add(5, new LookAtEntityGoal(this, PlayerEntity.class, 32.0F));
-        this.goalSelector.add(6, new LookAroundGoal(this));
+        this.goalSelector.add(1, new LookAtEntityGoal(this, PlayerEntity.class, 48.0F));
 
         this.targetSelector.add(1, new RevengeGoal(this));
         this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
@@ -367,48 +435,33 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
             activatePhase2(world);
         }
 
-        // Partículas sutiles en Fase 2
-        if (this.isPhase2() && this.age % 4 == 0) {
-            world.spawnParticles(
-                    PRESIDENTIAL_BLUE_DUST,
-                    this.getX(), this.getBodyY(0.55D), this.getZ(),
-                    2, 0.35D, 0.55D, 0.35D, 0.02D
-            );
-            world.spawnParticles(
-                    PRESIDENTIAL_RED_DUST,
-                    this.getX(), this.getBodyY(0.55D), this.getZ(),
-                    1, 0.35D, 0.55D, 0.35D, 0.02D
-            );
-        }
+        // Mantener a Charlie Kirk quieto flotando en el aire durante toda la pelea (Fase 1 y Fase 2), sin partículas pasivas
+        maintainAirborneAnchor();
 
         LivingEntity target = this.getTarget();
-        if (target == null || !target.isAlive()) {
-            PlayerEntity nearestPlayer = world.getClosestPlayer(this, 56.0D);
+        if (target == null || !target.isAlive() || target.isSpectator()
+                || (target instanceof PlayerEntity p && p.isCreative())) {
+            this.setTarget(null);
+            PlayerEntity nearestPlayer = world.getClosestPlayer(this, 60.0D);
             if (nearestPlayer != null && !nearestPlayer.isCreative() && !nearestPlayer.isSpectator()) {
                 this.setTarget(nearestPlayer);
                 target = nearestPlayer;
+            } else {
+                target = null;
             }
         }
 
         if (target == null || !target.isAlive()) {
             this.dataTracker.set(IN_COMBAT, false);
-            if (!this.isPhase2()) {
-                hoverInPlacePhase1(world);
-            } else {
-                this.setNoGravity(false);
+            if (this.getActiveSpecialAttack() != SPECIAL_NONE) {
+                endSpecialAttack();
             }
             return;
         }
 
         this.dataTracker.set(IN_COMBAT, true);
-        this.getLookControl().lookAt(target, 30.0F, 30.0F);
-
-        // 4. FASE 1: CHARLIE KIRK SE MANTIENE FLOTANDO EN EL AIRE DURANTE TODA LA BATALLA HASTA LA FASE 2
-        if (!this.isPhase2()) {
-            tickFloatingPhase1Combat(world, target);
-        } else {
-            this.setNoGravity(false);
-        }
+        this.getLookControl().lookAt(target, 35.0F, 35.0F);
+        tickCombatSpecialAttacks(world, target);
     }
 
     private void tickSpawnCinematic(ServerWorld world) {
@@ -467,6 +520,7 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
 
         if (ticks >= SPAWN_CINEMATIC_DURATION_TICKS) {
             this.dataTracker.set(SPAWN_CINEMATIC_TICKS, 0);
+            this.specialAttackCooldown = 50;
             this.frozenPlayerPoses.clear();
             releaseCinematicFrozenMobs(world, 240.0D);
 
@@ -501,50 +555,365 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
         }
     }
 
-    private void hoverInPlacePhase1(ServerWorld world) {
+    private void maintainAirborneAnchor() {
         this.setNoGravity(true);
         this.getNavigation().stop();
-        double hoverY = this.anchorGroundY + 2.0D + Math.sin(this.age * 0.08D) * 0.3D;
-        double vy = MathHelper.clamp((hoverY - this.getY()) * 0.25D, -0.25D, 0.25D);
-        this.setVelocity(0.0D, vy, 0.0D);
-        if (this.age % 6 == 0) {
-            spawnWeaponParticlesBurst(world, 1, 0.85D);
+        double targetHoverY = this.anchorGroundY + 1.95D + Math.sin(this.age * 0.08D) * 0.22D;
+        double vx = MathHelper.clamp((this.waitingAnchorX - this.getX()) * 0.28D, -0.35D, 0.35D);
+        double vy = MathHelper.clamp((targetHoverY - this.getY()) * 0.28D, -0.35D, 0.35D);
+        double vz = MathHelper.clamp((this.waitingAnchorZ - this.getZ()) * 0.28D, -0.35D, 0.35D);
+        this.setVelocity(vx, vy, vz);
+        this.velocityModified = true;
+    }
+
+    private void tickCombatSpecialAttacks(ServerWorld world, LivingEntity target) {
+        int active = this.getActiveSpecialAttack();
+        if (active == SPECIAL_NONE) {
+            if (this.specialAttackCooldown > 0) {
+                this.specialAttackCooldown--;
+                return;
+            }
+            int nextAttack = chooseNextSpecialAttack(world);
+            if (nextAttack == SPECIAL_WEAPON_CIRCLE) {
+                startWeaponCircleAttack(world);
+            } else if (nextAttack == SPECIAL_TELEKINESIS_EPSTEIN) {
+                startTelekinesisEpsteinAttack(world);
+            }
+            return;
+        }
+
+        if (active == SPECIAL_WEAPON_CIRCLE) {
+            tickWeaponCircleAttack(world);
+        } else if (active == SPECIAL_TELEKINESIS_EPSTEIN) {
+            tickTelekinesisEpsteinAttack(world);
         }
     }
 
-    private void tickFloatingPhase1Combat(ServerWorld world, LivingEntity target) {
-        this.setNoGravity(true);
-        this.getNavigation().stop();
+    private int chooseNextSpecialAttack(ServerWorld world) {
+        List<ServerPlayerEntity> candidates = collectTelekinesisCandidates(world);
+        boolean hasTelekinesisTarget = !candidates.isEmpty();
 
-        double floorRefY = Math.max(this.anchorGroundY - 1.0D, target.getY());
-        double targetHoverY = floorRefY + 1.75D + Math.sin(this.age * 0.08D) * 0.32D;
-
-        double dx = target.getX() - this.getX();
-        double dz = target.getZ() - this.getZ();
-        double horizDist = Math.sqrt(dx * dx + dz * dz);
-
-        double vx = 0.0D;
-        double vz = 0.0D;
-        if (horizDist > 2.2D) {
-            double moveSpeed = 0.25D;
-            vx = (dx / horizDist) * moveSpeed;
-            vz = (dz / horizDist) * moveSpeed;
+        if (this.lastSpecialAttackType == SPECIAL_WEAPON_CIRCLE && hasTelekinesisTarget) {
+            return SPECIAL_TELEKINESIS_EPSTEIN;
         }
-        double vy = MathHelper.clamp((targetHoverY - this.getY()) * 0.26D, -0.35D, 0.35D);
-        this.setVelocity(vx, vy, vz);
-        this.velocityModified = true;
+        return SPECIAL_WEAPON_CIRCLE;
+    }
 
-        if (this.airAttackCooldown > 0) {
-            this.airAttackCooldown--;
-        } else if (this.squaredDistanceTo(target) <= 11.5D) {
-            this.airAttackCooldown = 20;
-            this.tryAttack(world, target);
+    private List<ServerPlayerEntity> collectTelekinesisCandidates(ServerWorld world) {
+        List<ServerPlayerEntity> eligible = world.getPlayers(p ->
+                p.isAlive()
+                        && !p.isSpectator()
+                        && !p.isCreative()
+                        && p.squaredDistanceTo(this) <= 56.0D * 56.0D
+                        && !p.hasStatusEffect(ModEffects.EPSTEIN_EFFECT)
+        );
+        if (!eligible.isEmpty()) {
+            return eligible;
+        }
+        return world.getPlayers(p ->
+                p.isAlive()
+                        && !p.isSpectator()
+                        && !p.isCreative()
+                        && p.squaredDistanceTo(this) <= 56.0D * 56.0D
+        );
+    }
+
+    private void endSpecialAttack() {
+        this.dataTracker.set(ACTIVE_SPECIAL_ATTACK, SPECIAL_NONE);
+        this.dataTracker.set(SPECIAL_ATTACK_TICKS, 0);
+        this.dataTracker.set(TELEKINESIS_TARGET_ID, -1);
+        this.telekinesisTargetUuid = null;
+        this.telekinesisStartPos = null;
+        this.telekinesisHoldPos = null;
+    }
+
+    private void startWeaponCircleAttack(ServerWorld world) {
+        this.lastSpecialAttackType = SPECIAL_WEAPON_CIRCLE;
+        this.dataTracker.set(ACTIVE_SPECIAL_ATTACK, SPECIAL_WEAPON_CIRCLE);
+        this.dataTracker.set(SPECIAL_ATTACK_TICKS, 1);
+        this.dataTracker.set(WEAPON_CIRCLE_ANGLE, this.random.nextFloat() * ((float) Math.PI * 2.0F));
+        this.triggerAnim("actionController", "weapon_circle");
+
+        world.playSound(
+                null, this.getX(), this.getY(), this.getZ(),
+                SoundEvents.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 1.1F, 1.35F
+        );
+    }
+
+    private void tickWeaponCircleAttack(ServerWorld world) {
+        int ticks = this.dataTracker.get(SPECIAL_ATTACK_TICKS);
+        float angle = this.dataTracker.get(WEAPON_CIRCLE_ANGLE) + WEAPON_CIRCLE_ROT_SPEED;
+        this.dataTracker.set(WEAPON_CIRCLE_ANGLE, angle);
+
+        boolean phase2 = this.isPhase2();
+        boolean isBurstTick = false;
+        for (int burstTick : WEAPON_CIRCLE_BURST_TICKS) {
+            if (ticks == burstTick) {
+                isBurstTick = true;
+                break;
+            }
         }
 
-        // Soltar partículas aleatorias de las 19 armas mientras levita
-        if (this.age % 4 == 0) {
-            spawnWeaponParticlesBurst(world, 2, 0.95D);
+        if (isBurstTick) {
+            fireWeaponCircleGuns(world, angle, phase2);
         }
+        if (phase2 && ticks == WEAPON_CIRCLE_BAZOOKA_FIRE_TICK) {
+            fireWeaponCircleBazookas(world, angle);
+        }
+
+        if (ticks >= WEAPON_CIRCLE_DURATION_TICKS) {
+            endSpecialAttack();
+            this.specialAttackCooldown = ATTACK_COOLDOWN_TICKS;
+        } else {
+            this.dataTracker.set(SPECIAL_ATTACK_TICKS, ticks + 1);
+        }
+    }
+
+    private void fireWeaponCircleGuns(ServerWorld world, float baseAngle, boolean phase2) {
+        for (int slot = 0; slot < WEAPON_CIRCLE_COUNT; slot++) {
+            if (isBazookaSlot(slot, phase2)) {
+                continue;
+            }
+            double slotAngle = baseAngle + slot * ((Math.PI * 2.0D) / WEAPON_CIRCLE_COUNT);
+            double dirX = Math.cos(slotAngle);
+            double dirZ = Math.sin(slotAngle);
+            double dirY = -0.095D;
+
+            double muzzleRadius = WEAPON_CIRCLE_RADIUS + 0.55D;
+            double mx = this.getX() + dirX * muzzleRadius;
+            double my = this.getY() + 0.30D;
+            double mz = this.getZ() + dirZ * muzzleRadius;
+
+            GuardBulletProjectileEntity bullet = new GuardBulletProjectileEntity(world, this, CIRCLE_BULLET_DAMAGE);
+            bullet.setPosition(mx, my, mz);
+            bullet.setVelocity(dirX, dirY, dirZ, 1.55F, 1.0F);
+            world.spawnEntity(bullet);
+
+            world.spawnParticles(ParticleTypes.SMOKE, mx, my, mz, 2, 0.04D, 0.04D, 0.04D, 0.01D);
+        }
+
+        // Un solo sonido nítido por ráfaga para evitar saturación de audio
+        world.playSound(
+                null, this.getX(), this.getY(), this.getZ(),
+                ModSounds.GUARD_RIFLE_SHOT, SoundCategory.HOSTILE,
+                0.95F, 0.94F + this.random.nextFloat() * 0.12F
+        );
+    }
+
+    private void fireWeaponCircleBazookas(ServerWorld world, float baseAngle) {
+        for (int slot = 0; slot < WEAPON_CIRCLE_COUNT; slot++) {
+            if (!isBazookaSlot(slot, true)) {
+                continue;
+            }
+            double slotAngle = baseAngle + slot * ((Math.PI * 2.0D) / WEAPON_CIRCLE_COUNT);
+            double dirX = Math.cos(slotAngle);
+            double dirZ = Math.sin(slotAngle);
+            double dirY = -0.115D;
+
+            double muzzleRadius = WEAPON_CIRCLE_RADIUS + 0.65D;
+            double mx = this.getX() + dirX * muzzleRadius;
+            double my = this.getY() + 0.30D;
+            double mz = this.getZ() + dirZ * muzzleRadius;
+
+            GuardRocketProjectileEntity rocket = new GuardRocketProjectileEntity(
+                    world, this, CIRCLE_ROCKET_DIRECT_DAMAGE, CIRCLE_ROCKET_SPLASH_DAMAGE
+            );
+            rocket.setPosition(mx, my, mz);
+            rocket.setVelocity(dirX, dirY, dirZ, 1.15F, 0.5F);
+            world.spawnEntity(rocket);
+
+            world.spawnParticles(ParticleTypes.FLAME, mx, my, mz, 5, 0.08D, 0.08D, 0.08D, 0.025D);
+            world.spawnParticles(ParticleTypes.LARGE_SMOKE, mx, my, mz, 5, 0.10D, 0.10D, 0.10D, 0.02D);
+        }
+
+        world.playSound(
+                null, this.getX(), this.getY(), this.getZ(),
+                SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 1.25F, 0.78F
+        );
+    }
+
+    private void startTelekinesisEpsteinAttack(ServerWorld world) {
+        List<ServerPlayerEntity> candidates = collectTelekinesisCandidates(world);
+        if (candidates.isEmpty()) {
+            startWeaponCircleAttack(world);
+            return;
+        }
+
+        ServerPlayerEntity victim = candidates.get(this.random.nextInt(candidates.size()));
+        this.lastSpecialAttackType = SPECIAL_TELEKINESIS_EPSTEIN;
+        this.telekinesisTargetUuid = victim.getUuid();
+        this.telekinesisStartPos = victim.getPos();
+        double targetLiftY = Math.min(victim.getY() + 2.8D, this.anchorGroundY + 4.8D);
+        this.telekinesisHoldPos = new Vec3d(victim.getX(), targetLiftY, victim.getZ());
+
+        this.dataTracker.set(ACTIVE_SPECIAL_ATTACK, SPECIAL_TELEKINESIS_EPSTEIN);
+        this.dataTracker.set(SPECIAL_ATTACK_TICKS, 1);
+        this.dataTracker.set(TELEKINESIS_TARGET_ID, victim.getId());
+        this.triggerAnim("actionController", "telekinesis");
+        this.getLookControl().lookAt(victim, 45.0F, 45.0F);
+
+        world.playSound(
+                null, this.getX(), this.getY(), this.getZ(),
+                SoundEvents.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.HOSTILE, 1.2F, 0.85F
+        );
+    }
+
+    private void tickTelekinesisEpsteinAttack(ServerWorld world) {
+        int ticks = this.dataTracker.get(SPECIAL_ATTACK_TICKS);
+        PlayerEntity rawVictim = this.telekinesisTargetUuid != null ? world.getPlayerByUuid(this.telekinesisTargetUuid) : null;
+        if (!(rawVictim instanceof ServerPlayerEntity victim)
+                || !victim.isAlive()
+                || victim.isSpectator()
+                || victim.isCreative()) {
+            endSpecialAttack();
+            this.specialAttackCooldown = 60;
+            return;
+        }
+
+        this.getLookControl().lookAt(victim, 45.0F, 45.0F);
+
+        if (ticks < TELEKINESIS_DURATION_TICKS) {
+            Vec3d start = this.telekinesisStartPos != null ? this.telekinesisStartPos : victim.getPos();
+            Vec3d hold = this.telekinesisHoldPos != null ? this.telekinesisHoldPos : start.add(0.0D, 2.8D, 0.0D);
+
+            double progress = Math.min(1.0D, ticks / 16.0D);
+            double smoothT = progress * progress * (3.0D - 2.0D * progress);
+            double desiredX = MathHelper.lerp(smoothT, start.x, hold.x);
+            double desiredY = MathHelper.lerp(smoothT, start.y, hold.y) + Math.sin(ticks * 0.25D) * 0.08D;
+            double desiredZ = MathHelper.lerp(smoothT, start.z, hold.z);
+
+            victim.fallDistance = 0.0F;
+            Vec3d delta = new Vec3d(desiredX - victim.getX(), desiredY - victim.getY(), desiredZ - victim.getZ());
+            if (delta.lengthSquared() > 0.65D * 0.65D) {
+                victim.teleport(world, desiredX, desiredY, desiredZ, PositionFlag.ROT, 0.0F, 0.0F, false);
+            }
+            victim.setVelocity(
+                    MathHelper.clamp(delta.x * 0.50D, -0.75D, 0.75D),
+                    MathHelper.clamp(delta.y * 0.50D + 0.078D, -0.45D, 0.75D),
+                    MathHelper.clamp(delta.z * 0.50D, -0.75D, 0.75D)
+            );
+            victim.velocityModified = true;
+            victim.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(victim));
+
+            if (ticks % 2 == 0) {
+                spawnTelekinesisParticles(world, victim);
+            }
+            this.dataTracker.set(SPECIAL_ATTACK_TICKS, ticks + 1);
+            return;
+        }
+
+        // Tick 60: soltar suavemente, activar aviso + sonido "Efecto jefri", aplicar Efecto Epstein y spawnear niños
+        completeTelekinesisEpsteinEffect(world, victim);
+        endSpecialAttack();
+        this.specialAttackCooldown = ATTACK_COOLDOWN_TICKS;
+    }
+
+    private void spawnTelekinesisParticles(ServerWorld world, ServerPlayerEntity victim) {
+        Vec3d origin = new Vec3d(this.getX(), this.getBodyY(0.68D), this.getZ());
+        Vec3d targetCenter = new Vec3d(victim.getX(), victim.getBodyY(0.5D), victim.getZ());
+        Vec3d span = targetCenter.subtract(origin);
+        for (int s = 1; s <= 5; s++) {
+            double f = s / 6.0D;
+            world.spawnParticles(
+                    TELEKINESIS_PURPLE_DUST,
+                    origin.x + span.x * f,
+                    origin.y + span.y * f,
+                    origin.z + span.z * f,
+                    1, 0.08D, 0.08D, 0.08D, 0.01D
+            );
+        }
+        double ringAngle = (this.age % 36) * (Math.PI * 2.0D / 12.0D);
+        world.spawnParticles(
+                ParticleTypes.WITCH,
+                targetCenter.x + Math.cos(ringAngle) * 0.85D,
+                targetCenter.y,
+                targetCenter.z + Math.sin(ringAngle) * 0.85D,
+                1, 0.04D, 0.08D, 0.04D, 0.01D
+        );
+    }
+
+    private void completeTelekinesisEpsteinEffect(ServerWorld world, ServerPlayerEntity victim) {
+        boolean phase2 = this.isPhase2();
+        victim.fallDistance = 0.0F;
+        victim.setVelocity(Vec3d.ZERO);
+        victim.velocityModified = true;
+        victim.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(victim));
+
+        int amplifier = phase2 ? 1 : 0;
+        victim.addStatusEffect(new StatusEffectInstance(
+                ModEffects.EPSTEIN_EFFECT,
+                20 * 30,
+                amplifier,
+                false,
+                true,
+                true
+        ));
+
+        ServerPlayNetworking.send(victim, new CharlieEpsteinPopupPayload(phase2));
+
+        int kidCount = phase2 ? 8 : 5;
+        spawnEpsteinKidsForVictim(world, victim, kidCount);
+    }
+
+    private void spawnEpsteinKidsForVictim(ServerWorld world, ServerPlayerEntity victim, int count) {
+        EntityType<?>[] kidTypes = {
+                ModEntities.YOSTIN_BIBER,
+                ModEntities.VITOR_JUGO,
+                ModEntities.FER_OVILLA,
+                ModEntities.VALENTINA_PRIETA
+        };
+        int startVariant = this.random.nextInt(kidTypes.length);
+
+        for (int i = 0; i < count; i++) {
+            EntityType<?> chosenType = i < kidTypes.length
+                    ? kidTypes[(startVariant + i) % kidTypes.length]
+                    : kidTypes[this.random.nextInt(kidTypes.length)];
+            Entity created = chosenType.create(world, SpawnReason.MOB_SUMMONED);
+            if (!(created instanceof MobEntity kid)) {
+                continue;
+            }
+
+            double angle = (i * (Math.PI * 2.0D) / count) + this.random.nextDouble() * 0.45D;
+            double dist = 4.0D + this.random.nextDouble() * 3.5D;
+            int sx = (int) Math.floor(victim.getX() + Math.cos(angle) * dist);
+            int sz = (int) Math.floor(victim.getZ() + Math.sin(angle) * dist);
+            BlockPos spawnPos = findSafeKidSpawnPos(world, sx, (int) Math.round(this.anchorGroundY), sz, victim.getBlockPos());
+
+            float yOffset = (chosenType == ModEntities.VITOR_JUGO) ? 1.5F : 0.0F;
+            kid.refreshPositionAndAngles(
+                    spawnPos.getX() + 0.5D,
+                    spawnPos.getY() + yOffset,
+                    spawnPos.getZ() + 0.5D,
+                    this.random.nextFloat() * 360.0F,
+                    0.0F
+            );
+            CharlieEpsteinSummonHelper.markAsEpsteinSummon(kid, victim);
+            world.spawnEntity(kid);
+
+            world.spawnParticles(
+                    ParticleTypes.PORTAL,
+                    kid.getX(), kid.getBodyY(0.5D), kid.getZ(),
+                    14, 0.35D, 0.45D, 0.35D, 0.10D
+            );
+            world.spawnParticles(
+                    ParticleTypes.WITCH,
+                    kid.getX(), kid.getBodyY(0.5D), kid.getZ(),
+                    8, 0.25D, 0.35D, 0.25D, 0.04D
+            );
+        }
+    }
+
+    private BlockPos findSafeKidSpawnPos(ServerWorld world, int x, int preferredY, int z, BlockPos fallback) {
+        for (int dy = 3; dy >= -4; dy--) {
+            BlockPos pos = new BlockPos(x, preferredY + dy, z);
+            if (world.isChunkLoaded(pos)
+                    && world.getBlockState(pos.down()).isSolidBlock(world, pos.down())
+                    && world.getBlockState(pos).getCollisionShape(world, pos).isEmpty()
+                    && world.getBlockState(pos.up()).getCollisionShape(world, pos.up()).isEmpty()) {
+                return pos;
+            }
+        }
+        return fallback;
     }
 
     private void spawnWeaponParticlesBurst(ServerWorld world, int count, double spread) {
@@ -557,7 +926,7 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
 
     private void activatePhase2(ServerWorld world) {
         this.dataTracker.set(PHASE_2, true);
-        this.setNoGravity(false);
+        this.setNoGravity(true);
         this.triggerAnim("actionController", "phase2_transform");
         this.bossBar.setName(Text.translatable("entity.prueba_no1.charlie_kirk")
                 .append(Text.literal(" - Fase 2").formatted(Formatting.AQUA, Formatting.BOLD)));
@@ -570,11 +939,6 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
                 PRESIDENTIAL_BLUE_DUST,
                 this.getX(), this.getBodyY(0.6D), this.getZ(),
                 24, 0.9D, 1.0D, 0.9D, 0.08D
-        );
-        world.spawnParticles(
-                PRESIDENTIAL_RED_DUST,
-                this.getX(), this.getBodyY(0.6D), this.getZ(),
-                18, 0.9D, 1.0D, 0.9D, 0.08D
         );
 
         List<ServerPlayerEntity> nearbyPlayers = world.getPlayers(p -> p.squaredDistanceTo(this) <= 4096.0D);
@@ -590,17 +954,30 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
     }
 
     @Override
-    public boolean tryAttack(ServerWorld world, Entity target) {
-        boolean attacked = super.tryAttack(world, target);
-        if (attacked) {
-            this.triggerAnim("actionController", "attack");
-        }
-        return attacked;
-    }
-
-    @Override
     public boolean damage(ServerWorld world, DamageSource source, float amount) {
         if (this.isWaitingForPlayer() || this.isInAnyCinematic()) {
+            return false;
+        }
+
+        Entity attacker = source.getAttacker();
+        if (attacker == null && source.getSource() instanceof ProjectileEntity projectile) {
+            attacker = projectile.getOwner();
+        }
+        if (attacker instanceof WhiteHouseGuardEntity || CharlieEpsteinSummonHelper.isEpsteinSummon(attacker)) {
+            return false;
+        }
+        if (attacker instanceof PlayerEntity player && player.hasStatusEffect(ModEffects.EPSTEIN_EFFECT)) {
+            world.playSound(
+                    null, this.getX(), this.getY(), this.getZ(),
+                    SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 0.65F, 0.72F
+            );
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                serverPlayer.networkHandler.sendPacket(new TitleFadeS2CPacket(2, 24, 8));
+                serverPlayer.networkHandler.sendPacket(new TitleS2CPacket(
+                        Text.literal("No puedes dañarlo we").formatted(Formatting.WHITE, Formatting.BOLD)
+                ));
+                serverPlayer.networkHandler.sendPacket(new SubtitleS2CPacket(Text.empty()));
+            }
             return false;
         }
 
@@ -614,6 +991,8 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
     }
 
     private void startDeathCinematic(ServerWorld world) {
+        this.endSpecialAttack();
+        CharlieEpsteinSummonHelper.discardAllEpsteinSummonsNear(world, this.getPos(), 140.0D);
         this.dataTracker.set(IN_COMBAT, false);
         this.dataTracker.set(DYING_CINEMATIC, true);
         this.deathCinematicTicks = 0;
@@ -689,6 +1068,10 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
             this.dropStack(world, new ItemStack(ModItem.SCARLET_INGOT, 8 + this.random.nextInt(5)));
             this.dropStack(world, new ItemStack(ModItem.TONY_COIN, 12 + this.random.nextInt(9)));
             this.dropStack(world, new ItemStack(ModItem.LONTOTEM, 1));
+            pruebano1.modid.world.DungeonProgressionState.recordBossDefeated(
+                    world,
+                    pruebano1.modid.world.DungeonProgressionState.DungeonStage.CASA_BLANCA
+            );
 
             this.bossBar.clearPlayers();
             this.discard();
@@ -818,14 +1201,24 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
             boolean phase2 = nbt.getBoolean("Phase2");
             this.dataTracker.set(PHASE_2, phase2);
             if (phase2) {
-                this.setNoGravity(false);
                 this.bossBar.setName(Text.translatable("entity.prueba_no1.charlie_kirk")
                         .append(Text.literal(" - Fase 2").formatted(Formatting.AQUA, Formatting.BOLD)));
             }
         }
+        if (!this.isWaitingForPlayer() && !this.isDyingCinematic()) {
+            this.setNoGravity(true);
+        }
         if (this.hasCustomName()) {
             this.bossBar.setName(this.getDisplayName());
         }
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        if (this.getWorld() instanceof ServerWorld serverWorld) {
+            CharlieEpsteinSummonHelper.discardAllEpsteinSummonsNear(serverWorld, this.getPos(), 140.0D);
+        }
+        super.remove(reason);
     }
 
     @Override
@@ -835,12 +1228,7 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "movement", 5, state -> {
-            if (!this.isWaitingForPlayer() && state.isMoving()) {
-                return state.setAndContinue(WALK_ANIM);
-            }
-            return state.setAndContinue(IDLE_ANIM);
-        }));
+        controllers.add(new AnimationController<>(this, "movement", 5, state -> state.setAndContinue(IDLE_ANIM)));
 
         controllers.add(
                 new AnimationController<>(this, "actionController", 2, state -> PlayState.STOP)
@@ -848,6 +1236,8 @@ public class CharlieKirkEntity extends HostileEntity implements GeoEntity {
                         .triggerableAnim("spawn_cinematic", SPAWN_CINEMATIC_ANIM)
                         .triggerableAnim("phase2_transform", PHASE2_TRANSFORM_ANIM)
                         .triggerableAnim("death_cinematic", DEATH_CINEMATIC_ANIM)
+                        .triggerableAnim("weapon_circle", WEAPON_CIRCLE_ANIM)
+                        .triggerableAnim("telekinesis", TELEKINESIS_ANIM)
         );
     }
 

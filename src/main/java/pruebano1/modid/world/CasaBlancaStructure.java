@@ -86,6 +86,11 @@ public class CasaBlancaStructure extends Structure {
         super(config);
     }
 
+    public static boolean isValidPlacementStartChunk(long seed, int chunkX, int chunkZ) {
+        ChunkPos expected = PLACEMENT.getStartChunk(seed, chunkX, chunkZ);
+        return expected.x == chunkX && expected.z == chunkZ;
+    }
+
     public static void clearCaches() {
         SEED_ANCHOR_CACHE.clear();
     }
@@ -94,14 +99,24 @@ public class CasaBlancaStructure extends Structure {
         if (overworld.getRegistryKey() != World.OVERWORLD) {
             return;
         }
+        boolean needsRecalc = false;
         synchronized (ANCHOR_LOCK) {
             CasaBlancaWorldState state = CasaBlancaWorldState.get(overworld);
             if (state.isInitialized()) {
-                SEED_ANCHOR_CACHE.put(
-                        overworld.getSeed(),
-                        new WhiteHouseAnchor(state.getStartChunkX(), state.getBaseY(), state.getStartChunkZ())
-                );
+                if (isValidPlacementStartChunk(overworld.getSeed(), state.getStartChunkX(), state.getStartChunkZ())) {
+                    SEED_ANCHOR_CACHE.put(
+                            overworld.getSeed(),
+                            new WhiteHouseAnchor(state.getStartChunkX(), state.getBaseY(), state.getStartChunkZ())
+                    );
+                } else {
+                    SEED_ANCHOR_CACHE.remove(overworld.getSeed());
+                    state.resetUpgradedChunks();
+                    needsRecalc = true;
+                }
             }
+        }
+        if (needsRecalc) {
+            getOrResolveUniqueAnchor(overworld);
         }
     }
 
@@ -143,9 +158,12 @@ public class CasaBlancaStructure extends Structure {
             if (overworld != null && overworld.getRegistryKey() == World.OVERWORLD) {
                 CasaBlancaWorldState state = CasaBlancaWorldState.get(overworld);
                 if (state.isInitialized()) {
-                    WhiteHouseAnchor fromState = new WhiteHouseAnchor(state.getStartChunkX(), state.getBaseY(), state.getStartChunkZ());
-                    SEED_ANCHOR_CACHE.put(seed, fromState);
-                    return fromState;
+                    if (isValidPlacementStartChunk(seed, state.getStartChunkX(), state.getStartChunkZ())) {
+                        WhiteHouseAnchor fromState = new WhiteHouseAnchor(state.getStartChunkX(), state.getBaseY(), state.getStartChunkZ());
+                        SEED_ANCHOR_CACHE.put(seed, fromState);
+                        return fromState;
+                    }
+                    state.resetUpgradedChunks();
                 }
             }
 
@@ -183,33 +201,40 @@ public class CasaBlancaStructure extends Structure {
                 }
             }
 
-            // 2. Respaldo determinista en espiral a partir de 5,200 bloques
+            // 2. Respaldo determinista dentro de la rejilla PLACEMENT (ring = 1..6)
             if (chosenChunk == null) {
                 outerFallback:
-                for (int distBlocks = 5200; distBlocks <= 17000; distBlocks += 320) {
-                    int steps = 36;
-                    for (int i = 0; i < steps; i++) {
-                        double angle = (2.0 * Math.PI * i) / steps + ((seed & 0xFF) * 0.07) + 1.1;
-                        int wx = (int) Math.round(Math.cos(angle) * distBlocks);
-                        int wz = (int) Math.round(Math.sin(angle) * distBlocks);
-                        int cx = wx >> 4;
-                        int cz = wz >> 4;
-                        int centerX = (cx << 4) + 8;
-                        int centerZ = (cz << 4) + 8;
-                        if (isTooCloseToJoseTorres(centerX, centerZ, joseAnchor)) {
-                            continue;
-                        }
-                        if (isValidLandSite(biomeSource, sampler, centerX, centerZ)) {
-                            chosenChunk = new ChunkPos(cx, cz);
-                            break outerFallback;
+                for (int ring = 1; ring <= 6; ring++) {
+                    for (int rx = -ring; rx <= ring; rx++) {
+                        for (int rz = -ring; rz <= ring; rz++) {
+                            if (Math.abs(rx) != ring && Math.abs(rz) != ring) {
+                                continue;
+                            }
+                            ChunkPos candidate = PLACEMENT.getStartChunk(seed, rx * 320, rz * 320);
+                            int cx = candidate.getCenterX();
+                            int cz = candidate.getCenterZ();
+                            long originDistSq = (long) cx * cx + (long) cz * cz;
+                            if (originDistSq < 4500L * 4500L) {
+                                continue;
+                            }
+                            if (isTooCloseToJoseTorres(cx, cz, joseAnchor)) {
+                                continue;
+                            }
+                            if (isFallbackLandSite(biomeSource, sampler, cx, cz)) {
+                                chosenChunk = candidate;
+                                break outerFallback;
+                            }
                         }
                     }
                 }
             }
 
-            // 3. Último respaldo
+            // 3. Último respaldo sobre la rejilla PLACEMENT
             if (chosenChunk == null) {
-                chosenChunk = PLACEMENT.getStartChunk(seed, -320, 320);
+                ChunkPos primaryFallback = PLACEMENT.getStartChunk(seed, -320, 320);
+                chosenChunk = isTooCloseToJoseTorres(primaryFallback.getCenterX(), primaryFallback.getCenterZ(), joseAnchor)
+                        ? PLACEMENT.getStartChunk(seed, 320, 320)
+                        : primaryFallback;
             }
 
             int centerX = chosenChunk.getCenterX();
@@ -280,6 +305,30 @@ public class CasaBlancaStructure extends Structure {
             }
         }
         return validLandMatches >= (totalSamples * 3) / 5;
+    }
+
+    private static boolean isFallbackLandSite(
+            BiomeSource biomeSource,
+            MultiNoiseUtil.MultiNoiseSampler sampler,
+            int centerX,
+            int centerZ
+    ) {
+        RegistryEntry<Biome> centerBiome = biomeSource.getBiome(centerX >> 2, 72 >> 2, centerZ >> 2, sampler);
+        if (!isTemperateLandBiome(centerBiome, new BlockPos(centerX, 72, centerZ))) {
+            return false;
+        }
+        int validLandMatches = 0;
+        for (int ox = -120; ox <= 120; ox += 120) {
+            for (int oz = -120; oz <= 120; oz += 120) {
+                int sx = centerX + ox;
+                int sz = centerZ + oz;
+                RegistryEntry<Biome> b = biomeSource.getBiome(sx >> 2, 72 >> 2, sz >> 2, sampler);
+                if (isTemperateLandBiome(b, new BlockPos(sx, 72, sz))) {
+                    validLandMatches++;
+                }
+            }
+        }
+        return validLandMatches >= 5;
     }
 
     public static boolean isTemperateLandBiome(RegistryEntry<Biome> biomeEntry, BlockPos pos) {

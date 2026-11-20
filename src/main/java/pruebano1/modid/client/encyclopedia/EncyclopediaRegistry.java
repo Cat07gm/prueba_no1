@@ -1396,6 +1396,60 @@ public final class EncyclopediaRegistry {
                 .related("entity_charlie_kirk", "Ver Jefe Charlie Kirk")
                 .keywords("casa blanca white house dungeon charlie kirk oficina oval marine one conferencia buzon permiso")
                 .build());
+
+        list.add(EncyclopediaEntry.builder("palacio_nacional", "El Palacio Nacional de México")
+                .type("Dungeon Única / Sede Histórica")
+                .category(EncyclopediaCategory.STRUCTURES)
+                .rarity(EncyclopediaRarity.EPIC)
+                .icon(Items.BELL)
+                .description("Cuarta y casi última gran dungeon del mod. Recreación colosal de 480x480 bloques del Palacio Nacional de México y la Plaza de la Constitución (El Zócalo) con su Asta Bandera Monumental, toldos rojos, Campana de Dolores, salones históricos de 3 plantas y dos grandes arenas de jefe. Las explosiones no rompen bloques y ningún mob normal de Minecraft puede aparecer dentro.")
+                .stats(
+                        new StatInfo("Tamaño", "480 x 480 bloques", EncyclopediaEntry.GOLD_STAT_COLOR),
+                        new StatInfo("Protección", "Anti-explosiones y sin mobs vanilla", EncyclopediaEntry.GREEN_STAT_COLOR),
+                        new StatInfo("Frente (Zócalo)", "Mini-Jefe: ???", EncyclopediaEntry.CYAN_STAT_COLOR),
+                        new StatInfo("Interior", "Boss Final: ???", EncyclopediaEntry.RED_STAT_COLOR)
+                )
+                .structureContents(
+                        StructureFeatureInfo.of(
+                                "Plaza de la Constitución (El Zócalo) y Arena del Mini-Jefe",
+                                "Explanada monumental con la gigantesca Bandera de México en 3D y el anillo ceremonial de la Piedra del Sol enfrente del palacio para derrotar primero al Mini-Jefe.",
+                                Items.GREEN_BANNER
+                        ),
+                        StructureFeatureInfo.of(
+                                "Gran Patio Central / Salón Magno del Jefe Final",
+                                "Colosal arena interior libre de obstáculos rodeada por 3 pisos de arcadas virreinales y domo abovedado de cristal y oro, con el Gran Estrado Presidencial al Norte.",
+                                Items.GOLD_BLOCK
+                        ),
+                        StructureFeatureInfo.of(
+                                "3 Plantas de Salones Históricos",
+                                "Incluye Escaleras Imperiales con murales, Tesorería y Bóveda Real, Despacho Presidencial, Salón de Gabinete, Salón Morisco, Recinto Parlamentario, Biblioteca Madero, Patios Botánicos y cofres de tesoro.",
+                                Items.CHEST
+                        )
+                )
+                .structureSteps(
+                        StructureStepInfo.link(
+                                1,
+                                "Conquista antes La Casa Blanca",
+                                "Sigue el orden oficial (Isla Penstein ➔ Casa de José Torres ➔ Casa Blanca ➔ Palacio Nacional) derrotando primero a Charlie Kirk para no recibir la advertencia de progresión.",
+                                ModBlocks.WHITE_HOUSE_MAILBOX,
+                                "casa_blanca"
+                        ),
+                        StructureStepInfo.of(
+                                2,
+                                "Enfrenta primero al Mini-Jefe en el Zócalo",
+                                "En la explanada frontal del Palacio Nacional deberás vencer primero al Mini-Jefe antes de desafiar al Jefe Final en el interior.",
+                                Items.IRON_SWORD
+                        ),
+                        StructureStepInfo.of(
+                                3,
+                                "Combate Final dentro del Palacio Nacional",
+                                "Cruza la Puerta Central y el Gran Vestíbulo Imperial hasta el enorme Patio Central abovedado para el enfrentamiento definitivo (todos los jugadores deben estar en la dungeon al invocar).",
+                                ModItem.LONTOTEM
+                        )
+                )
+                .related("casa_blanca", "Ver Dungeon Anterior")
+                .keywords("palacio nacional mexico zocalo plaza constitucion campana dolores dungeon jefe final mini jefe")
+                .build());
     }
 
     private static List<StatInfo> buildGearStats(ItemConvertible item, List<StatInfo> extraStats) {

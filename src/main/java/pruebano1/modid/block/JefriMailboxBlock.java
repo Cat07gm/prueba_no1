@@ -116,6 +116,7 @@ public class JefriMailboxBlock extends HorizontalFacingBlock {
                     player,
                     "Buzón de Jefri penstein",
                     "Jefri penstein",
+                    "la Isla Penstein",
                     120.0D,
                     p -> IslaPensteinStructure.isPosOnIsland(serverWorld, p)
             )) {

@@ -3,6 +3,7 @@ package pruebano1.modid.entity;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -62,7 +63,25 @@ public class YostinBiberEntity extends HostileEntity implements GeoEntity {
 
         // Cada uno ataca por su cuenta (sin llamar a manada) en cuanto ve al jugador o si es golpeado
         this.targetSelector.add(1, new RevengeGoal(this));
-        this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.add(2, new ActiveTargetGoal<>(
+                this,
+                PlayerEntity.class,
+                true,
+                (target, world) -> CharlieEpsteinSummonHelper.canEpsteinSummonTarget(this, target)
+        ));
+    }
+
+    @Override
+    public boolean canTarget(LivingEntity target) {
+        return CharlieEpsteinSummonHelper.canEpsteinSummonTarget(this, target) && super.canTarget(target);
+    }
+
+    @Override
+    protected void mobTick(ServerWorld world) {
+        super.mobTick(world);
+        if (CharlieEpsteinSummonHelper.tickEpsteinSummon(this, world)) {
+            return;
+        }
     }
 
     @Override

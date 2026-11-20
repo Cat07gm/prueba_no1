@@ -11,8 +11,8 @@ import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.util.FeatureContext;
 
 /**
- * Feature encargada de generar los 29x29 chunks completos (448x448 bloques) de la dungeon única
- * "La Casa de José Torres" en el bioma de nieve, sin cortes de bordes ni límite de 8 chunks.
+ * Feature encargada de generar los 31x31 chunks completos (496x496 bloques) de la dungeon única
+ * "La Casa de José Torres" en biomas terrestres sin nieve, sin cortes de bordes ni límite de altura.
  */
 public class CasaJoseTorresFeature extends Feature<DefaultFeatureConfig> {
 
@@ -50,10 +50,10 @@ public class CasaJoseTorresFeature extends Feature<DefaultFeatureConfig> {
         int minZ = chunkZ << 4;
         BlockBox chunkBox = new BlockBox(
                 minX,
-                Math.max(world.getBottomY() + 1, anchor.baseY() - 28),
+                world.getBottomY() + 1,
                 minZ,
                 minX + 15,
-                Math.min(world.getTopYInclusive(), anchor.baseY() + 48),
+                world.getTopYInclusive(),
                 minZ + 15
         );
 
@@ -63,8 +63,10 @@ public class CasaJoseTorresFeature extends Feature<DefaultFeatureConfig> {
                 anchor.centerX(),
                 anchor.baseY(),
                 anchor.centerZ(),
-                context.getRandom()
+                context.getRandom(),
+                true
         );
+        CasaJoseTorresWorldState.get(serverWorld).markChunkUpgraded(chunkX, chunkZ);
         return true;
     }
 }

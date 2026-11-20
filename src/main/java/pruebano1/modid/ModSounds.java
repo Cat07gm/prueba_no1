@@ -127,6 +127,34 @@ public class ModSounds {
             SoundEvent.of(CHARLIE_KIRK_BOSS_MUSIC_LOOP_ID)
     );
 
+    public static final Identifier GUARD_PISTOL_SHOT_ID = Identifier.of(Prueba_no1.MOD_ID, "guard_pistol_shot");
+    public static final SoundEvent GUARD_PISTOL_SHOT = Registry.register(
+            Registries.SOUND_EVENT,
+            GUARD_PISTOL_SHOT_ID,
+            SoundEvent.of(GUARD_PISTOL_SHOT_ID)
+    );
+
+    public static final Identifier GUARD_RIFLE_SHOT_ID = Identifier.of(Prueba_no1.MOD_ID, "guard_rifle_shot");
+    public static final SoundEvent GUARD_RIFLE_SHOT = Registry.register(
+            Registries.SOUND_EVENT,
+            GUARD_RIFLE_SHOT_ID,
+            SoundEvent.of(GUARD_RIFLE_SHOT_ID)
+    );
+
+    public static final Identifier GUARD_BULLET_HIT_ID = Identifier.of(Prueba_no1.MOD_ID, "guard_bullet_hit");
+    public static final SoundEvent GUARD_BULLET_HIT = Registry.register(
+            Registries.SOUND_EVENT,
+            GUARD_BULLET_HIT_ID,
+            SoundEvent.of(GUARD_BULLET_HIT_ID)
+    );
+
+    public static final Identifier EFECTO_JEFRI_ID = Identifier.of(Prueba_no1.MOD_ID, "efecto_jefri");
+    public static final SoundEvent EFECTO_JEFRI = Registry.register(
+            Registries.SOUND_EVENT,
+            EFECTO_JEFRI_ID,
+            SoundEvent.of(EFECTO_JEFRI_ID)
+    );
+
     public static void registerModSounds() {
         Prueba_no1.LOGGER.info("Registrando sonidos personalizados para " + Prueba_no1.MOD_ID);
     }

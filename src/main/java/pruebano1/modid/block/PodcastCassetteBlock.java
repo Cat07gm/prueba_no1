@@ -109,6 +109,7 @@ public class PodcastCassetteBlock extends HorizontalFacingBlock {
                     player,
                     "Cassete de Podcast",
                     "José Torres",
+                    "la Casa de José Torres",
                     120.0D,
                     p -> CasaJoseTorresStructure.isPosInCasaJoseTorres(serverWorld, p)
             )) {

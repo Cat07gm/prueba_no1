@@ -249,5 +249,41 @@
         "stream": true
       }
     ]
+  },
+  "guard_pistol_shot": {
+    "subtitle": "subtitles.prueba_no1.guard_pistol_shot",
+    "sounds": [
+      {
+        "name": "prueba_no1:guard_pistol_shot",
+        "stream": false
+      }
+    ]
+  },
+  "guard_rifle_shot": {
+    "subtitle": "subtitles.prueba_no1.guard_rifle_shot",
+    "sounds": [
+      {
+        "name": "prueba_no1:guard_rifle_shot",
+        "stream": false
+      }
+    ]
+  },
+  "guard_bullet_hit": {
+    "subtitle": "subtitles.prueba_no1.guard_bullet_hit",
+    "sounds": [
+      {
+        "name": "prueba_no1:guard_bullet_hit",
+        "stream": false
+      }
+    ]
+  },
+  "efecto_jefri": {
+    "subtitle": "subtitles.prueba_no1.efecto_jefri",
+    "sounds": [
+      {
+        "name": "prueba_no1:efecto_jefri",
+        "stream": false
+      }
+    ]
   }
 }

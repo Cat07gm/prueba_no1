@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "prueba_no1:item/white_house_guard_bazooka_spawn_egg"
+  }
+}

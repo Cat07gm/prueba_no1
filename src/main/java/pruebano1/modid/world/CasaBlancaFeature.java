@@ -53,7 +53,7 @@ public class CasaBlancaFeature extends Feature<DefaultFeatureConfig> {
                 Math.max(world.getBottomY() + 1, anchor.baseY() - 28),
                 minZ,
                 minX + 15,
-                Math.min(world.getTopYInclusive(), anchor.baseY() + 52),
+                world.getTopYInclusive(),
                 minZ + 15
         );
 
@@ -63,8 +63,10 @@ public class CasaBlancaFeature extends Feature<DefaultFeatureConfig> {
                 anchor.centerX(),
                 anchor.baseY(),
                 anchor.centerZ(),
-                context.getRandom()
+                context.getRandom(),
+                true
         );
+        CasaBlancaWorldState.get(serverWorld).markChunkUpgraded(chunkX, chunkZ);
         return true;
     }
 }

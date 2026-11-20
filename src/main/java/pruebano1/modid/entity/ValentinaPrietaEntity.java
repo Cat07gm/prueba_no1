@@ -77,7 +77,17 @@ public class ValentinaPrietaEntity extends HostileEntity implements GeoEntity {
         this.goalSelector.add(5, new LookAroundGoal(this));
 
         this.targetSelector.add(1, new RevengeGoal(this));
-        this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.add(2, new ActiveTargetGoal<>(
+                this,
+                PlayerEntity.class,
+                true,
+                (target, world) -> CharlieEpsteinSummonHelper.canEpsteinSummonTarget(this, target)
+        ));
+    }
+
+    @Override
+    public boolean canTarget(LivingEntity target) {
+        return CharlieEpsteinSummonHelper.canEpsteinSummonTarget(this, target) && super.canTarget(target);
     }
 
     @Override
@@ -122,6 +132,9 @@ public class ValentinaPrietaEntity extends HostileEntity implements GeoEntity {
     @Override
     protected void mobTick(ServerWorld world) {
         super.mobTick(world);
+        if (CharlieEpsteinSummonHelper.tickEpsteinSummon(this, world)) {
+            return;
+        }
 
         // Contador de tropiezos: cada 12 segundos (240 ticks) caminando se tropieza y pierde 0.5 corazones (1.0F)
         double horizontalSpeedSq = this.getVelocity().horizontalLengthSquared();

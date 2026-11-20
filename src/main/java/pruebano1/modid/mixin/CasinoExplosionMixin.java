@@ -10,12 +10,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import pruebano1.modid.world.DrafteaCasinoManager;
+import pruebano1.modid.world.PalacioNacionalStructure;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Evita que TNT, creepers, camas u otras explosiones destruyan bloques dentro del casino "Draftea Tony Diaz".
+ * Evita que TNT, creepers, camas u otras explosiones destruyan bloques dentro del casino "Draftea Tony Diaz"
+ * o dentro de la dungeon "El Palacio Nacional de México".
  */
 @Mixin(ExplosionImpl.class)
 public abstract class CasinoExplosionMixin {
@@ -23,6 +25,11 @@ public abstract class CasinoExplosionMixin {
     @Shadow
     @Final
     private ServerWorld world;
+
+    private static boolean isExplosionProtected(ServerWorld world, BlockPos pos) {
+        return DrafteaCasinoManager.isProtectedBlock(world, pos)
+                || PalacioNacionalStructure.isPosInPalacioNacional(world, pos);
+    }
 
     @Inject(method = "getBlocksToDestroy", at = @At("RETURN"), cancellable = true)
     private void filterCasinoProtectedBlocks(CallbackInfoReturnable<List<BlockPos>> cir) {
@@ -33,7 +40,7 @@ public abstract class CasinoExplosionMixin {
 
         boolean hasProtected = false;
         for (BlockPos pos : blocks) {
-            if (DrafteaCasinoManager.isProtectedBlock(this.world, pos)) {
+            if (isExplosionProtected(this.world, pos)) {
                 hasProtected = true;
                 break;
             }
@@ -44,7 +51,7 @@ public abstract class CasinoExplosionMixin {
 
         List<BlockPos> filtered = new ArrayList<>(blocks.size());
         for (BlockPos pos : blocks) {
-            if (!DrafteaCasinoManager.isProtectedBlock(this.world, pos)) {
+            if (!isExplosionProtected(this.world, pos)) {
                 filtered.add(pos);
             }
         }

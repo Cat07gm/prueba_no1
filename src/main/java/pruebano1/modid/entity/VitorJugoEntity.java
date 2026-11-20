@@ -105,12 +105,25 @@ public class VitorJugoEntity extends HostileEntity implements GeoEntity {
         });
 
         this.targetSelector.add(1, new RevengeGoal(this));
-        this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.add(2, new ActiveTargetGoal<>(
+                this,
+                PlayerEntity.class,
+                true,
+                (target, world) -> CharlieEpsteinSummonHelper.canEpsteinSummonTarget(this, target)
+        ));
+    }
+
+    @Override
+    public boolean canTarget(LivingEntity target) {
+        return CharlieEpsteinSummonHelper.canEpsteinSummonTarget(this, target) && super.canTarget(target);
     }
 
     @Override
     protected void mobTick(ServerWorld world) {
         super.mobTick(world);
+        if (CharlieEpsteinSummonHelper.tickEpsteinSummon(this, world)) {
+            return;
+        }
 
         LivingEntity target = this.getTarget();
         if (target != null && target.isAlive()) {
@@ -175,8 +188,11 @@ public class VitorJugoEntity extends HostileEntity implements GeoEntity {
         }
     }
 
-    private static boolean isValidVictim(PlayerEntity player) {
-        return player.isAlive() && !player.isSpectator() && !player.isCreative();
+    private boolean isValidVictim(PlayerEntity player) {
+        if (!player.isAlive() || player.isSpectator() || player.isCreative()) {
+            return false;
+        }
+        return CharlieEpsteinSummonHelper.canEpsteinSummonTarget(this, player);
     }
 
     /** Quita el efecto solo si es el que puso Vitor Jugo (no borra pociones del jugador). */

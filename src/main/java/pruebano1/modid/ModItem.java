@@ -431,6 +431,50 @@ public class ModItem {
             new Item.Settings().registryKey(CHARLIE_KIRK_SPAWN_EGG_KEY)
     );
 
+    // PROYECTILES Y HUEVOS GENERADORES DE LA SEGURIDAD DE LA CASA BLANCA (SERVICIO SECRETO)
+    public static final RegistryKey<Item> GUARD_BULLET_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "guard_bullet")
+    );
+    public static final Item GUARD_BULLET = new Item(
+            new Item.Settings().registryKey(GUARD_BULLET_KEY)
+    );
+
+    public static final RegistryKey<Item> GUARD_ROCKET_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "guard_rocket")
+    );
+    public static final Item GUARD_ROCKET = new Item(
+            new Item.Settings().registryKey(GUARD_ROCKET_KEY)
+    );
+
+    public static final RegistryKey<Item> WHITE_HOUSE_GUARD_PISTOL_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "white_house_guard_pistol_spawn_egg")
+    );
+    public static final Item WHITE_HOUSE_GUARD_PISTOL_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.WHITE_HOUSE_GUARD_PISTOL,
+            new Item.Settings().registryKey(WHITE_HOUSE_GUARD_PISTOL_SPAWN_EGG_KEY)
+    );
+
+    public static final RegistryKey<Item> WHITE_HOUSE_GUARD_RIFLE_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "white_house_guard_rifle_spawn_egg")
+    );
+    public static final Item WHITE_HOUSE_GUARD_RIFLE_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.WHITE_HOUSE_GUARD_RIFLE,
+            new Item.Settings().registryKey(WHITE_HOUSE_GUARD_RIFLE_SPAWN_EGG_KEY)
+    );
+
+    public static final RegistryKey<Item> WHITE_HOUSE_GUARD_BAZOOKA_SPAWN_EGG_KEY = RegistryKey.of(
+            RegistryKeys.ITEM,
+            Identifier.of(Prueba_no1.MOD_ID, "white_house_guard_bazooka_spawn_egg")
+    );
+    public static final Item WHITE_HOUSE_GUARD_BAZOOKA_SPAWN_EGG = new SpawnEggItem(
+            ModEntities.WHITE_HOUSE_GUARD_BAZOOKA,
+            new Item.Settings().registryKey(WHITE_HOUSE_GUARD_BAZOOKA_SPAWN_EGG_KEY)
+    );
+
     //TOALLA KOTEX (Proyectil tipo flecha de Jefri penstein y usable con Arco/Ballesta o lanzándola con la mano)
     public static final RegistryKey<Item> TOALLA_KOTEX_KEY = RegistryKey.of(
             RegistryKeys.ITEM,
@@ -504,6 +548,11 @@ public class ModItem {
         registerItem(TONY_FASE2_SPAWN_EGG_KEY, TONY_FASE2_SPAWN_EGG);
         registerItem(TONY_FASE3_SPAWN_EGG_KEY, TONY_FASE3_SPAWN_EGG);
         registerItem(CHARLIE_KIRK_SPAWN_EGG_KEY, CHARLIE_KIRK_SPAWN_EGG);
+        registerItem(GUARD_BULLET_KEY, GUARD_BULLET);
+        registerItem(GUARD_ROCKET_KEY, GUARD_ROCKET);
+        registerItem(WHITE_HOUSE_GUARD_PISTOL_SPAWN_EGG_KEY, WHITE_HOUSE_GUARD_PISTOL_SPAWN_EGG);
+        registerItem(WHITE_HOUSE_GUARD_RIFLE_SPAWN_EGG_KEY, WHITE_HOUSE_GUARD_RIFLE_SPAWN_EGG);
+        registerItem(WHITE_HOUSE_GUARD_BAZOOKA_SPAWN_EGG_KEY, WHITE_HOUSE_GUARD_BAZOOKA_SPAWN_EGG);
         registerItem(TOALLA_KOTEX_KEY, TOALLA_KOTEX);
         registerItem(ICE_BALL_KEY, ICE_BALL);
 
@@ -527,6 +576,9 @@ public class ModItem {
             entries.add(JEFRI_PENSTEIN_SPAWN_EGG);
             entries.add(JOSE_TORRES_SPAWN_EGG);
             entries.add(CHARLIE_KIRK_SPAWN_EGG);
+            entries.add(WHITE_HOUSE_GUARD_PISTOL_SPAWN_EGG);
+            entries.add(WHITE_HOUSE_GUARD_RIFLE_SPAWN_EGG);
+            entries.add(WHITE_HOUSE_GUARD_BAZOOKA_SPAWN_EGG);
             entries.add(PI_DIDI_SPAWN_EGG);
             entries.add(YOSTIN_BIBER_SPAWN_EGG);
             entries.add(VITOR_JUGO_SPAWN_EGG);
